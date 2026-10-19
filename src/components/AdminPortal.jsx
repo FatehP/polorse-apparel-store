@@ -593,10 +593,10 @@ export default function AdminPortal({ onSwitchToStore }) {
                     <span style={{ fontSize: '0.72rem', color: 'var(--accent-orange)', fontWeight: '700', textTransform: 'uppercase' }}>
                       {prod.category}
                     </span>
-                    <h4 style={{ fontSize: '0.95rem', color: '#fff', marginTop: '2px', lineHeight: '1.3' }}>
+                    <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', marginTop: '2px', lineHeight: '1.3' }}>
                       {prod.title}
                     </h4>
-                    <div style={{ fontSize: '0.88rem', fontWeight: '700', marginTop: '4px', color: '#fff' }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: '700', marginTop: '4px', color: 'var(--text-primary)' }}>
                       ₹{prod.price.toLocaleString('en-IN')}{' '}
                       {prod.originalPrice && (
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
@@ -731,7 +731,7 @@ export default function AdminPortal({ onSwitchToStore }) {
 
             {/* Multi-Image Upload & Preview Grid */}
             <div>
-              <label style={{ fontSize: '0.85rem', color: '#fff', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
                 Product Gallery Photos (Upload Multiple Photos or Add URLs)
               </label>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '10px' }}>
@@ -875,13 +875,13 @@ export default function AdminPortal({ onSwitchToStore }) {
 
             {/* Sizes & Stock inventory */}
             <div>
-              <label style={{ fontSize: '0.85rem', color: '#fff', fontWeight: '600', display: 'block', marginBottom: '8px' }}>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600', display: 'block', marginBottom: '8px' }}>
                 Sizes & Initial Stock
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '10px' }}>
                 {newProd.sizes.map(s => (
                   <div key={s.size} style={{ background: 'var(--bg-secondary)', padding: '10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-subtle)' }}>
-                    <div style={{ fontSize: '0.85rem', fontWeight: '700', color: '#fff', marginBottom: '4px' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' }}>
                       Size {s.size}
                     </div>
                     <input
@@ -898,7 +898,7 @@ export default function AdminPortal({ onSwitchToStore }) {
 
             {/* Colors Management */}
             <div>
-              <label style={{ fontSize: '0.85rem', color: '#fff', fontWeight: '600', display: 'block', marginBottom: '8px' }}>
+              <label style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: '600', display: 'block', marginBottom: '8px' }}>
                 Available Colors
               </label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
@@ -999,7 +999,7 @@ export default function AdminPortal({ onSwitchToStore }) {
                       <span className="badge-tag badge-orange" style={{ marginRight: '8px' }}>
                         {order.id}
                       </span>
-                      <strong style={{ fontSize: '1.1rem', color: '#fff' }}>
+                      <strong style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>
                         {order.customerName}
                       </strong>
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginLeft: '10px' }}>
@@ -1042,7 +1042,7 @@ export default function AdminPortal({ onSwitchToStore }) {
                           <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem' }}>
                             <img src={item.imageUrl} alt="" style={{ width: '38px', height: '44px', objectFit: 'cover', borderRadius: '4px' }} />
                             <div>
-                              <div style={{ color: '#fff', fontWeight: '600' }}>{item.title}</div>
+                              <div style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{item.title}</div>
                               <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                                 Size: {item.size} • Color: {item.color} • Qty: {item.quantity}
                               </div>
@@ -1061,7 +1061,7 @@ export default function AdminPortal({ onSwitchToStore }) {
                         {order.address}
                       </p>
                       <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ fontSize: '0.88rem', color: '#fff', fontWeight: '600' }}>
+                        <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: '600' }}>
                           📞 {order.phone}
                         </span>
                         <a
@@ -1093,7 +1093,7 @@ export default function AdminPortal({ onSwitchToStore }) {
                         Payment Details
                       </h4>
                       <div style={{ fontSize: '0.88rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <div>Payment: <strong style={{ color: '#fff' }}>{order.paymentMethod}</strong></div>
+                        <div>Payment: <strong style={{ color: 'var(--text-primary)' }}>{order.paymentMethod}</strong></div>
                         <div>Status: <span style={{ color: order.paymentStatus.includes('PAID') ? 'var(--accent-green)' : 'var(--accent-orange)' }}>{order.paymentStatus}</span></div>
                         {order.couponApplied && (
                           <div style={{ color: 'var(--accent-lime)' }}>Coupon: {order.couponApplied} (-₹{order.discount})</div>
@@ -1209,7 +1209,7 @@ export default function AdminPortal({ onSwitchToStore }) {
                       <span className="badge-tag badge-orange" style={{ fontSize: '0.82rem' }}>
                         {coupon.code}
                       </span>
-                      <strong style={{ color: '#fff' }}>
+                      <strong style={{ color: 'var(--text-primary)' }}>
                         {coupon.type === 'percentage' ? `${coupon.value}% OFF` : `₹${coupon.value} Flat OFF`}
                       </strong>
                     </div>
@@ -1275,7 +1275,7 @@ export default function AdminPortal({ onSwitchToStore }) {
             </div>
 
             <div style={{ marginTop: '16px' }}>
-              <h4 style={{ color: '#fff', fontSize: '0.95rem', marginBottom: '6px' }}>
+              <h4 style={{ color: 'var(--text-primary)', fontSize: '0.95rem', marginBottom: '6px' }}>
                 Flutter Code Preview (Paste into your future Flutter app):
               </h4>
               <pre style={{

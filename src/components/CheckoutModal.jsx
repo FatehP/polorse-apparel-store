@@ -193,17 +193,17 @@ export default function CheckoutModal({
 
         {completedOrder ? (
           /* Order Confirmation View */
-          <div style={{ padding: '40px 32px', textAlign: 'center' }}>
+          <div style={{ padding: '36px 28px', textAlign: 'center' }}>
             <div style={{
               width: '68px',
               height: '68px',
               borderRadius: '50%',
-              background: 'rgba(16, 185, 129, 0.15)',
+              background: 'rgba(5, 150, 105, 0.12)',
               border: '2px solid var(--accent-green)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              margin: '0 auto 20px',
+              margin: '0 auto 16px',
               color: 'var(--accent-green)'
             }}>
               <CheckCircle2 size={38} />
@@ -213,11 +213,11 @@ export default function CheckoutModal({
               ORDER CONFIRMED
             </span>
 
-            <h2 style={{ fontSize: '1.8rem', color: '#fff', marginTop: '6px' }}>
-              Thank You, {completedOrder.customerName.split(' ')[0]}!
+            <h2 style={{ fontSize: '1.75rem', color: 'var(--text-primary)', marginTop: '6px', fontWeight: '800' }}>
+              Thank You, {completedOrder.customerName}!
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', marginTop: '6px' }}>
-              Your streetwear drop is being prepped. Order ID: <strong>{completedOrder.id}</strong>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', marginTop: '4px' }}>
+              Your streetwear drop is being prepped. Order ID: <strong style={{ color: 'var(--accent-navy)' }}>{completedOrder.id}</strong>
             </p>
 
             <div style={{
@@ -225,44 +225,103 @@ export default function CheckoutModal({
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
               padding: '20px',
-              marginTop: '24px',
+              marginTop: '22px',
               textAlign: 'left',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px'
+              gap: '12px',
+              boxShadow: 'var(--shadow-sm)'
             }}>
+              {/* Ordered Items Summary */}
+              {completedOrder.items && completedOrder.items.length > 0 && (
+                <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700', letterSpacing: '0.04em' }}>
+                    Ordered Items ({completedOrder.items.length})
+                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                    {completedOrder.items.map((item, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          {item.imageUrl && (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title}
+                              style={{ width: '36px', height: '42px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-subtle)' }}
+                            />
+                          )}
+                          <div>
+                            <div style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+                              {item.title}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                              Size: {item.size} • Color: {item.color} • Qty: {item.quantity}
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: '700', color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                          ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Order Meta Details */}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Payment Method:</span>
-                <strong style={{ color: '#fff' }}>{completedOrder.paymentMethod}</strong>
+                <span style={{ color: 'var(--text-secondary)' }}>Payment Method:</span>
+                <strong style={{ color: 'var(--text-primary)' }}>{completedOrder.paymentMethod}</strong>
               </div>
+
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Total Amount:</span>
-                <strong style={{ color: 'var(--accent-orange)' }}>₹{completedOrder.total.toLocaleString('en-IN')}</strong>
+                <span style={{ color: 'var(--text-secondary)' }}>Deliver To:</span>
+                <span style={{ color: 'var(--text-primary)', fontWeight: '600', maxWidth: '65%', textAlign: 'right' }}>
+                  {completedOrder.address}
+                </span>
               </div>
+
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Deliver To:</span>
-                <span style={{ color: '#fff', maxWidth: '65%', textAlign: 'right' }}>{completedOrder.address}</span>
+                <span style={{ color: 'var(--text-secondary)' }}>Phone / WhatsApp:</span>
+                <strong style={{ color: 'var(--text-primary)' }}>{completedOrder.phone}</strong>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Phone / WhatsApp:</span>
-                <strong style={{ color: '#fff' }}>{completedOrder.phone}</strong>
+
+              {completedOrder.discount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', color: 'var(--accent-green)' }}>
+                  <span>Coupon Discount ({completedOrder.couponApplied || 'Applied'}):</span>
+                  <strong>-₹{completedOrder.discount.toLocaleString('en-IN')}</strong>
+                </div>
+              )}
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '1.05rem',
+                fontWeight: '700',
+                borderTop: '1px solid var(--border-subtle)',
+                paddingTop: '10px',
+                marginTop: '4px'
+              }}>
+                <span style={{ color: 'var(--text-primary)' }}>Total Amount Paid:</span>
+                <strong style={{ color: 'var(--accent-red)', fontSize: '1.2rem' }}>
+                  ₹{completedOrder.total.toLocaleString('en-IN')}
+                </strong>
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '22px' }}>
               <a
                 href={`https://wa.me/?text=Hi!%20I%20just%20placed%20order%20${completedOrder.id}%20for%20Polorse%20totaling%20₹${completedOrder.total}.`}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-secondary"
-                style={{ flex: 1, textDecoration: 'none', textAlign: 'center' }}
+                style={{ flex: 1, textDecoration: 'none', textAlign: 'center', padding: '12px' }}
               >
                 Notify on WhatsApp
               </a>
               <button
                 onClick={onClose}
                 className="btn-primary"
-                style={{ flex: 1 }}
+                style={{ flex: 1, padding: '12px' }}
               >
                 Back to Store
               </button>
@@ -495,7 +554,7 @@ export default function CheckoutModal({
                     fontWeight: '700',
                     borderTop: '1px solid var(--border-subtle)',
                     paddingTop: '8px',
-                    color: '#fff'
+                    color: 'var(--text-primary)'
                   }}>
                     <span>Amount Payable</span>
                     <span style={{ color: 'var(--accent-orange)' }}>₹{finalTotal.toLocaleString('en-IN')}</span>

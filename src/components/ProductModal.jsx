@@ -389,7 +389,7 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-                  Colorway: <strong style={{ color: '#fff' }}>{selectedColor}</strong>
+                  Colorway: <strong style={{ color: 'var(--text-primary)' }}>{selectedColor}</strong>
                 </span>
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
@@ -403,9 +403,9 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                       gap: '8px',
                       padding: '6px 14px',
                       borderRadius: 'var(--radius-full)',
-                      background: selectedColor === col.name ? 'rgba(255,255,255,0.12)' : 'var(--bg-card)',
-                      border: selectedColor === col.name ? '2px solid var(--accent-orange)' : '1px solid var(--border-subtle)',
-                      color: selectedColor === col.name ? '#fff' : 'var(--text-secondary)',
+                      background: selectedColor === col.name ? 'rgba(15, 28, 63, 0.08)' : 'var(--bg-card)',
+                      border: selectedColor === col.name ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                      color: selectedColor === col.name ? 'var(--text-primary)' : 'var(--text-secondary)',
                       fontSize: '0.82rem',
                       fontWeight: '600'
                     }}

@@ -210,9 +210,9 @@ export default function CartDrawer({
                       {item.title}
                     </h4>
                     <div style={{ display: 'flex', gap: '8px', marginTop: '4px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                      <span>Size: <strong style={{ color: '#fff' }}>{item.selectedSize}</strong></span>
+                      <span>Size: <strong style={{ color: 'var(--text-primary)' }}>{item.selectedSize}</strong></span>
                       <span>•</span>
-                      <span>Color: <strong style={{ color: '#fff' }}>{item.selectedColor}</strong></span>
+                      <span>Color: <strong style={{ color: 'var(--text-primary)' }}>{item.selectedColor}</strong></span>
                     </div>
                   </div>
 
@@ -230,16 +230,16 @@ export default function CartDrawer({
                     }}>
                       <button
                         onClick={() => onUpdateQuantity(item, item.quantity - 1)}
-                        style={{ padding: '4px 8px', color: '#fff', fontSize: '0.9rem' }}
+                        style={{ padding: '4px 8px', color: 'var(--text-primary)', fontSize: '0.9rem' }}
                       >
                         -
                       </button>
-                      <span style={{ fontSize: '0.85rem', fontWeight: '700', minWidth: '20px', textAlign: 'center' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: '700', minWidth: '20px', textAlign: 'center', color: 'var(--text-primary)' }}>
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => onUpdateQuantity(item, item.quantity + 1)}
-                        style={{ padding: '4px 8px', color: '#fff', fontSize: '0.9rem' }}
+                        style={{ padding: '4px 8px', color: 'var(--text-primary)', fontSize: '0.9rem' }}
                       >
                         +
                       </button>

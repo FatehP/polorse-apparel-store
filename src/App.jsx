@@ -292,7 +292,7 @@ export default function App() {
                 borderRadius: 'var(--radius-lg)',
                 border: '1px solid var(--border-subtle)'
               }}>
-                <h3 style={{ fontSize: '1.4rem', color: '#fff', marginBottom: '8px' }}>No Apparel Matches Your Search</h3>
+                <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '8px' }}>No Apparel Matches Your Search</h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', marginBottom: '20px' }}>
                   Try a different search term or category, or upload new clothes in Brother's Admin!
                 </p>
@@ -351,7 +351,7 @@ export default function App() {
           </div>
 
           <div>
-            <h4 style={{ color: '#fff', fontSize: '0.9rem', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <h4 style={{ color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Customer Care
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -363,7 +363,7 @@ export default function App() {
           </div>
 
           <div>
-            <h4 style={{ color: '#fff', fontSize: '0.9rem', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <h4 style={{ color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Promotions
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
@@ -374,7 +374,7 @@ export default function App() {
           </div>
 
           <div>
-            <h4 style={{ color: '#fff', fontSize: '0.9rem', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <h4 style={{ color: 'var(--text-primary)', fontSize: '0.9rem', marginBottom: '14px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Brother's Backoffice
             </h4>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '12px' }}>
