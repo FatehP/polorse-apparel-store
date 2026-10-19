@@ -62,6 +62,7 @@ export default function AdminPortal({ onSwitchToStore }) {
     originalPrice: '',
     description: '',
     imageUrl: '',
+    images: [],
     tags: 'OVERSIZED, NEW DROP',
     colors: [
       { name: 'Obsidian Black', hex: '#111111' },
@@ -75,6 +76,8 @@ export default function AdminPortal({ onSwitchToStore }) {
       { size: 'XXL', stock: 5 }
     ]
   });
+
+  const [imageUrlInput, setImageUrlInput] = useState('');
 
   // Color inputs inside product form
   const [colorInputName, setColorInputName] = useState('');
@@ -132,16 +135,65 @@ export default function AdminPortal({ onSwitchToStore }) {
 
   const activeOrdersCount = orders.filter(o => o.orderStatus !== 'Delivered' && o.orderStatus !== 'Cancelled').length;
 
-  // Handle Image Upload / Preview
+  // Handle Multiple Image Uploads / Files
   const handleImageFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setNewProd(prev => ({ ...prev, imageUrl: reader.result }));
+        setNewProd(prev => {
+          const currentImages = prev.images || [];
+          const updated = [...currentImages, reader.result];
+          return {
+            ...prev,
+            images: updated,
+            imageUrl: prev.imageUrl || reader.result
+          };
+        });
       };
       reader.readAsDataURL(file);
-    }
+    });
+  };
+
+  const handleAddImageUrl = () => {
+    if (!imageUrlInput.trim()) return;
+    setNewProd(prev => {
+      const currentImages = prev.images || [];
+      const updated = [...currentImages, imageUrlInput.trim()];
+      return {
+        ...prev,
+        images: updated,
+        imageUrl: prev.imageUrl || imageUrlInput.trim()
+      };
+    });
+    setImageUrlInput('');
+  };
+
+  const handleRemoveImage = (index) => {
+    setNewProd(prev => {
+      const updated = (prev.images || []).filter((_, i) => i !== index);
+      return {
+        ...prev,
+        images: updated,
+        imageUrl: updated[0] || ''
+      };
+    });
+  };
+
+  const handleSetPrimaryImage = (index) => {
+    setNewProd(prev => {
+      const current = prev.images || [];
+      const target = current[index];
+      const rest = current.filter((_, i) => i !== index);
+      const updated = [target, ...rest];
+      return {
+        ...prev,
+        images: updated,
+        imageUrl: target
+      };
+    });
   };
 
   // Add Color to Product Form
@@ -183,7 +235,8 @@ export default function AdminPortal({ onSwitchToStore }) {
       price: parseFloat(newProd.price),
       originalPrice: newProd.originalPrice ? parseFloat(newProd.originalPrice) : null,
       description: newProd.description || 'Premium streetwear heavyweight drop.',
-      imageUrl: newProd.imageUrl || '/products/hoodie-charcoal.jpg',
+      imageUrl: (newProd.images && newProd.images.length > 0) ? newProd.images[0] : (newProd.imageUrl || '/products/hoodie-charcoal.jpg'),
+      images: (newProd.images && newProd.images.length > 0) ? newProd.images : [newProd.imageUrl || '/products/hoodie-charcoal.jpg'],
       tags: newProd.tags.split(',').map(t => t.trim()).filter(Boolean),
       colors: newProd.colors,
       sizes: newProd.sizes,
@@ -676,34 +729,133 @@ export default function AdminPortal({ onSwitchToStore }) {
               </div>
             </div>
 
-            {/* Image upload & preview */}
+            {/* Multi-Image Upload & Preview Grid */}
             <div>
-              <label style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                Product Image (Upload from Computer or enter Image URL)
+              <label style={{ fontSize: '0.85rem', color: '#fff', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
+                Product Gallery Photos (Upload Multiple Photos or Add URLs)
               </label>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '10px' }}>
+                Add multiple views (e.g. Front, Back, On-Body Model Fit, Fabric Close-up). Customers will be able to browse all photos in Quick View!
+              </p>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', marginBottom: '14px' }}>
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={handleImageFileChange}
-                  style={{ maxWidth: '300px' }}
+                  style={{ maxWidth: '280px' }}
                 />
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>or</span>
-                <input
-                  type="text"
-                  placeholder="Paste image URL (https://...)"
-                  value={newProd.imageUrl}
-                  onChange={(e) => setNewProd({ ...newProd, imageUrl: e.target.value })}
-                />
-              </div>
-              {newProd.imageUrl && (
-                <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <img
-                    src={newProd.imageUrl}
-                    alt="Preview"
-                    style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-hover)' }}
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>or paste image URL:</span>
+                <div style={{ display: 'flex', gap: '8px', flex: 1, minWidth: '260px' }}>
+                  <input
+                    type="text"
+                    placeholder="https://images.unsplash.com/..."
+                    value={imageUrlInput}
+                    onChange={(e) => setImageUrlInput(e.target.value)}
+                    style={{ flex: 1, fontSize: '0.85rem' }}
                   />
-                  <span style={{ fontSize: '0.82rem', color: 'var(--accent-green)' }}>✓ Image preview loaded</span>
+                  <button
+                    type="button"
+                    onClick={handleAddImageUrl}
+                    className="btn-secondary"
+                    style={{ padding: '8px 16px', fontSize: '0.82rem', whiteSpace: 'nowrap' }}
+                  >
+                    + Add URL
+                  </button>
+                </div>
+              </div>
+
+              {/* Gallery Previews with Primary selection */}
+              {newProd.images && newProd.images.length > 0 && (
+                <div style={{
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '14px',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  alignItems: 'center'
+                }}>
+                  {newProd.images.map((img, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        position: 'relative',
+                        width: '90px',
+                        height: '90px',
+                        borderRadius: 'var(--radius-sm)',
+                        overflow: 'hidden',
+                        border: idx === 0 ? '2px solid var(--accent-orange)' : '1px solid var(--border-subtle)',
+                        boxShadow: 'var(--shadow-sm)'
+                      }}
+                    >
+                      <img
+                        src={img}
+                        alt={`Photo ${idx + 1}`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: '4px',
+                          left: '4px',
+                          background: idx === 0 ? 'var(--accent-orange)' : 'rgba(0,0,0,0.6)',
+                          color: '#fff',
+                          fontSize: '0.65rem',
+                          fontWeight: '700',
+                          padding: '1px 5px',
+                          borderRadius: '4px'
+                        }}
+                      >
+                        {idx === 0 ? 'PRIMARY' : `#${idx + 1}`}
+                      </span>
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '4px',
+                        left: '4px',
+                        right: '4px',
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                      }}>
+                        {idx !== 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleSetPrimaryImage(idx)}
+                            style={{
+                              background: 'rgba(0,0,0,0.7)',
+                              color: '#fff',
+                              fontSize: '0.65rem',
+                              padding: '2px 4px',
+                              borderRadius: '3px'
+                            }}
+                            title="Set as Primary"
+                          >
+                            Main
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(idx)}
+                          style={{
+                            background: 'rgba(194,26,44,0.85)',
+                            color: '#fff',
+                            fontSize: '0.7rem',
+                            padding: '1px 6px',
+                            borderRadius: '3px',
+                            marginLeft: 'auto'
+                          }}
+                          title="Remove Photo"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ fontSize: '0.82rem', color: 'var(--accent-green)', marginLeft: '8px' }}>
+                    ✓ {newProd.images.length} photo(s) in gallery
+                  </div>
                 </div>
               )}
             </div>

@@ -20,6 +20,12 @@ const INITIAL_PRODUCTS = [
     originalPrice: 4999,
     description: "420 GSM ultra-heavyweight brushed french terry cotton. Features distressed ribbing, drop-shoulder silhouette, double-layered hood, and Polorse tonal high-density chest embroidery.",
     imageUrl: "/products/hoodie-charcoal.jpg",
+    images: [
+      "/products/hoodie-charcoal.jpg",
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["DROP 01", "OVERSIZED", "BESTSELLER"],
     colors: [
       { name: "Vintage Charcoal", hex: "#2b2b2e" },
@@ -44,6 +50,12 @@ const INITIAL_PRODUCTS = [
     originalPrice: 5499,
     description: "450 GSM pure loopback fleece cotton. Featuring the signature Polorse Equestrian Shield embroidered on the chest with golden brass eyelets and custom drawstrings.",
     imageUrl: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=900&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["SIGNATURE", "LUXURY FLEECE", "NEW"],
     colors: [
       { name: "Polorse Navy", hex: "#0F1C3F" },
@@ -68,6 +80,12 @@ const INITIAL_PRODUCTS = [
     originalPrice: 2199,
     description: "280 GSM premium compact cotton jersey with wide ribbed collar and dropped shoulders. Tailored for a structured, boxy drape that holds its shape wash after wash.",
     imageUrl: "/products/tee-cream.jpg",
+    images: [
+      "/products/tee-cream.jpg",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["ESSENTIAL", "HEAVYWEIGHT", "NEW"],
     colors: [
       { name: "Bone Cream", hex: "#e5ded3" },
@@ -91,6 +109,11 @@ const INITIAL_PRODUCTS = [
     originalPrice: 2799,
     description: "260 GSM double-mercerized pique combed cotton with knit ribbed collar, two-button mother-of-pearl placket, and embroidered horse mallet insignia.",
     imageUrl: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=900&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1625910513413-5b822d86a9f4?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["POLO CLUB", "BESTSELLER", "CLASSIC"],
     colors: [
       { name: "Chalk White", hex: "#F8F9FA" },
@@ -115,6 +138,11 @@ const INITIAL_PRODUCTS = [
     originalPrice: 3499,
     description: "Handcrafted from 100% pure European flax linen with a relaxed resort Cuban collar, straight split hem, and natural wooden buttons. Exceptionally breathable for warm climates.",
     imageUrl: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=900&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["100% LINEN", "SUMMER RESORT", "TRENDING"],
     colors: [
       { name: "Ecru Ivory", hex: "#F3ECE1" },
@@ -139,6 +167,11 @@ const INITIAL_PRODUCTS = [
     originalPrice: 3899,
     description: "Classic 100% two-ply Oxford weave cotton. Featuring a curved tail, relaxed dropped shoulders, button-down collar, and reinforced chest pocket with discreet Polorse embroidery.",
     imageUrl: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["OXFORD WEAVE", "TIMELESS", "SMART CASUAL"],
     colors: [
       { name: "Crisp White", hex: "#FFFFFF" },
@@ -162,6 +195,11 @@ const INITIAL_PRODUCTS = [
     originalPrice: 5999,
     description: "14 oz heavyweight authentic ringspun cotton denim. Subtle stone wash with whiskering, high-rise relaxed wide-leg silhouette, custom antique copper hardware, and genuine leather back patch.",
     imageUrl: "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=900&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1582552938357-32b906df40cb?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["14 OZ DENIM", "WIDE LEG", "PREMIUM SELVEDGE"],
     colors: [
       { name: "Washed Indigo", hex: "#4A6FA5" },
@@ -185,6 +223,12 @@ const INITIAL_PRODUCTS = [
     originalPrice: 5499,
     description: "Engineered from washed ripstop cotton with articulated knee darts, dual deep cargo compartments, an elasticated waistband with industrial metal-tipped drawstrings, and adjustable ankle toggles.",
     imageUrl: "/products/cargo-olive.jpg",
+    images: [
+      "/products/cargo-olive.jpg",
+      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["TACTICAL", "LIMITED EDITION"],
     colors: [
       { name: "Washed Olive", hex: "#636d55" },
@@ -208,6 +252,11 @@ const INITIAL_PRODUCTS = [
     originalPrice: 4299,
     description: "Crafted from heavy 320 GSM brushed twill cotton with double forward front pleats, hidden elastic waist extension, slash pockets, and a clean taper that lands effortlessly over sneakers or loafers.",
     imageUrl: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=900&q=80",
+    images: [
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=900&q=80"
+    ],
     tags: ["PLEATED FIT", "QUIET LUXURY", "NEW"],
     colors: [
       { name: "Warm Khaki", hex: "#D4C5A9" },
@@ -310,14 +359,26 @@ export async function fetchProducts() {
   }
   try {
     const parsed = JSON.parse(stored);
-    const existingIds = new Set(parsed.map(p => p.id));
+    let hasUpdates = false;
+
+    // Enrich existing products if their images array is missing or empty
+    const enriched = parsed.map(p => {
+      const initial = INITIAL_PRODUCTS.find(ip => ip.id === p.id);
+      if (initial && (!p.images || p.images.length === 0)) {
+        hasUpdates = true;
+        return { ...p, images: initial.images, imageUrl: p.imageUrl || initial.imageUrl };
+      }
+      return p;
+    });
+
+    const existingIds = new Set(enriched.map(p => p.id));
     const missing = INITIAL_PRODUCTS.filter(p => !existingIds.has(p.id));
-    if (missing.length > 0) {
-      const merged = [...parsed, ...missing];
+    if (missing.length > 0 || hasUpdates) {
+      const merged = [...enriched, ...missing];
       localStorage.setItem("polorse_products", JSON.stringify(merged));
       return merged;
     }
-    return parsed;
+    return enriched;
   } catch (e) {
     localStorage.setItem("polorse_products", JSON.stringify(INITIAL_PRODUCTS));
     return INITIAL_PRODUCTS;
