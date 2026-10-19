@@ -249,7 +249,7 @@ export default function App() {
           </section>
 
           {/* Product Catalog Grid */}
-          <section id="catalog" style={{ maxWidth: '1360px', margin: '0 auto', padding: '60px 24px' }}>
+          <section id="catalog" style={{ maxWidth: '1360px', margin: '0 auto', padding: '40px 24px 16px' }}>
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',

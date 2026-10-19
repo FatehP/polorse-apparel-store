@@ -170,21 +170,21 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          background: 'var(--bg-primary)',
+          background: 'transparent',
           borderRight: '1px solid var(--border-subtle)',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          height: '100%'
         }}>
           {/* Main Showcase Viewport */}
           <div style={{
             position: 'relative',
+            flex: '1 1 0%',
             minHeight: '380px',
-            maxHeight: '480px',
-            flex: '1',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden',
-            backgroundColor: '#F3ECE1'
+            background: 'transparent'
           }}>
             <img
               key={activeImageIndex}
@@ -194,7 +194,6 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
               style={{
                 width: '100%',
                 height: '100%',
-                maxHeight: '480px',
                 objectFit: 'cover',
                 display: 'block'
               }}
@@ -209,26 +208,6 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                 <span className="badge-tag badge-lime">{discountPercent}% OFF</span>
               )}
             </div>
-
-            {/* Image Counter Badge on Top-Right */}
-            {imageList.length > 1 && (
-              <div style={{
-                position: 'absolute',
-                top: '16px',
-                right: '16px',
-                background: 'rgba(15, 28, 63, 0.8)',
-                backdropFilter: 'blur(6px)',
-                color: '#fff',
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-full)',
-                fontSize: '0.75rem',
-                fontWeight: '700',
-                letterSpacing: '0.04em',
-                zIndex: 5
-              }}>
-                {activeImageIndex + 1} / {imageList.length}
-              </div>
-            )}
 
             {/* Left & Right Navigational Arrows */}
             {imageList.length > 1 && (
@@ -299,13 +278,14 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
           {/* Thumbnail Preview Strip */}
           {imageList.length > 1 && (
             <div style={{
-              padding: '12px 16px',
-              background: 'var(--bg-secondary)',
+              padding: '14px 16px',
+              background: 'transparent',
               borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
               gap: '10px',
-              overflowX: 'auto'
+              overflowX: 'auto',
+              flexShrink: 0
             }}>
               {imageList.map((img, idx) => (
                 <button
@@ -315,44 +295,38 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                   aria-label={`View photo ${idx + 1}`}
                   style={{
                     position: 'relative',
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: 'var(--radius-sm)',
+                    width: '62px',
+                    height: '62px',
+                    borderRadius: '8px',
                     overflow: 'hidden',
-                    border: activeImageIndex === idx ? '2px solid var(--accent-navy)' : '2px solid transparent',
-                    boxShadow: activeImageIndex === idx ? '0 0 0 1px var(--accent-navy)' : 'none',
-                    opacity: activeImageIndex === idx ? 1 : 0.65,
-                    transform: activeImageIndex === idx ? 'scale(1.05)' : 'scale(1)',
+                    border: activeImageIndex === idx
+                      ? '2.5px solid var(--accent-navy)'
+                      : '1.5px solid rgba(15, 28, 63, 0.22)',
+                    boxShadow: activeImageIndex === idx
+                      ? '0 0 0 1px var(--accent-navy), 0 3px 8px rgba(15, 28, 63, 0.22)'
+                      : '0 1px 3px rgba(0, 0, 0, 0.06)',
+                    opacity: activeImageIndex === idx ? 1 : 0.75,
+                    transform: activeImageIndex === idx ? 'scale(1.04)' : 'scale(1)',
                     transition: 'all var(--transition-fast)',
                     cursor: 'pointer',
                     flexShrink: 0,
                     padding: 0,
-                    background: 'var(--bg-primary)'
+                    background: 'transparent'
                   }}
                   onMouseEnter={(e) => {
-                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '0.95';
+                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '1';
                   }}
                   onMouseLeave={(e) => {
-                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '0.65';
+                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '0.75';
                   }}
                 >
                   <img
                     src={img}
                     alt={`Thumbnail ${idx + 1}`}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '6px' }}
                   />
                 </button>
               ))}
-              <div style={{
-                fontSize: '0.72rem',
-                color: 'var(--text-muted)',
-                marginLeft: 'auto',
-                whiteSpace: 'nowrap',
-                paddingLeft: '8px',
-                fontWeight: '600'
-              }}>
-                {imageList.length} Photos
-              </div>
             </div>
           )}
         </div>

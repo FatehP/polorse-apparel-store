@@ -53,7 +53,8 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd }) {
         position: 'relative',
         width: '100%',
         paddingTop: '105%',
-        background: '#15151a',
+        background: '#FAF7F2',
+        borderBottom: '1px solid var(--border-subtle)',
         overflow: 'hidden'
       }}>
         <img
