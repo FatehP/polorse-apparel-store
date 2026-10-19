@@ -166,126 +166,123 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
           <X size={18} />
         </button>
 
-        {/* Left Side: Product Showcase Gallery with Multiple Images */}
+        {/* Left Side: Full-Bleed Product Image with Floating Thumbnail Grid */}
         <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'transparent',
-          borderRight: '1px solid var(--border-subtle)',
+          position: 'relative',
+          width: '100%',
+          minHeight: '520px',
+          height: '100%',
           overflow: 'hidden',
-          height: '100%'
+          background: 'transparent',
+          borderRight: '1px solid var(--border-subtle)'
         }}>
-          {/* Main Showcase Viewport */}
-          <div style={{
-            position: 'relative',
-            flex: '1 1 0%',
-            minHeight: '380px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-            background: 'transparent'
-          }}>
-            <img
-              key={activeImageIndex}
-              src={imageList[activeImageIndex]}
-              alt={`${product.title} - Angle ${activeImageIndex + 1}`}
-              className="animate-fade"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block'
-              }}
-            />
+          {/* Full-Bleed Main Image Filling Entire Height */}
+          <img
+            key={activeImageIndex}
+            src={imageList[activeImageIndex]}
+            alt={`${product.title} - Angle ${activeImageIndex + 1}`}
+            className="animate-fade"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block'
+            }}
+          />
 
-            {/* Badges on Top-Left */}
-            <div style={{ position: 'absolute', top: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 5 }}>
-              {product.tags?.map((tag, idx) => (
-                <span key={idx} className="badge-tag badge-red">{tag}</span>
-              ))}
-              {discountPercent > 0 && (
-                <span className="badge-tag badge-lime">{discountPercent}% OFF</span>
-              )}
-            </div>
-
-            {/* Left & Right Navigational Arrows */}
-            {imageList.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={handlePrevImage}
-                  aria-label="Previous image"
-                  style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    color: 'var(--accent-navy)',
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
-                    boxShadow: 'var(--shadow-md)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 10,
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
-                >
-                  <ChevronLeft size={20} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleNextImage}
-                  aria-label="Next image"
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    color: 'var(--accent-navy)',
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
-                    boxShadow: 'var(--shadow-md)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 10,
-                    transition: 'all var(--transition-fast)'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </>
+          {/* Badges on Top-Left */}
+          <div style={{ position: 'absolute', top: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 10 }}>
+            {product.tags?.map((tag, idx) => (
+              <span key={idx} className="badge-tag badge-red">{tag}</span>
+            ))}
+            {discountPercent > 0 && (
+              <span className="badge-tag badge-lime">{discountPercent}% OFF</span>
             )}
           </div>
 
-          {/* Thumbnail Preview Strip */}
+          {/* Left & Right Navigational Arrows */}
+          {imageList.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={handlePrevImage}
+                aria-label="Previous image"
+                style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.92)',
+                  backdropFilter: 'blur(4px)',
+                  color: 'var(--accent-navy)',
+                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'var(--shadow-md)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 10,
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <button
+                type="button"
+                onClick={handleNextImage}
+                aria-label="Next image"
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.92)',
+                  backdropFilter: 'blur(4px)',
+                  color: 'var(--accent-navy)',
+                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'var(--shadow-md)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  zIndex: 10,
+                  transition: 'all var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(-50%) scale(1)'}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </>
+          )}
+
+          {/* Floating Thumbnail Grid (Overlay Above Full Image with Transparent Background) */}
           {imageList.length > 1 && (
             <div style={{
-              padding: '14px 16px',
+              position: 'absolute',
+              bottom: '16px',
+              left: 0,
+              right: 0,
+              padding: '0 16px',
               background: 'transparent',
-              borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '10px',
-              overflowX: 'auto',
-              flexShrink: 0
+              zIndex: 10,
+              overflowX: 'auto'
             }}>
               {imageList.map((img, idx) => (
                 <button
@@ -295,18 +292,17 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                   aria-label={`View photo ${idx + 1}`}
                   style={{
                     position: 'relative',
-                    width: '62px',
-                    height: '62px',
+                    width: '58px',
+                    height: '58px',
                     borderRadius: '8px',
                     overflow: 'hidden',
                     border: activeImageIndex === idx
-                      ? '2.5px solid var(--accent-navy)'
-                      : '1.5px solid rgba(15, 28, 63, 0.22)',
-                    boxShadow: activeImageIndex === idx
-                      ? '0 0 0 1px var(--accent-navy), 0 3px 8px rgba(15, 28, 63, 0.22)'
-                      : '0 1px 3px rgba(0, 0, 0, 0.06)',
-                    opacity: activeImageIndex === idx ? 1 : 0.75,
-                    transform: activeImageIndex === idx ? 'scale(1.04)' : 'scale(1)',
+                      ? '2.5px solid #0F1C3F'
+                      : '1.5px solid rgba(255, 255, 255, 0.9)',
+                    outline: activeImageIndex === idx ? '2px solid #FFFFFF' : 'none',
+                    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.28)',
+                    opacity: activeImageIndex === idx ? 1 : 0.82,
+                    transform: activeImageIndex === idx ? 'scale(1.06)' : 'scale(1)',
                     transition: 'all var(--transition-fast)',
                     cursor: 'pointer',
                     flexShrink: 0,
@@ -317,13 +313,13 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                     if (activeImageIndex !== idx) e.currentTarget.style.opacity = '1';
                   }}
                   onMouseLeave={(e) => {
-                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '0.75';
+                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '0.82';
                   }}
                 >
                   <img
                     src={img}
                     alt={`Thumbnail ${idx + 1}`}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: '6px' }}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
                 </button>
               ))}
