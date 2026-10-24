@@ -1,5 +1,5 @@
-import React from 'react';
-import { ShoppingBag, ShieldCheck, Flame, Search, SlidersHorizontal, Store, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingBag, ShieldCheck, Flame, Search, SlidersHorizontal, Store, X, User, LogOut, ChevronDown } from 'lucide-react';
 
 export default function Navbar({
   activeView,
@@ -12,8 +12,13 @@ export default function Navbar({
   setSelectedCategory,
   categories = [],
   onOpenFilter,
-  activeFiltersCount = 0
+  activeFiltersCount = 0,
+  currentUser = null,
+  onOpenAuth,
+  onLogout
 }) {
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       const catalogEl = document.getElementById('catalog');
@@ -225,6 +230,151 @@ export default function Navbar({
               <span>Admin</span>
             </button>
           </div>
+
+          {/* User Authentication Trigger / Profile Dropdown */}
+          {activeView === 'store' && (
+            <div style={{ position: 'relative' }}>
+              {!currentUser ? (
+                <button
+                  type="button"
+                  onClick={onOpenAuth}
+                  id="navbar-sign-in-btn"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    background: 'var(--bg-secondary)',
+                    border: '1.5px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-md)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.82rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: 'var(--shadow-sm)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  title="Sign In / Register"
+                >
+                  <User size={15} style={{ color: 'var(--accent-navy)' }} />
+                  <span>Sign In</span>
+                </button>
+              ) : (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    id="navbar-user-profile-btn"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '5px 12px 5px 6px',
+                      background: 'var(--bg-secondary)',
+                      border: '1.5px solid var(--border-subtle)',
+                      borderRadius: 'var(--radius-full)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.82rem',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      boxShadow: 'var(--shadow-sm)'
+                    }}
+                    title="User Account"
+                  >
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      background: 'var(--accent-navy)',
+                      color: '#FAF7F2',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.78rem',
+                      fontWeight: '800'
+                    }}>
+                      {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <span style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {currentUser.name ? currentUser.name.split(' ')[0] : 'Member'}
+                    </span>
+                    <ChevronDown size={14} style={{ color: 'var(--text-muted)' }} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 8px)',
+                        right: 0,
+                        background: 'var(--bg-secondary)',
+                        border: '1.5px solid var(--border-subtle)',
+                        borderRadius: 'var(--radius-md)',
+                        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
+                        minWidth: '220px',
+                        padding: '6px 0',
+                        zIndex: 60
+                      }}
+                    >
+                      <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-subtle)' }}>
+                        <p style={{ margin: 0, fontWeight: '800', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                          {currentUser.name}
+                        </p>
+                        <p style={{ margin: '2px 0 0 0', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                          {currentUser.email || currentUser.phone}
+                        </p>
+                        <span style={{
+                          display: 'inline-block',
+                          marginTop: '6px',
+                          fontSize: '0.68rem',
+                          fontWeight: '800',
+                          background: 'rgba(252, 211, 77, 0.2)',
+                          color: '#B45309',
+                          padding: '2px 7px',
+                          borderRadius: 'var(--radius-sm)'
+                        }}>
+                          {currentUser.tier || 'Polorse VIP'}
+                        </span>
+                      </div>
+
+                      {currentUser.savedAddress && (
+                        <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                          <span style={{ color: 'var(--text-primary)', fontWeight: '700', display: 'block' }}>Saved City:</span>
+                          <span>{currentUser.savedAddress.city} ({currentUser.savedAddress.pincode})</span>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onLogout?.();
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          padding: '10px 14px',
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--accent-red)',
+                          fontSize: '0.82rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <LogOut size={15} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Cart Trigger */}
           {activeView === 'store' && (

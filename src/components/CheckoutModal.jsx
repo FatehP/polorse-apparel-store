@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, CheckCircle2, ShieldCheck, Truck, Smartphone, Banknote, ArrowRight, Check, MapPin, Navigation, Clock, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, CheckCircle2, ShieldCheck, Truck, Smartphone, Banknote, ArrowRight, Check, MapPin, Navigation, Clock, AlertCircle, UserCheck, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { createOrder } from '../services/storeService';
 import { checkPincodeDeliverability, autoDetectLocation } from '../services/pincodeService';
@@ -9,7 +9,9 @@ export default function CheckoutModal({
   onClose,
   cartItems,
   appliedCoupon,
-  onOrderSuccess
+  onOrderSuccess,
+  currentUser = null,
+  onOpenAuth
 }) {
   if (!isOpen) return null;
 
@@ -27,6 +29,26 @@ export default function CheckoutModal({
   const [completedOrder, setCompletedOrder] = useState(null);
   const [isDetecting, setIsDetecting] = useState(false);
   const [deliveryStatus, setDeliveryStatus] = useState(null);
+
+  // Autofill if logged in
+  useEffect(() => {
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        customerName: currentUser.name || prev.customerName,
+        phone: currentUser.phone || prev.phone,
+        address: currentUser.savedAddress?.addressLine || prev.address,
+        city: currentUser.savedAddress?.city || prev.city,
+        pincode: currentUser.savedAddress?.pincode || prev.pincode,
+        state: currentUser.savedAddress?.state || prev.state
+      }));
+      if (currentUser.savedAddress?.pincode) {
+        checkPincodeDeliverability(currentUser.savedAddress.pincode).then(info => {
+          setDeliveryStatus(info);
+        });
+      }
+    }
+  }, [currentUser]);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -331,9 +353,66 @@ export default function CheckoutModal({
           /* Checkout Input Form */
           <div style={{ padding: '32px' }}>
             <h2 style={{ fontSize: '1.5rem', marginBottom: '6px' }}>Checkout & Delivery</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '24px' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', marginBottom: '16px' }}>
               Fast Pan-India shipping with Cash on Delivery or Instant UPI.
             </p>
+
+            {/* Member Sign In / Guest Notice Banner */}
+            {currentUser ? (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 14px',
+                background: 'rgba(15, 28, 63, 0.05)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: '20px',
+                fontSize: '0.82rem',
+                color: 'var(--text-primary)'
+              }}>
+                <UserCheck size={16} style={{ color: 'var(--accent-green)' }} />
+                <span>
+                  Logged in as <strong>{currentUser.name}</strong> • Saved address details auto-filled.
+                </span>
+              </div>
+            ) : (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '10px',
+                padding: '10px 14px',
+                background: 'rgba(252, 211, 77, 0.1)',
+                border: '1px solid rgba(252, 211, 77, 0.3)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: '20px',
+                fontSize: '0.82rem',
+                color: 'var(--text-primary)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={16} style={{ color: '#D97706', flexShrink: 0 }} />
+                  <span>Have an account? Sign in for 1-click address autofill, or continue as Guest.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={onOpenAuth}
+                  style={{
+                    background: 'var(--accent-navy)',
+                    color: '#FAF7F2',
+                    border: 'none',
+                    padding: '4px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Sign In
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handlePlaceOrder} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
               {/* Left Column: Customer & Shipping Details */}

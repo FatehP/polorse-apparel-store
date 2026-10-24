@@ -6,7 +6,9 @@ import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import AdminPortal from './components/AdminPortal';
 import FilterDrawer from './components/FilterDrawer';
+import AuthModal from './components/AuthModal';
 import { fetchProducts } from './services/storeService';
+import { getCurrentUser, logout } from './services/authService';
 import { ArrowDown, Flame, Sparkles, Shield, Truck, RefreshCw, Smartphone, SlidersHorizontal, X, RotateCcw, ArrowUpDown } from 'lucide-react';
 
 export default function App() {
@@ -29,6 +31,23 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
+
+  // User Authentication State
+  const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setCurrentUser(getCurrentUser());
+    };
+    window.addEventListener('polorse_auth_changed', handleAuthChange);
+    return () => window.removeEventListener('polorse_auth_changed', handleAuthChange);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setCurrentUser(null);
+  };
 
   // Load products
   const loadStoreProducts = async () => {
@@ -215,6 +234,9 @@ export default function App() {
         categories={categories}
         onOpenFilter={() => setIsFilterOpen(true)}
         activeFiltersCount={activeFiltersCount}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* Main View Router: Storefront vs Brother's Admin Portal */}
@@ -715,6 +737,18 @@ export default function App() {
         cartItems={cart}
         appliedCoupon={appliedCoupon}
         onOrderSuccess={handleOrderSuccess}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+      />
+
+      {/* Member Authentication Modal (Sign In / Sign Up) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onAuthSuccess={(user) => {
+          setCurrentUser(user);
+          setIsAuthModalOpen(false);
+        }}
       />
 
       {/* Filter & Sort Drawer */}
