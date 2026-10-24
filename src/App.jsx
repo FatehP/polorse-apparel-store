@@ -245,7 +245,7 @@ export default function App() {
       ) : (
         <main style={{ flex: 1 }}>
           {/* Product Catalog Grid (Products First) */}
-          <section id="catalog" style={{ maxWidth: '1360px', margin: '0 auto', padding: '32px 24px 48px' }}>
+          <section id="catalog" className="catalog-section" style={{ maxWidth: '1360px', margin: '0 auto', padding: '32px 24px 48px' }}>
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -497,7 +497,7 @@ export default function App() {
                 </button>
               </div>
             ) : (
-              <div style={{
+              <div className="catalog-grid" style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
                 gap: '24px'

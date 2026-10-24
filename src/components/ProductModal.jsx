@@ -141,38 +141,12 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 50,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '20px'
-      }}
+      className="product-modal-overlay"
       onClick={onClose}
     >
       <div
-        className="animate-fade"
+        className="product-modal-dialog animate-fade"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: 'var(--bg-secondary)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-lg)',
-          maxWidth: '960px',
-          width: '100%',
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
-          boxShadow: 'var(--shadow-lg)',
-          position: 'relative'
-        }}
       >
         {/* iOS Native Modal Pull Handle */}
         <div className="sheet-handle" style={{ gridColumn: '1 / -1', margin: '10px auto 4px auto' }} />
@@ -202,16 +176,8 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
           <X size={18} />
         </button>
 
-        {/* Left Side: Full-Bleed Product Image with Floating Thumbnail Grid */}
-        <div style={{
-          position: 'relative',
-          width: '100%',
-          minHeight: '520px',
-          height: '100%',
-          overflow: 'hidden',
-          background: 'transparent',
-          borderRight: '1px solid var(--border-subtle)'
-        }}>
+        {/* Left Side: Product Image with Floating Thumbnail Grid */}
+        <div className="product-modal-image-col">
           {/* Full-Bleed Main Image Filling Entire Height */}
           <img
             key={activeImageIndex}
@@ -380,7 +346,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
         </div>
 
         {/* Right Side: Product Details & Controls */}
-        <div style={{ padding: '32px 28px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="product-modal-details-col">
           <div>
             <span style={{
               fontSize: '0.8rem',
@@ -392,7 +358,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               {product.category}
             </span>
             <h2 style={{
-              fontSize: '1.6rem',
+              fontSize: '1.5rem',
               color: 'var(--text-primary)',
               marginTop: '4px',
               lineHeight: '1.2'
@@ -404,7 +370,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
               <span style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: '1.8rem',
+                fontSize: '1.7rem',
                 fontWeight: '800',
                 color: 'var(--text-primary)',
                 lineHeight: 1
@@ -414,7 +380,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               {product.originalPrice && (
                 <>
                   <span style={{
-                    fontSize: '1.05rem',
+                    fontSize: '1rem',
                     color: 'var(--text-muted)',
                     textDecoration: 'line-through',
                     lineHeight: 1
@@ -442,14 +408,18 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
+              flexWrap: 'wrap',
+              gap: '6px',
               marginTop: '12px',
               padding: '7px 11px',
               background: 'var(--bg-primary)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-sm)',
               fontSize: '0.74rem',
-              color: 'var(--text-secondary)'
+              color: 'var(--text-secondary)',
+              lineHeight: 1.4,
+              wordBreak: 'break-word',
+              maxWidth: '100%'
             }}>
               <span style={{
                 fontFamily: 'monospace',
@@ -492,7 +462,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                   Colorway: <strong style={{ color: 'var(--text-primary)' }}>{selectedColor}</strong>
                 </span>
               </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {product.colors.map(col => (
                   <button
                     key={col.name}
@@ -745,32 +715,33 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
           </div>
 
           {/* Quantity Selector and Action Buttons (Add to Bag & Buy Now) */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '10px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '10px', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               background: 'var(--bg-primary)',
               border: '1.5px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
-              padding: '0 6px',
+              padding: '0 4px',
               height: '46px',
+              flexShrink: 0,
               boxSizing: 'border-box'
             }}>
               <button
                 type="button"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                style={{ padding: '0 10px', height: '100%', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ padding: '0 8px', height: '100%', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 aria-label="Decrease quantity"
               >
                 -
               </button>
-              <span style={{ minWidth: '24px', textAlign: 'center', fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+              <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
                 {quantity}
               </span>
               <button
                 type="button"
                 onClick={() => setQuantity(quantity + 1)}
-                style={{ padding: '0 10px', height: '100%', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{ padding: '0 8px', height: '100%', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 aria-label="Increase quantity"
               >
                 +
@@ -784,15 +755,16 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               disabled={!product.inStock}
               id="modal-add-to-bag-btn"
               style={{
-                flex: 1,
+                flex: '1 1 0',
+                minWidth: '0',
                 height: '46px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
-                padding: '0 16px',
+                gap: '6px',
+                padding: '0 8px',
                 fontWeight: '800',
-                fontSize: '0.9rem',
+                fontSize: '0.84rem',
                 borderRadius: 'var(--radius-md)',
                 background: isAdded ? 'rgba(46, 125, 50, 0.12)' : '#FFFFFF',
                 color: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
@@ -808,12 +780,12 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             >
               {isAdded ? (
                 <>
-                  <Check size={17} style={{ color: 'var(--accent-green)' }} />
+                  <Check size={16} style={{ color: 'var(--accent-green)' }} />
                   <span>Added!</span>
                 </>
               ) : (
                 <>
-                  <ShoppingBag size={17} />
+                  <ShoppingBag size={16} />
                   <span>Add to Bag</span>
                 </>
               )}
@@ -826,15 +798,16 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               disabled={!product.inStock}
               id="modal-buy-now-btn"
               style={{
-                flex: 1,
+                flex: '1 1 0',
+                minWidth: '0',
                 height: '46px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
-                padding: '0 18px',
+                gap: '6px',
+                padding: '0 8px',
                 fontWeight: '800',
-                fontSize: '0.92rem',
+                fontSize: '0.85rem',
                 borderRadius: 'var(--radius-md)',
                 background: 'var(--accent-navy)',
                 color: '#FAF7F2',
@@ -848,20 +821,13 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               }}
               title="Direct Instant Checkout"
             >
-              <Zap size={16} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
+              <Zap size={15} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
               <span>Buy Now</span>
             </button>
           </div>
 
           {/* Value props */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '10px',
-            borderTop: '1px solid var(--border-subtle)',
-            paddingTop: '16px',
-            marginTop: '8px'
-          }}>
+          <div className="product-modal-value-props">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
               <Truck size={16} style={{ color: 'var(--accent-navy)' }} />
               <span>Express Pan-India (2-3 Days)</span>

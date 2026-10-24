@@ -34,17 +34,23 @@ export default function Navbar({
       <div style={{
         background: 'linear-gradient(90deg, #0F1C3F 0%, #162A4F 60%, #C21A2C 100%)',
         color: '#fff',
-        padding: '7px 16px',
-        fontSize: '0.8rem',
+        padding: '6px 12px',
+        fontSize: '0.74rem',
         fontWeight: '600',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '8px',
-        letterSpacing: '0.04em'
+        gap: '6px',
+        letterSpacing: '0.04em',
+        width: '100%',
+        maxWidth: '100vw',
+        overflow: 'hidden',
+        boxSizing: 'border-box'
       }}>
-        <Flame size={14} style={{ color: '#FCD34D' }} />
-        <span>POLORSE SIGNATURE DROP • MADE IN INDIA • USE CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE SHIPPING</span>
+        <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE SHIPPING
+        </span>
       </div>
 
       {/* Main Navbar Row */}
