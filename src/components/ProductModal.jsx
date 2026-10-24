@@ -385,12 +385,13 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             </h2>
 
             {/* Price section with clean discount pill */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
               <span style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: '1.8rem',
                 fontWeight: '800',
-                color: 'var(--text-primary)'
+                color: 'var(--text-primary)',
+                lineHeight: 1
               }}>
                 ₹{product.price.toLocaleString('en-IN')}
               </span>
@@ -399,7 +400,8 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                   <span style={{
                     fontSize: '1.05rem',
                     color: 'var(--text-muted)',
-                    textDecoration: 'line-through'
+                    textDecoration: 'line-through',
+                    lineHeight: 1
                   }}>
                     ₹{product.originalPrice.toLocaleString('en-IN')}
                   </span>
@@ -408,8 +410,11 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                     fontWeight: '800',
                     color: 'var(--accent-red)',
                     background: 'rgba(194, 26, 44, 0.08)',
-                    padding: '3px 8px',
-                    borderRadius: 'var(--radius-sm)'
+                    padding: '4px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    lineHeight: 1,
+                    display: 'inline-flex',
+                    alignItems: 'center'
                   }}>
                     {discountPercent}% OFF • Save ₹{savingsAmount.toLocaleString('en-IN')}
                   </span>

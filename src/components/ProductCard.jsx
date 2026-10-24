@@ -215,13 +215,14 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
           gap: '10px'
         }}>
           {/* Price Row */}
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: '1.25rem',
                 fontWeight: '700',
-                color: 'var(--text-primary)'
+                color: 'var(--text-primary)',
+                lineHeight: 1
               }}>
                 ₹{product.price.toLocaleString('en-IN')}
               </span>
@@ -229,7 +230,8 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
                 <span style={{
                   fontSize: '0.85rem',
                   color: 'var(--text-muted)',
-                  textDecoration: 'line-through'
+                  textDecoration: 'line-through',
+                  lineHeight: 1
                 }}>
                   ₹{product.originalPrice.toLocaleString('en-IN')}
                 </span>
@@ -241,8 +243,11 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
                 fontWeight: '700',
                 color: 'var(--accent-red)',
                 background: 'rgba(194, 26, 44, 0.08)',
-                padding: '2px 7px',
-                borderRadius: 'var(--radius-sm)'
+                padding: '3px 7px',
+                borderRadius: 'var(--radius-sm)',
+                lineHeight: 1,
+                display: 'inline-flex',
+                alignItems: 'center'
               }}>
                 {discountPercent}% OFF
               </span>
