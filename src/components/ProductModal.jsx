@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
-  Zap
+  Zap,
+  Ruler
 } from 'lucide-react';
 import { checkPincodeDeliverability, autoDetectLocation } from '../services/pincodeService';
 
@@ -25,6 +26,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.size || '');
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
 
   // Multi-image list
   const imageList = (Array.isArray(product.images) && product.images.length > 0)
@@ -211,14 +213,27 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             }}
           />
 
-          {/* Badges on Top-Left */}
-          <div style={{ position: 'absolute', top: '16px', left: '16px', display: 'flex', gap: '8px', zIndex: 10 }}>
-            {product.tags?.map((tag, idx) => (
-              <span key={idx} className="badge-tag badge-red">{tag}</span>
-            ))}
-            {discountPercent > 0 && (
-              <span className="badge-tag badge-lime">{discountPercent}% OFF</span>
-            )}
+          {/* Clean 1-Badge Signature Overlay on Top-Left */}
+          <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 10 }}>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: 'rgba(15, 28, 63, 0.88)',
+              backdropFilter: 'blur(8px)',
+              color: '#FAF7F2',
+              fontSize: '0.72rem',
+              fontWeight: '800',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              padding: '5px 12px',
+              borderRadius: 'var(--radius-full)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+              border: '1px solid rgba(255, 255, 255, 0.15)'
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#FCD34D' }} />
+              {product.tags?.[0] || 'STREET SIGNATURE'}
+            </span>
           </div>
 
           {/* Left & Right Navigational Arrows */}
@@ -286,21 +301,25 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             </>
           )}
 
-          {/* Floating Thumbnail Grid (Overlay Above Full Image with Transparent Background) */}
+          {/* Floating Thumbnail Grid Dock (Glitch-Free Frosted Glass Dock) */}
           {imageList.length > 1 && (
             <div style={{
               position: 'absolute',
               bottom: '16px',
-              left: 0,
-              right: 0,
-              padding: '0 16px',
-              background: 'transparent',
-              display: 'flex',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
+              gap: '8px',
+              padding: '6px 8px',
+              background: 'rgba(15, 28, 63, 0.55)',
+              backdropFilter: 'blur(12px)',
+              borderRadius: '12px',
               zIndex: 10,
-              overflowX: 'auto'
+              maxWidth: 'calc(100% - 32px)',
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)'
             }}>
               {imageList.map((img, idx) => (
                 <button
@@ -310,28 +329,27 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                   aria-label={`View photo ${idx + 1}`}
                   style={{
                     position: 'relative',
-                    width: '58px',
-                    height: '58px',
+                    width: '52px',
+                    height: '52px',
                     borderRadius: '8px',
                     overflow: 'hidden',
                     border: activeImageIndex === idx
-                      ? '2.5px solid #0F1C3F'
-                      : '1.5px solid rgba(255, 255, 255, 0.9)',
-                    outline: activeImageIndex === idx ? '2px solid #FFFFFF' : 'none',
-                    boxShadow: '0 3px 10px rgba(0, 0, 0, 0.28)',
-                    opacity: activeImageIndex === idx ? 1 : 0.82,
-                    transform: activeImageIndex === idx ? 'scale(1.06)' : 'scale(1)',
+                      ? '2px solid #FAF7F2'
+                      : '1.5px solid rgba(255, 255, 255, 0.3)',
+                    boxShadow: activeImageIndex === idx ? '0 0 10px rgba(255, 255, 255, 0.4)' : 'none',
+                    opacity: activeImageIndex === idx ? 1 : 0.72,
+                    transform: activeImageIndex === idx ? 'scale(1.04)' : 'scale(1)',
                     transition: 'all var(--transition-fast)',
                     cursor: 'pointer',
                     flexShrink: 0,
                     padding: 0,
-                    background: 'transparent'
+                    background: '#0F1C3F'
                   }}
                   onMouseEnter={(e) => {
                     if (activeImageIndex !== idx) e.currentTarget.style.opacity = '1';
                   }}
                   onMouseLeave={(e) => {
-                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '0.82';
+                    if (activeImageIndex !== idx) e.currentTarget.style.opacity = '0.72';
                   }}
                 >
                   <img
@@ -366,12 +384,12 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               {product.title}
             </h2>
 
-            {/* Price section */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', marginTop: '10px' }}>
+            {/* Price section with clean discount pill */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
               <span style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: '1.75rem',
-                fontWeight: '700',
+                fontSize: '1.8rem',
+                fontWeight: '800',
                 color: 'var(--text-primary)'
               }}>
                 ₹{product.price.toLocaleString('en-IN')}
@@ -386,11 +404,14 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                     ₹{product.originalPrice.toLocaleString('en-IN')}
                   </span>
                   <span style={{
-                    fontSize: '0.85rem',
-                    color: 'var(--accent-lime)',
-                    fontWeight: '600'
+                    fontSize: '0.74rem',
+                    fontWeight: '800',
+                    color: 'var(--accent-red)',
+                    background: 'rgba(194, 26, 44, 0.08)',
+                    padding: '3px 8px',
+                    borderRadius: 'var(--radius-sm)'
                   }}>
-                    Save ₹{savingsAmount.toLocaleString('en-IN')}
+                    {discountPercent}% OFF • Save ₹{savingsAmount.toLocaleString('en-IN')}
                   </span>
                 </>
               )}
@@ -442,19 +463,90 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             </div>
           )}
 
-          {/* Size Selection */}
+          {/* Size Selection with Streetwear Size Guide Trigger */}
           {product.sizes && product.sizes.length > 0 && (
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-secondary)' }}>
                   Select Size (Street Fit):
                 </span>
-                {currentStock < 10 && (
-                  <span style={{ fontSize: '0.78rem', color: 'var(--accent-orange)', fontWeight: '700' }}>
-                    🔥 Only {currentStock} pieces left in {selectedSize}!
-                  </span>
-                )}
+                <button
+                  type="button"
+                  onClick={() => setIsSizeGuideOpen(!isSizeGuideOpen)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--accent-navy)',
+                    fontSize: '0.78rem',
+                    fontWeight: '700',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    cursor: 'pointer',
+                    padding: 0,
+                    textDecoration: 'underline'
+                  }}
+                >
+                  <Ruler size={13} />
+                  <span>{isSizeGuideOpen ? 'Hide Guide' : 'Size Guide'}</span>
+                </button>
               </div>
+
+              {/* Expandable Streetwear Fit Chart */}
+              {isSizeGuideOpen && (
+                <div className="animate-fade" style={{
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '10px 14px',
+                  marginBottom: '10px'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <strong style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>Polorse Boxy Fit Chart (Inches)</strong>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Oversized Drape</span>
+                  </div>
+                  <table style={{ width: '100%', fontSize: '0.75rem', borderCollapse: 'collapse', textAlign: 'center' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
+                        <th style={{ padding: '3px 6px', textAlign: 'left' }}>Size</th>
+                        <th style={{ padding: '3px 6px' }}>Chest</th>
+                        <th style={{ padding: '3px 6px' }}>Length</th>
+                        <th style={{ padding: '3px 6px' }}>Shoulder</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', fontWeight: selectedSize === 'S' ? '800' : '500' }}>
+                        <td style={{ padding: '3px 6px', textAlign: 'left', color: 'var(--accent-navy)' }}>S</td>
+                        <td style={{ padding: '3px 6px' }}>44"</td>
+                        <td style={{ padding: '3px 6px' }}>28.5"</td>
+                        <td style={{ padding: '3px 6px' }}>21"</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', fontWeight: selectedSize === 'M' ? '800' : '500' }}>
+                        <td style={{ padding: '3px 6px', textAlign: 'left', color: 'var(--accent-navy)' }}>M</td>
+                        <td style={{ padding: '3px 6px' }}>46"</td>
+                        <td style={{ padding: '3px 6px' }}>29.5"</td>
+                        <td style={{ padding: '3px 6px' }}>22"</td>
+                      </tr>
+                      <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', fontWeight: selectedSize === 'L' ? '800' : '500' }}>
+                        <td style={{ padding: '3px 6px', textAlign: 'left', color: 'var(--accent-navy)' }}>L</td>
+                        <td style={{ padding: '3px 6px' }}>48"</td>
+                        <td style={{ padding: '3px 6px' }}>30.5"</td>
+                        <td style={{ padding: '3px 6px' }}>23"</td>
+                      </tr>
+                      <tr style={{ fontWeight: selectedSize === 'XL' ? '800' : '500' }}>
+                        <td style={{ padding: '3px 6px', textAlign: 'left', color: 'var(--accent-navy)' }}>XL</td>
+                        <td style={{ padding: '3px 6px' }}>50"</td>
+                        <td style={{ padding: '3px 6px' }}>31.5"</td>
+                        <td style={{ padding: '3px 6px' }}>24"</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p style={{ margin: '6px 0 0 0', fontSize: '0.68rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
+                    💡 <em>Generous dropped-shoulder drape. Stay true to size for boxy fit, or size down for standard fit.</em>
+                  </p>
+                </div>
+              )}
+
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {product.sizes.map(s => (
                   <button
@@ -480,67 +572,70 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             </div>
           )}
 
-          {/* Location & Pincode Deliverability Checker */}
+          {/* Sleek Compact Pincode & Delivery Section */}
           <div style={{
+            padding: '11px 14px',
             background: 'var(--bg-primary)',
             border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-md)',
-            padding: '14px 16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '10px'
+            borderRadius: 'var(--radius-md)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                <MapPin size={16} style={{ color: 'var(--accent-red)' }} />
-                <span>Check Delivery & COD Availability</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                <MapPin size={14} style={{ color: 'var(--accent-red)' }} />
+                <span>Delivery & COD Check</span>
               </div>
-
               <button
                 type="button"
                 onClick={handleAutoDetect}
                 disabled={isDetecting}
                 style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--accent-navy)',
+                  fontSize: '0.72rem',
+                  fontWeight: '700',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: 'var(--accent-navy)',
-                  background: 'rgba(15, 28, 63, 0.06)',
-                  padding: '3px 8px',
-                  borderRadius: 'var(--radius-full)'
+                  cursor: 'pointer',
+                  padding: 0
                 }}
               >
-                <Navigation size={12} className={isDetecting ? 'animate-spin' : ''} />
+                <Navigation size={11} className={isDetecting ? 'animate-spin' : ''} />
                 <span>{isDetecting ? 'Detecting...' : 'Auto-Detect PIN'}</span>
               </button>
             </div>
 
-            <form onSubmit={handleCheckPincode} style={{ display: 'flex', gap: '8px' }}>
+            <form onSubmit={handleCheckPincode} style={{ display: 'flex', gap: '6px' }}>
               <input
                 type="text"
                 maxLength={6}
-                placeholder="Enter 6-digit Indian PIN (e.g. 560038)"
+                placeholder="Enter 6-digit Indian PIN"
                 value={pincodeInput}
                 onChange={(e) => setPincodeInput(e.target.value.replace(/[^0-9]/g, ''))}
                 style={{
-                  fontSize: '0.85rem',
-                  padding: '8px 12px',
+                  flex: 1,
+                  fontSize: '0.82rem',
+                  padding: '7px 10px',
                   background: 'var(--bg-secondary)',
-                  borderRadius: 'var(--radius-sm)'
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-primary)'
                 }}
               />
               <button
                 type="submit"
                 disabled={isCheckingPincode || pincodeInput.length !== 6}
-                className="btn-secondary"
                 style={{
-                  padding: '8px 16px',
-                  fontSize: '0.82rem',
-                  whiteSpace: 'nowrap',
-                  background: pincodeInput.length === 6 ? 'var(--accent-navy)' : 'var(--bg-secondary)',
-                  color: pincodeInput.length === 6 ? '#fff' : 'var(--text-muted)'
+                  padding: '7px 14px',
+                  fontSize: '0.78rem',
+                  fontWeight: '700',
+                  borderRadius: 'var(--radius-sm)',
+                  border: 'none',
+                  background: pincodeInput.length === 6 ? 'var(--accent-navy)' : 'var(--bg-card)',
+                  color: pincodeInput.length === 6 ? '#FAF7F2' : 'var(--text-muted)',
+                  cursor: pincodeInput.length === 6 ? 'pointer' : 'default',
+                  transition: 'all 0.2s ease'
                 }}
               >
                 {isCheckingPincode ? 'Checking...' : 'Check'}
@@ -549,37 +644,37 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
 
             {pincodeResult && (
               <div style={{
-                background: pincodeResult.isDeliverable ? 'rgba(5, 150, 105, 0.08)' : 'rgba(194, 26, 44, 0.08)',
-                border: `1px solid ${pincodeResult.isDeliverable ? 'rgba(5, 150, 105, 0.25)' : 'rgba(194, 26, 44, 0.25)'}`,
-                padding: '10px 12px',
-                borderRadius: 'var(--radius-sm)',
-                fontSize: '0.82rem',
+                marginTop: '8px',
+                paddingTop: '8px',
+                borderTop: '1px solid var(--border-subtle)',
                 display: 'flex',
-                flexDirection: 'column',
-                gap: '4px'
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '0.78rem',
+                flexWrap: 'wrap',
+                gap: '6px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  {pincodeResult.isDeliverable ? (
-                    <CheckCircle2 size={15} style={{ color: 'var(--accent-green)' }} />
-                  ) : (
-                    <AlertCircle size={15} style={{ color: 'var(--accent-red)' }} />
-                  )}
-                  <strong style={{ color: pincodeResult.isDeliverable ? 'var(--accent-green)' : 'var(--accent-red)' }}>
-                    {pincodeResult.isDeliverable
-                      ? `Deliverable to ${pincodeResult.city}, ${pincodeResult.state} (${pincodeResult.pincode})`
-                      : 'Currently Non-Serviceable'}
-                  </strong>
-                </div>
-
+                <span style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  fontWeight: '700',
+                  color: pincodeResult.isDeliverable ? 'var(--accent-green)' : 'var(--accent-red)'
+                }}>
+                  {pincodeResult.isDeliverable ? <CheckCircle2 size={13} /> : <AlertCircle size={13} />}
+                  <span>{pincodeResult.isDeliverable ? `Deliverable to ${pincodeResult.city} (2-3 days)` : 'Currently non-serviceable'}</span>
+                </span>
                 {pincodeResult.isDeliverable && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '4px' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-secondary)' }}>
-                      <Clock size={12} /> {pincodeResult.message}
-                    </span>
-                    <span className={`badge-tag ${pincodeResult.isCodAllowed ? 'badge-lime' : ''}`} style={{ fontSize: '0.68rem', padding: '1px 6px' }}>
-                      {pincodeResult.isCodAllowed ? '✓ Cash on Delivery Available' : 'Prepaid Orders Only'}
-                    </span>
-                  </div>
+                  <span style={{
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    color: pincodeResult.isCodAllowed ? '#166534' : 'var(--text-muted)',
+                    background: pincodeResult.isCodAllowed ? 'rgba(34, 197, 94, 0.12)' : 'transparent',
+                    padding: '2px 6px',
+                    borderRadius: 'var(--radius-sm)'
+                  }}>
+                    {pincodeResult.isCodAllowed ? '✓ COD Available' : 'Prepaid Only'}
+                  </span>
                 )}
               </div>
             )}
@@ -618,7 +713,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               </button>
             </div>
 
-            {/* Add to Bag Button */}
+            {/* High-Contrast Luxury Add to Bag Button */}
             <button
               type="button"
               onClick={handleAdd}
@@ -632,16 +727,17 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                 justifyContent: 'center',
                 gap: '8px',
                 padding: '0 16px',
-                fontWeight: '700',
+                fontWeight: '800',
                 fontSize: '0.9rem',
                 borderRadius: 'var(--radius-md)',
-                background: isAdded ? 'rgba(46, 125, 50, 0.12)' : 'var(--bg-primary)',
-                color: isAdded ? 'var(--accent-green)' : 'var(--text-primary)',
-                border: isAdded ? '1.5px solid var(--accent-green)' : '1.5px solid var(--border-subtle)',
+                background: isAdded ? 'rgba(46, 125, 50, 0.12)' : '#FFFFFF',
+                color: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
+                border: isAdded ? '1.5px solid var(--accent-green)' : '1.5px solid var(--accent-navy)',
                 boxSizing: 'border-box',
                 whiteSpace: 'nowrap',
                 lineHeight: 1,
                 cursor: !product.inStock ? 'not-allowed' : 'pointer',
+                boxShadow: 'var(--shadow-sm)',
                 transition: 'all var(--transition-fast)'
               }}
               title="Add item to Bag"
