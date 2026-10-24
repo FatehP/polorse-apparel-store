@@ -15,7 +15,8 @@ import {
   ChevronRight,
   Maximize2,
   Zap,
-  Ruler
+  Ruler,
+  ArrowLeft
 } from 'lucide-react';
 import { checkPincodeDeliverability, autoDetectLocation } from '../services/pincodeService';
 
@@ -60,16 +61,26 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [imageList.length]);
 
-  // Mobile Body Scroll Lock to prevent background page scroll leakage
+  // Bulletproof iOS Body Scroll Lock: physically freeze body at current scroll position
   useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    const originalTouchAction = document.body.style.touchAction;
-    document.body.style.overflow = 'hidden';
-    document.body.style.touchAction = 'none';
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const prevPosition = body.style.position;
+    const prevTop = body.style.top;
+    const prevWidth = body.style.width;
+    const prevOverflow = body.style.overflow;
+
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
 
     return () => {
-      document.body.style.overflow = originalOverflow;
-      document.body.style.touchAction = originalTouchAction;
+      body.style.position = prevPosition;
+      body.style.top = prevTop;
+      body.style.width = prevWidth;
+      body.style.overflow = prevOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, []);
 
@@ -169,8 +180,65 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
         {/* iOS Native Modal Pull Handle */}
         <div className="sheet-handle" style={{ gridColumn: '1 / -1', margin: '10px auto 4px auto' }} />
 
-        {/* Close Button */}
+        {/* Mobile Full-Page Top Navigation Bar */}
+        <div className="modal-mobile-topbar">
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--bg-secondary)',
+              border: '1.5px solid var(--border-subtle)',
+              fontSize: '0.82rem',
+              fontWeight: '700',
+              color: 'var(--accent-navy)',
+              boxShadow: 'var(--shadow-sm)',
+              cursor: 'pointer'
+            }}
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Drop</span>
+          </button>
+
+          <span style={{
+            fontSize: '0.78rem',
+            fontWeight: '800',
+            letterSpacing: '0.12em',
+            color: 'var(--accent-navy)',
+            textTransform: 'uppercase'
+          }}>
+            POLORSE ARCHIVE
+          </span>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close modal"
+            style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '50%',
+              background: 'var(--bg-secondary)',
+              border: '1.5px solid var(--border-subtle)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-primary)',
+              boxShadow: 'var(--shadow-sm)',
+              cursor: 'pointer'
+            }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Desktop Floating Close Button */}
         <button
+          className="modal-desktop-close-btn"
           onClick={onClose}
           aria-label="Close modal"
           style={{
@@ -183,7 +251,6 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             borderRadius: '50%',
             width: '36px',
             height: '36px',
-            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 10,
