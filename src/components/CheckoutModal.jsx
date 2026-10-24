@@ -216,36 +216,42 @@ export default function CheckoutModal({
           fullName: currentUser.savedAddress.fullName || currentUser.name || '',
           phone: currentUser.savedAddress.phone || currentUser.phone || '',
           addressLine: currentUser.savedAddress.addressLine || '',
-          city: currentUser.savedAddress.city || 'Mumbai',
-          state: currentUser.savedAddress.state || 'Maharashtra',
-          pincode: currentUser.savedAddress.pincode || '400001',
+          city: currentUser.savedAddress.city || '',
+          state: currentUser.savedAddress.state || '',
+          pincode: currentUser.savedAddress.pincode || '',
           tag: 'Home',
           isPrimary: true
         };
         setAddresses([defaultAddr]);
         setSelectedAddressId(defaultAddr.id);
       } else {
-        setAddressForm(prev => ({
-          ...prev,
-          fullName: currentUser.name || '',
-          phone: currentUser.phone || ''
-        }));
+        setAddressForm({
+          fullName: '',
+          phone: '',
+          addressLine: '',
+          city: '',
+          state: '',
+          pincode: '',
+          tag: 'Home',
+          isPrimary: true
+        });
         setIsAddingNewAddress(true);
       }
     } else {
-      const demoGuestAddr = {
-        id: 'addr-guest',
-        fullName: 'Fateh Prajapati',
-        phone: '9876543210',
-        addressLine: 'Aura Studio 402, High Street Boulevard',
-        city: 'Mumbai',
-        state: 'Maharashtra',
-        pincode: '400001',
-        tag: 'Home / Studio',
+      // Guest User - Empty blank address form ready for user to enter their actual details
+      setAddresses([]);
+      setSelectedAddressId(null);
+      setAddressForm({
+        fullName: '',
+        phone: '',
+        addressLine: '',
+        city: '',
+        state: '',
+        pincode: '',
+        tag: 'Home',
         isPrimary: true
-      };
-      setAddresses([demoGuestAddr]);
-      setSelectedAddressId(demoGuestAddr.id);
+      });
+      setIsAddingNewAddress(true);
     }
   }, [currentUser]);
 
@@ -1719,12 +1725,13 @@ export default function CheckoutModal({
                         type="button"
                         onClick={() => {
                           setEditingAddressId(null);
+                          setDeliveryStatus(null);
                           setAddressForm({
-                            fullName: currentUser?.name || '',
-                            phone: currentUser?.phone || '',
+                            fullName: '',
+                            phone: '',
                             addressLine: '',
                             city: '',
-                            state: 'Maharashtra',
+                            state: '',
                             pincode: '',
                             tag: 'Home',
                             isPrimary: addresses.length === 0
@@ -1932,8 +1939,8 @@ export default function CheckoutModal({
                             <Clock size={14} />
                             <span>
                               {deliveryStatus.isDeliverable
-                                ? `Estimated Delivery: ${deliveryStatus.standardDays} days (${deliveryStatus.city}, ${deliveryStatus.state})`
-                                : 'Pincode deliverability check.'}
+                                ? `Estimated Delivery: ${deliveryStatus.deliveryDays || '2-3 Days'} (${deliveryStatus.city}, ${deliveryStatus.state})`
+                                : (deliveryStatus.message || 'Pincode deliverability check.')}
                             </span>
                           </div>
                         )}
@@ -2339,11 +2346,8 @@ export default function CheckoutModal({
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: '0.76rem', textTransform: 'uppercase', fontWeight: '800', color: 'var(--text-muted)' }}>
-                        Items in Drop ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})
-                      </span>
-                      <span style={{ fontSize: '0.78rem', color: 'var(--accent-navy)', fontWeight: '700' }}>
-                        Polorse Heavyweight Drop
+                      <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', fontWeight: '800', color: 'var(--text-primary)' }}>
+                        Items in Order ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})
                       </span>
                     </div>
 
