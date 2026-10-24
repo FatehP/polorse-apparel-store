@@ -5,15 +5,23 @@ import ProductModal from './components/ProductModal';
 import CartDrawer from './components/CartDrawer';
 import CheckoutModal from './components/CheckoutModal';
 import AdminPortal from './components/AdminPortal';
+import FilterDrawer from './components/FilterDrawer';
 import { fetchProducts } from './services/storeService';
-import { ArrowDown, Flame, Sparkles, Shield, Truck, RefreshCw, Smartphone } from 'lucide-react';
+import { ArrowDown, Flame, Sparkles, Shield, Truck, RefreshCw, Smartphone, SlidersHorizontal, X, RotateCcw, ArrowUpDown } from 'lucide-react';
 
 export default function App() {
   const [activeView, setActiveView] = useState('store'); // 'store' or 'admin'
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  // Search & Filtering States
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSort, setSelectedSort] = useState('featured');
+  const [priceRange, setPriceRange] = useState('all');
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Cart & Modals
   const [cart, setCart] = useState([]);
@@ -43,18 +51,93 @@ export default function App() {
     return () => window.removeEventListener("aura_store_update", handleStoreUpdate);
   }, []);
 
-  // Derive categories
+  // Derive categories & counts
   const categories = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
 
-  // Filter products
-  const filteredProducts = products.filter(p => {
-    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-    const matchesSearch = !searchQuery.trim() ||
-      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const categoryCounts = products.reduce((acc, p) => {
+    if (p.category) {
+      acc[p.category] = (acc[p.category] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
+  // Compute active filters count
+  let activeFiltersCount = 0;
+  if (selectedCategory !== 'all') activeFiltersCount++;
+  if (selectedSort !== 'featured') activeFiltersCount++;
+  if (priceRange !== 'all') activeFiltersCount++;
+  if (selectedSizes.length > 0) activeFiltersCount += selectedSizes.length;
+  if (inStockOnly) activeFiltersCount++;
+
+  // Reset all filters
+  const handleClearAllFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setSelectedSort('featured');
+    setPriceRange('all');
+    setSelectedSizes([]);
+    setInStockOnly(false);
+  };
+
+  // Multi-criteria Filter & Sort
+  const filteredProducts = products
+    .filter(p => {
+      // 1. Category
+      if (selectedCategory !== 'all' && p.category !== selectedCategory) {
+        return false;
+      }
+
+      // 2. Search Query (title, description, category, tags, color names)
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const titleMatch = p.title?.toLowerCase().includes(q);
+        const descMatch = p.description?.toLowerCase().includes(q);
+        const catMatch = p.category?.toLowerCase().includes(q);
+        const tagMatch = p.tags?.some(t => t.toLowerCase().includes(q));
+        const colorMatch = p.colors?.some(c => c.name?.toLowerCase().includes(q));
+        if (!titleMatch && !descMatch && !catMatch && !tagMatch && !colorMatch) {
+          return false;
+        }
+      }
+
+      // 3. Price Range
+      if (priceRange === 'under-1500' && p.price >= 1500) return false;
+      if (priceRange === '1500-2500' && (p.price < 1500 || p.price > 2500)) return false;
+      if (priceRange === '2500-3500' && (p.price < 2500 || p.price > 3500)) return false;
+      if (priceRange === 'above-3500' && p.price <= 3500) return false;
+
+      // 4. Sizes
+      if (selectedSizes.length > 0) {
+        const hasAnySize = p.sizes?.some(s => selectedSizes.includes(s.size) && s.stock > 0);
+        if (!hasAnySize) return false;
+      }
+
+      // 5. In-Stock Only
+      if (inStockOnly && !p.inStock) return false;
+
+      return true;
+    })
+    .sort((a, b) => {
+      if (selectedSort === 'price-low') {
+        return a.price - b.price;
+      }
+      if (selectedSort === 'price-high') {
+        return b.price - a.price;
+      }
+      if (selectedSort === 'newest') {
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      }
+      if (selectedSort === 'discount') {
+        const discA = a.originalPrice ? ((a.originalPrice - a.price) / a.originalPrice) : 0;
+        const discB = b.originalPrice ? ((b.originalPrice - b.price) / b.originalPrice) : 0;
+        return discB - discA;
+      }
+      // 'featured'
+      if (a.isFeatured && !b.isFeatured) return -1;
+      if (!a.isFeatured && b.isFeatured) return 1;
+      return 0;
+    });
+
 
   // Cart operations
   const handleAddToCart = (productWithSelection) => {
@@ -122,6 +205,8 @@ export default function App() {
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         categories={categories}
+        onOpenFilter={() => setIsFilterOpen(true)}
+        activeFiltersCount={activeFiltersCount}
       />
 
       {/* Main View Router: Storefront vs Brother's Admin Portal */}
@@ -253,10 +338,10 @@ export default function App() {
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
-              alignItems: 'baseline',
+              alignItems: 'center',
               justifyContent: 'space-between',
               gap: '16px',
-              marginBottom: '32px'
+              marginBottom: '20px'
             }}>
               <div>
                 <span className="badge-tag badge-orange" style={{ marginBottom: '6px' }}>CATALOG DROP</span>
@@ -264,21 +349,218 @@ export default function App() {
                   {selectedCategory === 'all' ? 'All Streetwear Apparel' : selectedCategory}
                 </h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  Showing {filteredProducts.length} pieces • Hand-crafted oversized silhouettes
+                  Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'piece' : 'pieces'} • Hand-crafted oversized silhouettes
                 </p>
               </div>
 
-              {/* Mobile / Tablet search bar */}
-              <div style={{ width: '100%', maxWidth: '300px' }}>
-                <input
-                  type="text"
-                  placeholder="Filter by name, color, style..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ borderRadius: 'var(--radius-full)' }}
-                />
+              {/* Catalog Toolbar: Sort Dropdown & Filter Trigger Button */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                {/* Sort Dropdown */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                    Sort:
+                  </span>
+                  <select
+                    value={selectedSort}
+                    onChange={(e) => setSelectedSort(e.target.value)}
+                    style={{
+                      width: 'auto',
+                      padding: '8px 14px',
+                      fontSize: '0.84rem',
+                      fontWeight: '600',
+                      borderRadius: 'var(--radius-full)',
+                      background: 'var(--bg-secondary)',
+                      borderColor: 'var(--border-subtle)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="featured">Featured / Recommended</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="newest">Newest Drops</option>
+                    <option value="discount">Highest Discount</option>
+                  </select>
+                </div>
+
+                {/* Filter Trigger Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsFilterOpen(true)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '7px',
+                    padding: '8px 16px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    background: activeFiltersCount > 0 ? 'var(--accent-navy)' : 'var(--bg-secondary)',
+                    color: activeFiltersCount > 0 ? '#fff' : 'var(--text-primary)',
+                    border: '1px solid',
+                    borderColor: activeFiltersCount > 0 ? 'var(--accent-navy)' : 'var(--border-subtle)',
+                    boxShadow: 'var(--shadow-sm)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <SlidersHorizontal size={15} style={{ color: activeFiltersCount > 0 ? '#fff' : 'var(--accent-red)' }} />
+                  <span>Filters</span>
+                  {activeFiltersCount > 0 && (
+                    <span style={{
+                      background: 'var(--accent-red)',
+                      color: '#fff',
+                      fontSize: '0.7rem',
+                      fontWeight: '700',
+                      minWidth: '18px',
+                      height: '18px',
+                      borderRadius: '9px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '0 4px',
+                      marginLeft: '2px'
+                    }}>
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
+
+            {/* Active Filter Chips Bar */}
+            {(searchQuery || selectedCategory !== 'all' || priceRange !== 'all' || selectedSizes.length > 0 || inStockOnly || selectedSort !== 'featured') && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '8px',
+                marginBottom: '24px',
+                padding: '10px 14px',
+                background: 'var(--bg-secondary)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-subtle)'
+              }}>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Active Filters:
+                </span>
+
+                {searchQuery && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '3px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: '600'
+                  }}>
+                    <span>Search: "{searchQuery}"</span>
+                    <button onClick={() => setSearchQuery('')} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {selectedCategory !== 'all' && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '3px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: '600'
+                  }}>
+                    <span>Category: {selectedCategory}</span>
+                    <button onClick={() => setSelectedCategory('all')} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {priceRange !== 'all' && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '3px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: '600'
+                  }}>
+                    <span>Price: {priceRange}</span>
+                    <button onClick={() => setPriceRange('all')} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                {selectedSizes.map(size => (
+                  <span key={size} style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '3px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: '600'
+                  }}>
+                    <span>Size: {size}</span>
+                    <button onClick={() => setSelectedSizes(selectedSizes.filter(s => s !== size))} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+
+                {inStockOnly && (
+                  <span style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '3px 10px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-primary)',
+                    fontWeight: '600'
+                  }}>
+                    <span>In-Stock Only</span>
+                    <button onClick={() => setInStockOnly(false)} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+
+                <button
+                  onClick={handleClearAllFilters}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    fontSize: '0.78rem',
+                    color: 'var(--accent-red)',
+                    fontWeight: '700',
+                    marginLeft: 'auto',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <RotateCcw size={12} />
+                  <span>Clear All Filters</span>
+                </button>
+              </div>
+            )}
 
             {loading ? (
               <div style={{ textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>
@@ -292,15 +574,15 @@ export default function App() {
                 borderRadius: 'var(--radius-lg)',
                 border: '1px solid var(--border-subtle)'
               }}>
-                <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '8px' }}>No Apparel Matches Your Search</h3>
+                <h3 style={{ fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '8px' }}>No Apparel Matches Your Search or Filters</h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', marginBottom: '20px' }}>
-                  Try a different search term or category, or upload new clothes in Brother's Admin!
+                  Try relaxing your price range, clearing search terms, or exploring other categories!
                 </p>
                 <button
-                  onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+                  onClick={handleClearAllFilters}
                   className="btn-primary"
                 >
-                  Clear Filters
+                  Reset All Filters
                 </button>
               </div>
             ) : (
@@ -444,6 +726,27 @@ export default function App() {
         cartItems={cart}
         appliedCoupon={appliedCoupon}
         onOrderSuccess={handleOrderSuccess}
+      />
+
+      {/* Filter & Sort Drawer */}
+      <FilterDrawer
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        selectedSort={selectedSort}
+        setSelectedSort={setSelectedSort}
+        priceRange={priceRange}
+        setPriceRange={setPriceRange}
+        selectedSizes={selectedSizes}
+        setSelectedSizes={setSelectedSizes}
+        inStockOnly={inStockOnly}
+        setInStockOnly={setInStockOnly}
+        onClearAll={handleClearAllFilters}
+        totalProductsCount={products.length}
+        filteredCount={filteredProducts.length}
+        categoryCounts={categoryCounts}
       />
     </div>
   );
