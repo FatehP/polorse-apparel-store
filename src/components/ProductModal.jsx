@@ -762,7 +762,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               disabled={!product.inStock}
               id="modal-buy-now-btn"
               style={{
-                flex: 1.25,
+                flex: 1,
                 height: '46px',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -785,7 +785,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               title="Direct Instant Checkout"
             >
               <Zap size={16} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
-              <span>Buy Now • ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
+              <span>Buy Now</span>
             </button>
           </div>
 
