@@ -214,127 +214,8 @@ export default function App() {
         <AdminPortal onSwitchToStore={() => setActiveView('store')} />
       ) : (
         <main style={{ flex: 1 }}>
-          {/* Hero Banner */}
-          <section style={{
-            position: 'relative',
-            padding: '75px 24px 65px',
-            background: 'radial-gradient(ellipse at top, #F3ECE1 0%, #FAF7F2 80%)',
-            borderBottom: '1px solid var(--border-subtle)',
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              maxWidth: '1240px',
-              margin: '0 auto',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              position: 'relative',
-              zIndex: 2
-            }}>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '6px 16px',
-                borderRadius: 'var(--radius-full)',
-                background: 'rgba(194, 26, 44, 0.08)',
-                border: '1px solid rgba(194, 26, 44, 0.25)',
-                color: 'var(--accent-red)',
-                fontSize: '0.82rem',
-                fontWeight: '700',
-                letterSpacing: '0.08em',
-                marginBottom: '18px'
-              }}>
-                <Flame size={15} />
-                <span>POLORSE SIGNATURE DROP • CRAFTED IN INDIA • 100% COMBED COTTON</span>
-              </div>
-
-              <h1 style={{
-                fontSize: 'clamp(2.5rem, 6vw, 4.4rem)',
-                lineHeight: '1.05',
-                letterSpacing: '-0.03em',
-                maxWidth: '920px',
-                marginBottom: '18px',
-                color: 'var(--text-primary)'
-              }}>
-                CRAFTED IN INDIA. <span style={{ color: 'var(--accent-red)' }}>POLORSE</span> APPAREL.
-              </h1>
-
-              <p style={{
-                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-                color: 'var(--text-secondary)',
-                maxWidth: '680px',
-                lineHeight: '1.6',
-                marginBottom: '32px'
-              }}>
-                Ultra-heavyweight dropped-shoulder hoodies, tailored boxy tees, and structured bottoms. Engineered for refined comfort, exceptional drape, and timeless Indian craftsmanship.
-              </p>
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'center' }}>
-                <a
-                  href="#catalog"
-                  className="btn-primary"
-                  style={{ textDecoration: 'none', padding: '14px 28px', fontSize: '1rem', borderRadius: 'var(--radius-full)' }}
-                >
-                  <span>Explore Collection</span>
-                  <ArrowDown size={18} />
-                </a>
-
-                <button
-                  onClick={() => setActiveView('admin')}
-                  className="btn-secondary"
-                  style={{ padding: '14px 24px', fontSize: '0.95rem', borderRadius: 'var(--radius-full)' }}
-                >
-                  <Shield size={18} style={{ color: 'var(--accent-red)' }} />
-                  <span>Brother's Admin Portal</span>
-                </button>
-              </div>
-
-              {/* Highlights Bar in White & Creme */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '20px',
-                width: '100%',
-                maxWidth: '960px',
-                marginTop: '56px',
-                padding: '20px 24px',
-                background: 'var(--bg-secondary)',
-                borderRadius: 'var(--radius-lg)',
-                border: '1px solid var(--border-subtle)',
-                boxShadow: 'var(--shadow-md)',
-                textAlign: 'left'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Truck size={24} style={{ color: 'var(--accent-navy)' }} />
-                  <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Pan-India Fast Shipping</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Delivered in 3-5 business days</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Sparkles size={24} style={{ color: 'var(--accent-red)' }} />
-                  <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Cash on Delivery & UPI</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Pay cash at doorstep or via UPI</div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <RefreshCw size={24} style={{ color: 'var(--accent-gold)' }} />
-                  <div>
-                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Easy Size Exchanges</div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>7 days doorstep replacement</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Product Catalog Grid */}
-          <section id="catalog" style={{ maxWidth: '1360px', margin: '0 auto', padding: '40px 24px 16px' }}>
+          {/* Product Catalog Grid (Products First) */}
+          <section id="catalog" style={{ maxWidth: '1360px', margin: '0 auto', padding: '32px 24px 48px' }}>
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -601,6 +482,104 @@ export default function App() {
                 ))}
               </div>
             )}
+          </section>
+
+          {/* Brand Story & Trust Highlights Section (Below Catalog) */}
+          <section style={{
+            position: 'relative',
+            padding: '70px 24px 65px',
+            background: 'radial-gradient(ellipse at center, #F3ECE1 0%, #FAF7F2 100%)',
+            borderTop: '1px solid var(--border-subtle)',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              maxWidth: '1240px',
+              margin: '0 auto',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              position: 'relative',
+              zIndex: 2
+            }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '6px 16px',
+                borderRadius: 'var(--radius-full)',
+                background: 'rgba(194, 26, 44, 0.08)',
+                border: '1px solid rgba(194, 26, 44, 0.25)',
+                color: 'var(--accent-red)',
+                fontSize: '0.82rem',
+                fontWeight: '700',
+                letterSpacing: '0.08em',
+                marginBottom: '18px'
+              }}>
+                <Flame size={15} />
+                <span>POLORSE SIGNATURE DROP • CRAFTED IN INDIA • 100% COMBED COTTON</span>
+              </div>
+
+              <h2 style={{
+                fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
+                lineHeight: '1.1',
+                letterSpacing: '-0.03em',
+                maxWidth: '920px',
+                marginBottom: '18px',
+                color: 'var(--text-primary)'
+              }}>
+                CRAFTED IN INDIA. <span style={{ color: 'var(--accent-red)' }}>POLORSE</span> APPAREL.
+              </h2>
+
+              <p style={{
+                fontSize: 'clamp(0.95rem, 1.8vw, 1.15rem)',
+                color: 'var(--text-secondary)',
+                maxWidth: '680px',
+                lineHeight: '1.6',
+                marginBottom: '36px'
+              }}>
+                Ultra-heavyweight dropped-shoulder hoodies, tailored boxy tees, and structured bottoms. Engineered for refined comfort, exceptional drape, and timeless Indian craftsmanship.
+              </p>
+
+              {/* Highlights Bar in White & Creme */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '20px',
+                width: '100%',
+                maxWidth: '960px',
+                padding: '24px',
+                background: 'var(--bg-secondary)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--border-subtle)',
+                boxShadow: 'var(--shadow-md)',
+                textAlign: 'left'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Truck size={24} style={{ color: 'var(--accent-navy)' }} />
+                  <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Pan-India Fast Shipping</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Delivered in 3-5 business days</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Sparkles size={24} style={{ color: 'var(--accent-red)' }} />
+                  <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Cash on Delivery & UPI</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>Pay cash at doorstep or via UPI</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <RefreshCw size={24} style={{ color: 'var(--accent-gold)' }} />
+                  <div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>Easy Size Exchanges</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>7 days doorstep replacement</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
         </main>
       )}
