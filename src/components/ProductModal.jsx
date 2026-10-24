@@ -167,11 +167,6 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
     <div
       className="product-modal-overlay"
       onClick={onClose}
-      onTouchMove={(e) => {
-        if (e.target === e.currentTarget) {
-          e.preventDefault();
-        }
-      }}
     >
       <div
         className="product-modal-dialog animate-fade"
@@ -180,7 +175,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
         {/* iOS Native Modal Pull Handle */}
         <div className="sheet-handle" style={{ gridColumn: '1 / -1', margin: '10px auto 4px auto' }} />
 
-        {/* Mobile Full-Page Top Navigation Bar */}
+        {/* Mobile Full-Page Top Navigation Bar - Single Clean Back Button */}
         <div className="modal-mobile-topbar">
           <button
             type="button"
@@ -189,50 +184,19 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '6px 14px',
+              padding: '8px 16px',
               borderRadius: 'var(--radius-full)',
               background: 'var(--bg-secondary)',
               border: '1.5px solid var(--border-subtle)',
-              fontSize: '0.82rem',
+              fontSize: '0.86rem',
               fontWeight: '700',
               color: 'var(--accent-navy)',
               boxShadow: 'var(--shadow-sm)',
               cursor: 'pointer'
             }}
           >
-            <ArrowLeft size={16} />
-            <span>Back to Drop</span>
-          </button>
-
-          <span style={{
-            fontSize: '0.78rem',
-            fontWeight: '800',
-            letterSpacing: '0.12em',
-            color: 'var(--accent-navy)',
-            textTransform: 'uppercase'
-          }}>
-            POLORSE ARCHIVE
-          </span>
-
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close modal"
-            style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '50%',
-              background: 'var(--bg-secondary)',
-              border: '1.5px solid var(--border-subtle)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-primary)',
-              boxShadow: 'var(--shadow-sm)',
-              cursor: 'pointer'
-            }}
-          >
-            <X size={16} />
+            <ArrowLeft size={18} />
+            <span>Back</span>
           </button>
         </div>
 
