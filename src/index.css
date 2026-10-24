@@ -307,8 +307,10 @@ input:focus, textarea:focus, select:focus {
   align-items: center;
   justify-content: center;
   padding: 20px;
-  overflow-x: hidden;
+  overflow: hidden;
   box-sizing: border-box;
+  touch-action: none !important;
+  overscroll-behavior: contain !important;
 }
 
 .product-modal-dialog {
@@ -364,7 +366,7 @@ input:focus, textarea:focus, select:focus {
   .product-modal-overlay {
     padding: 0 !important;
     align-items: flex-end !important;
-    touch-action: pan-y !important;
+    touch-action: none !important;
     overscroll-behavior: contain !important;
   }
 

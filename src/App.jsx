@@ -44,6 +44,22 @@ export default function App() {
     return () => window.removeEventListener('polorse_auth_changed', handleAuthChange);
   }, []);
 
+  // Global mobile body scroll lock whenever any modal or drawer is active
+  const isAnyModalActive = Boolean(selectedProduct || isCartOpen || isFilterOpen || isCheckoutOpen || isAuthModalOpen);
+  useEffect(() => {
+    if (isAnyModalActive) {
+      const originalOverflow = document.body.style.overflow;
+      const originalTouchAction = document.body.style.touchAction;
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.touchAction = originalTouchAction;
+      };
+    }
+  }, [isAnyModalActive]);
+
   const handleLogout = () => {
     logout();
     setCurrentUser(null);

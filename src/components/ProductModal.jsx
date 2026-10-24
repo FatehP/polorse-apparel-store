@@ -60,6 +60,19 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [imageList.length]);
 
+  // Mobile Body Scroll Lock to prevent background page scroll leakage
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    const originalTouchAction = document.body.style.touchAction;
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.touchAction = originalTouchAction;
+    };
+  }, []);
+
   // Pincode Deliverability State
   const [pincodeInput, setPincodeInput] = useState('');
   const [pincodeResult, setPincodeResult] = useState(null);
@@ -143,6 +156,11 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
     <div
       className="product-modal-overlay"
       onClick={onClose}
+      onTouchMove={(e) => {
+        if (e.target === e.currentTarget) {
+          e.preventDefault();
+        }
+      }}
     >
       <div
         className="product-modal-dialog animate-fade"
