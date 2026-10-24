@@ -586,19 +586,21 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
           </div>
 
           {/* Quantity Selector and Action Buttons (Add to Bag & Buy Now) */}
-          <div style={{ display: 'flex', gap: '12px', marginTop: '10px', alignItems: 'stretch' }}>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '10px', alignItems: 'center' }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               background: 'var(--bg-primary)',
               border: '1.5px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
-              padding: '0 6px'
+              padding: '0 6px',
+              height: '46px',
+              boxSizing: 'border-box'
             }}>
               <button
                 type="button"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                style={{ padding: '8px 10px', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer' }}
+                style={{ padding: '0 10px', height: '100%', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 aria-label="Decrease quantity"
               >
                 -
@@ -609,7 +611,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               <button
                 type="button"
                 onClick={() => setQuantity(quantity + 1)}
-                style={{ padding: '8px 10px', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer' }}
+                style={{ padding: '0 10px', height: '100%', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                 aria-label="Increase quantity"
               >
                 +
@@ -624,17 +626,21 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               id="modal-add-to-bag-btn"
               style={{
                 flex: 1,
-                display: 'flex',
+                height: '46px',
+                display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                padding: '12px 14px',
+                padding: '0 16px',
                 fontWeight: '700',
                 fontSize: '0.9rem',
                 borderRadius: 'var(--radius-md)',
                 background: isAdded ? 'rgba(46, 125, 50, 0.12)' : 'var(--bg-primary)',
                 color: isAdded ? 'var(--accent-green)' : 'var(--text-primary)',
                 border: isAdded ? '1.5px solid var(--accent-green)' : '1.5px solid var(--border-subtle)',
+                boxSizing: 'border-box',
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
                 cursor: !product.inStock ? 'not-allowed' : 'pointer',
                 transition: 'all var(--transition-fast)'
               }}
@@ -661,17 +667,21 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               id="modal-buy-now-btn"
               style={{
                 flex: 1.25,
-                display: 'flex',
+                height: '46px',
+                display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                padding: '12px 16px',
+                padding: '0 18px',
                 fontWeight: '800',
                 fontSize: '0.92rem',
                 borderRadius: 'var(--radius-md)',
                 background: 'var(--accent-navy)',
                 color: '#FAF7F2',
-                border: 'none',
+                border: '1.5px solid var(--accent-navy)',
+                boxSizing: 'border-box',
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
                 cursor: !product.inStock ? 'not-allowed' : 'pointer',
                 boxShadow: '0 4px 14px rgba(15, 28, 63, 0.25)',
                 transition: 'all var(--transition-fast)'

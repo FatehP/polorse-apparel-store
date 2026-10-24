@@ -236,16 +236,18 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
             {/* Add to Bag Button */}
             <button
               onClick={handleQuickAddClick}
               disabled={!product.inStock}
               style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '4px',
-                padding: '6px 10px',
+                height: '32px',
+                padding: '0 10px',
                 background: isAdded ? 'var(--accent-green)' : 'var(--bg-secondary)',
                 color: isAdded ? '#fff' : 'var(--text-primary)',
                 border: '1px solid',
@@ -256,6 +258,9 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
                 boxShadow: 'var(--shadow-sm)',
                 cursor: product.inStock ? 'pointer' : 'not-allowed',
                 opacity: product.inStock ? 1 : 0.5,
+                whiteSpace: 'nowrap',
+                boxSizing: 'border-box',
+                lineHeight: 1,
                 transition: 'all var(--transition-fast)'
               }}
               title="Add to Bag"
@@ -278,18 +283,24 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
               onClick={handleBuyNowClick}
               disabled={!product.inStock}
               style={{
-                display: 'flex',
+                display: 'inline-flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '4px',
-                padding: '6px 11px',
+                height: '32px',
+                padding: '0 10px',
                 background: 'var(--accent-navy)',
                 color: '#fff',
+                border: '1px solid var(--accent-navy)',
                 fontSize: '0.78rem',
                 fontWeight: '700',
                 borderRadius: 'var(--radius-md)',
                 boxShadow: '0 2px 8px rgba(15, 28, 63, 0.2)',
                 cursor: product.inStock ? 'pointer' : 'not-allowed',
                 opacity: product.inStock ? 1 : 0.5,
+                whiteSpace: 'nowrap',
+                boxSizing: 'border-box',
+                lineHeight: 1,
                 transition: 'all var(--transition-fast)'
               }}
               title="Buy Now (Direct Checkout)"
