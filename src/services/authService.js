@@ -356,7 +356,118 @@ export function updateUserAddress(addressData) {
   return addOrUpdateUserAddress({ ...addressData, isPrimary: true });
 }
 
-// 6. Sign Out
+// 6. User Profile Update (Name, Email, Phone, Avatar)
+export function updateUserProfile(profileData) {
+  const current = getCurrentUser();
+  if (!current) return null;
+
+  const updatedUser = {
+    ...current,
+    ...profileData
+  };
+  setCurrentUser(updatedUser);
+
+  const users = getStoredUsers();
+  const idx = users.findIndex(u => u.id === current.id);
+  if (idx !== -1) {
+    users[idx] = { ...users[idx], ...profileData };
+    saveUsers(users);
+  }
+  return updatedUser;
+}
+
+// 7. Card Management (Credit & Debit Cards)
+export function getUserCards() {
+  const current = getCurrentUser();
+  if (!current) return [];
+  if (Array.isArray(current.savedCards) && current.savedCards.length > 0) {
+    return current.savedCards;
+  }
+  // Default demo card
+  const demoCards = [
+    {
+      id: 'card-1',
+      number: '4532 8901 2345 6789',
+      last4: '6789',
+      name: current.name || 'FATEH PRAJAPATI',
+      expiry: '08/28',
+      network: 'Visa',
+      isPrimary: true
+    },
+    {
+      id: 'card-2',
+      number: '5412 7512 3412 4242',
+      last4: '4242',
+      name: current.name || 'FATEH PRAJAPATI',
+      expiry: '11/27',
+      network: 'MasterCard',
+      isPrimary: false
+    }
+  ];
+  return demoCards;
+}
+
+export function saveUserCards(cards) {
+  const current = getCurrentUser();
+  if (!current) return;
+
+  const updatedUser = {
+    ...current,
+    savedCards: cards
+  };
+  setCurrentUser(updatedUser);
+
+  const users = getStoredUsers();
+  const idx = users.findIndex(u => u.id === current.id);
+  if (idx !== -1) {
+    users[idx] = { ...users[idx], savedCards: cards };
+    saveUsers(users);
+  }
+}
+
+export function addOrUpdateUserCard(cardData) {
+  const current = getCurrentUser();
+  if (!current) return null;
+
+  const existingCards = getUserCards();
+  const isEditing = Boolean(cardData.id);
+  const targetId = cardData.id || `card-${Date.now()}`;
+  const cleanNumber = (cardData.number || '').replace(/\s+/g, '');
+  const last4 = cleanNumber.slice(-4) || '1234';
+
+  let updatedList;
+  if (isEditing) {
+    updatedList = existingCards.map(c =>
+      c.id === targetId ? { ...c, ...cardData, last4 } : (cardData.isPrimary ? { ...c, isPrimary: false } : c)
+    );
+  } else {
+    const newCard = {
+      ...cardData,
+      id: targetId,
+      last4,
+      isPrimary: cardData.isPrimary || existingCards.length === 0
+    };
+    const prevList = cardData.isPrimary
+      ? existingCards.map(c => ({ ...c, isPrimary: false }))
+      : existingCards;
+    updatedList = [newCard, ...prevList];
+  }
+
+  saveUserCards(updatedList);
+  return updatedList.find(c => c.id === targetId);
+}
+
+export function deleteUserCard(cardId) {
+  const existingCards = getUserCards();
+  const remaining = existingCards.filter(c => c.id !== cardId);
+  if (remaining.length > 0 && !remaining.some(c => c.isPrimary)) {
+    remaining[0].isPrimary = true;
+  }
+  saveUserCards(remaining);
+  return remaining;
+}
+
+// 8. Sign Out
 export function logout() {
   setCurrentUser(null);
 }

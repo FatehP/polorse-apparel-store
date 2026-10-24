@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, ShieldCheck, Flame, Search, SlidersHorizontal, Store, X, User, LogOut, ChevronDown } from 'lucide-react';
+import { ShoppingBag, ShieldCheck, Flame, Search, SlidersHorizontal, Store, X, User, LogOut, ChevronDown, Package, MapPin, CreditCard } from 'lucide-react';
 
 export default function Navbar({
   activeView,
@@ -15,6 +15,7 @@ export default function Navbar({
   activeFiltersCount = 0,
   currentUser = null,
   onOpenAuth,
+  onOpenProfile,
   onLogout
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -228,6 +229,33 @@ export default function Navbar({
             </button>
           </div>
 
+          {/* Orders Quick-Access Pill (Always Accessible) */}
+          {activeView === 'store' && (
+            <button
+              type="button"
+              onClick={() => onOpenProfile?.('orders')}
+              id="navbar-orders-shortcut-btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '7px 12px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-full)',
+                color: 'var(--text-primary)',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="Track Orders & Delivery Status"
+            >
+              <Package size={14} style={{ color: 'var(--accent-navy)' }} />
+              <span className="nav-desktop-only">Orders</span>
+            </button>
+          )}
+
           {/* User Authentication Trigger / Profile Dropdown */}
           {activeView === 'store' && (
             <div style={{ position: 'relative' }}>
@@ -276,7 +304,7 @@ export default function Navbar({
                       cursor: 'pointer',
                       boxShadow: 'var(--shadow-sm)'
                     }}
-                    title="User Account"
+                    title="User Account Hub"
                   >
                     <div style={{
                       width: '28px',
@@ -288,9 +316,18 @@ export default function Navbar({
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '0.78rem',
-                      fontWeight: '800'
+                      fontWeight: '800',
+                      overflow: 'hidden'
                     }}>
-                      {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                      {currentUser.avatar ? (
+                        <img
+                          src={currentUser.avatar}
+                          alt={currentUser.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'
+                      )}
                     </div>
                     <span style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {currentUser.name ? currentUser.name.split(' ')[0] : 'Member'}
@@ -309,18 +346,42 @@ export default function Navbar({
                         border: '1.5px solid var(--border-subtle)',
                         borderRadius: 'var(--radius-md)',
                         boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
-                        minWidth: '220px',
+                        minWidth: '240px',
                         padding: '6px 0',
                         zIndex: 60
                       }}
                     >
                       <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-subtle)' }}>
-                        <p style={{ margin: 0, fontWeight: '800', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
-                          {currentUser.name}
-                        </p>
-                        <p style={{ margin: '2px 0 0 0', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
-                          {currentUser.email || currentUser.phone}
-                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <div style={{
+                            width: '34px',
+                            height: '34px',
+                            borderRadius: '50%',
+                            background: 'var(--accent-navy)',
+                            color: '#fff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.85rem',
+                            fontWeight: '800',
+                            overflow: 'hidden',
+                            flexShrink: 0
+                          }}>
+                            {currentUser.avatar ? (
+                              <img src={currentUser.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                              currentUser.name?.charAt(0) || 'U'
+                            )}
+                          </div>
+                          <div style={{ overflow: 'hidden' }}>
+                            <p style={{ margin: 0, fontWeight: '800', fontSize: '0.88rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {currentUser.name}
+                            </p>
+                            <p style={{ margin: '1px 0 0 0', fontSize: '0.72rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {currentUser.email || currentUser.phone}
+                            </p>
+                          </div>
+                        </div>
                         <span style={{
                           display: 'inline-block',
                           marginTop: '6px',
@@ -335,13 +396,113 @@ export default function Navbar({
                         </span>
                       </div>
 
-                      {currentUser.savedAddress && (
-                        <div style={{ padding: '8px 14px', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                          <span style={{ color: 'var(--text-primary)', fontWeight: '700', display: 'block' }}>Saved City:</span>
-                          <span>{currentUser.savedAddress.city} ({currentUser.savedAddress.pincode})</span>
-                        </div>
-                      )}
+                      {/* 1. Profile Details & Photo */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onOpenProfile?.('profile');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 14px',
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.84rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <User size={15} style={{ color: 'var(--accent-navy)' }} />
+                        <span>My Profile & Avatar</span>
+                      </button>
 
+                      {/* 2. My Orders & Live Tracking */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onOpenProfile?.('orders');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 14px',
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.84rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <Package size={15} style={{ color: 'var(--accent-navy)' }} />
+                        <span>My Orders & Live Status</span>
+                      </button>
+
+                      {/* 3. Saved Addresses */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onOpenProfile?.('addresses');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 14px',
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.84rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <MapPin size={15} style={{ color: 'var(--accent-navy)' }} />
+                        <span>Delivery Addresses</span>
+                      </button>
+
+                      {/* 4. Payment Cards & UPI */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onOpenProfile?.('payments');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 14px',
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--text-primary)',
+                          fontSize: '0.84rem',
+                          fontWeight: '700',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <CreditCard size={15} style={{ color: 'var(--accent-navy)' }} />
+                        <span>Payment Cards & UPI</span>
+                      </button>
+
+                      <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '4px 0' }} />
+
+                      {/* Sign Out */}
                       <button
                         type="button"
                         onClick={() => {
@@ -352,7 +513,7 @@ export default function Navbar({
                           width: '100%',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '8px',
+                          gap: '10px',
                           padding: '10px 14px',
                           background: 'none',
                           border: 'none',

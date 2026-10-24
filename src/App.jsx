@@ -7,6 +7,7 @@ import CheckoutModal from './components/CheckoutModal';
 import AdminPortal from './components/AdminPortal';
 import FilterDrawer from './components/FilterDrawer';
 import AuthModal from './components/AuthModal';
+import UserProfileModal from './components/UserProfileModal';
 import { fetchProducts } from './services/storeService';
 import { getCurrentUser, logout } from './services/authService';
 import { ArrowDown, Flame, Sparkles, Shield, Truck, RefreshCw, Smartphone, SlidersHorizontal, X, RotateCcw, ArrowUpDown } from 'lucide-react';
@@ -32,9 +33,11 @@ export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
-  // User Authentication State
+  // User Authentication & Customer Account Hub State
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [profileModalInitialTab, setProfileModalInitialTab] = useState('profile');
 
   useEffect(() => {
     const handleAuthChange = () => {
@@ -45,7 +48,7 @@ export default function App() {
   }, []);
 
   // Global mobile body scroll lock whenever any modal or drawer is active
-  const isAnyModalActive = Boolean(selectedProduct || isCartOpen || isFilterOpen || isCheckoutOpen || isAuthModalOpen);
+  const isAnyModalActive = Boolean(selectedProduct || isCartOpen || isFilterOpen || isCheckoutOpen || isAuthModalOpen || isProfileModalOpen);
   useEffect(() => {
     if (isAnyModalActive) {
       const originalOverflow = document.body.style.overflow;
@@ -60,6 +63,15 @@ export default function App() {
   const handleLogout = () => {
     logout();
     setCurrentUser(null);
+  };
+
+  const handleOpenProfile = (tab = 'profile') => {
+    setProfileModalInitialTab(tab);
+    setIsProfileModalOpen(true);
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setCurrentUser(updatedUser);
   };
 
   // Load products
@@ -261,6 +273,7 @@ export default function App() {
         activeFiltersCount={activeFiltersCount}
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenProfile={handleOpenProfile}
         onLogout={handleLogout}
       />
 
@@ -778,6 +791,16 @@ export default function App() {
           setCurrentUser(user);
           setIsAuthModalOpen(false);
         }}
+      />
+
+      {/* Customer Profile, Orders, Addresses & Payments Modal */}
+      <UserProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        initialTab={profileModalInitialTab}
+        currentUser={currentUser}
+        onUserUpdate={handleUserUpdate}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
       />
 
       {/* Filter & Sort Drawer */}

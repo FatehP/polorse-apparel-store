@@ -15,7 +15,6 @@ import {
   MapPin,
   Navigation,
   Clock,
-  AlertCircle,
   Sparkles,
   Edit2,
   Plus,
@@ -28,8 +27,130 @@ import { checkPincodeDeliverability, autoDetectLocation } from '../services/pinc
 import {
   getUserAddresses,
   addOrUpdateUserAddress,
-  deleteUserAddress
+  deleteUserAddress,
+  getUserCards
 } from '../services/authService';
+
+// Crisp Vector Brand Logos for Payment Options
+function PhonePeLogo() {
+  return (
+    <div
+      style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '8px',
+        background: '#5f259f',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#FFFFFF',
+        fontWeight: '900',
+        fontSize: '1.25rem',
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        flexShrink: 0,
+        boxShadow: '0 2px 5px rgba(95, 37, 159, 0.3)'
+      }}
+    >
+      पे
+    </div>
+  );
+}
+
+function GooglePayLogo() {
+  return (
+    <div
+      style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '8px',
+        background: '#FFFFFF',
+        border: '1px solid #E5E7EB',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontWeight: '900',
+        fontSize: '0.95rem',
+        flexShrink: 0,
+        boxShadow: '0 2px 5px rgba(0,0,0,0.06)'
+      }}
+    >
+      <span style={{ color: '#4285F4' }}>G</span>
+      <span style={{ color: '#EA4335' }}>P</span>
+      <span style={{ color: '#FBBC05' }}>a</span>
+      <span style={{ color: '#34A853' }}>y</span>
+    </div>
+  );
+}
+
+function PaytmLogo() {
+  return (
+    <div
+      style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '8px',
+        background: '#002E6E',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        boxShadow: '0 2px 5px rgba(0, 46, 110, 0.25)'
+      }}
+    >
+      <span style={{ color: '#00BAF2', fontWeight: '900', fontSize: '0.78rem', letterSpacing: '-0.02em' }}>
+        pay<span style={{ color: '#FFFFFF' }}>tm</span>
+      </span>
+    </div>
+  );
+}
+
+function AmazonPayLogo() {
+  return (
+    <div
+      style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '8px',
+        background: '#232F3E',
+        display: 'flex',
+        flexItems: 'center',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#FF9900',
+        fontWeight: '900',
+        fontSize: '0.75rem',
+        flexShrink: 0,
+        letterSpacing: '-0.02em',
+        boxShadow: '0 2px 5px rgba(35, 47, 62, 0.2)'
+      }}
+    >
+      a<span style={{ color: '#FFFFFF' }}>pay</span>
+    </div>
+  );
+}
+
+function BhimUpiLogo() {
+  return (
+    <div
+      style={{
+        width: '36px',
+        height: '36px',
+        borderRadius: '8px',
+        background: '#0F1C3F',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#FAF7F2',
+        fontWeight: '900',
+        fontSize: '0.74rem',
+        flexShrink: 0,
+        letterSpacing: '0.04em'
+      }}
+    >
+      UPI
+    </div>
+  );
+}
 
 export default function CheckoutModal({
   isOpen,
@@ -42,10 +163,7 @@ export default function CheckoutModal({
 }) {
   if (!isOpen) return null;
 
-  // Checkout Steps:
-  // Step 1: Payment Method Selection
-  // Step 2: Address Selection
-  // Step 3: Order Summary & Confirmation
+  // Steps: 1: Payment Selection, 2: Address Selection, 3: Order Summary & Confirmation
   const [currentStep, setCurrentStep] = useState(1);
 
   // --- Payment States ---
@@ -115,7 +233,6 @@ export default function CheckoutModal({
         setIsAddingNewAddress(true);
       }
     } else {
-      // Guest demo address
       const demoGuestAddr = {
         id: 'addr-guest',
         fullName: 'Fateh Prajapati',
@@ -251,7 +368,7 @@ export default function CheckoutModal({
   const handleDeleteAddress = (id, e) => {
     e.stopPropagation();
     if (addresses.length <= 1) {
-      alert('You must have at least one delivery address.');
+      alert('You must retain at least one delivery address.');
       return;
     }
     if (currentUser) {
@@ -361,10 +478,7 @@ export default function CheckoutModal({
     <div
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        inset: 0,
         backgroundColor: 'rgba(15, 28, 63, 0.85)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
@@ -456,7 +570,7 @@ export default function CheckoutModal({
             </button>
           </div>
 
-          {/* 3-Step Indicator Bar */}
+          {/* 3-Step Progress Indicator */}
           {!completedOrder && (
             <div
               style={{
@@ -467,7 +581,7 @@ export default function CheckoutModal({
                 padding: '4px 0'
               }}
             >
-              {/* Step 1: Payment */}
+              {/* Step 1 */}
               <button
                 type="button"
                 onClick={() => setCurrentStep(1)}
@@ -525,7 +639,7 @@ export default function CheckoutModal({
                 }}
               />
 
-              {/* Step 2: Address */}
+              {/* Step 2 */}
               <button
                 type="button"
                 onClick={() => setCurrentStep(2)}
@@ -583,7 +697,7 @@ export default function CheckoutModal({
                 }}
               />
 
-              {/* Step 3: Summary */}
+              {/* Step 3 */}
               <button
                 type="button"
                 onClick={() => setCurrentStep(3)}
@@ -635,7 +749,7 @@ export default function CheckoutModal({
           )}
         </div>
 
-        {/* Scrollable Content Area */}
+        {/* Scrollable Content Body */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px', boxSizing: 'border-box' }}>
           {completedOrder ? (
             /* ============================================================ */
@@ -673,7 +787,7 @@ export default function CheckoutModal({
                   marginBottom: '10px'
                 }}
               >
-                ORDER CONFIRMED
+                ORDER CONFIRMED & PREPPED
               </span>
 
               <h2
@@ -688,7 +802,7 @@ export default function CheckoutModal({
                 Thank You, {completedOrder.customerName}!
               </h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '440px', margin: '0 auto' }}>
-                Your limited Polorse drop is being prepped. Order ID:{' '}
+                Your streetwear drop is being packed. Order ID:{' '}
                 <strong style={{ color: 'var(--accent-navy)' }}>{completedOrder.id}</strong>
               </p>
 
@@ -788,7 +902,7 @@ export default function CheckoutModal({
             /* MULTI-STEP CHECKOUT WIZARD                                   */
             /* ============================================================ */
             <div>
-              {/* Only show Login or Register if NOT logged in */}
+              {/* Only prompt Login if NOT logged in */}
               {!currentUser && (
                 <div
                   style={{
@@ -838,7 +952,7 @@ export default function CheckoutModal({
               )}
 
               {/* ======================================================== */}
-              {/* STEP 1: PAYMENT SELECTION (Just Like Amazon)             */}
+              {/* STEP 1: PAYMENT SELECTION (COLUMN LIST WITH LOGOS)        */}
               {/* ======================================================== */}
               {currentStep === 1 && (
                 <div>
@@ -855,12 +969,12 @@ export default function CheckoutModal({
                       Select Payment Method
                     </h3>
                     <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                      Choose your payment mode. Instant confirmation and encrypted security.
+                      Choose your payment mode. Instant confirmation and bank-grade encryption.
                     </p>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {/* OPTION 1: UPI with Subviews (PhonePe, Google Pay, Paytm, Amazon Pay, Other) */}
+                    {/* OPTION 1: UPI Category with Vertical Column of Apps & Logos */}
                     <div
                       onClick={() => setPaymentCategory('UPI')}
                       style={{
@@ -874,18 +988,22 @@ export default function CheckoutModal({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <input
-                            type="radio"
-                            name="paymentCategory"
-                            checked={paymentCategory === 'UPI'}
-                            onChange={() => setPaymentCategory('UPI')}
-                            style={{ accentColor: 'var(--accent-navy)', width: '18px', height: '18px' }}
+                          {/* Custom Radio Button */}
+                          <div
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: paymentCategory === 'UPI' ? '6px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                              background: '#FFFFFF',
+                              flexShrink: 0
+                            }}
                           />
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Smartphone size={18} style={{ color: 'var(--accent-navy)' }} />
-                              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                                UPI (PhonePe, GPay, Paytm, Amazon Pay)
+                              <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
+                                UPI Options (PhonePe, GPay, Paytm, Amazon Pay)
                               </strong>
                               <span
                                 style={{
@@ -901,21 +1019,21 @@ export default function CheckoutModal({
                               </span>
                             </div>
                             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                              Pay instantly with your preferred UPI app
+                              Pay instantly via your favorite UPI app or any virtual payment address
                             </span>
                           </div>
                         </div>
-                        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--accent-navy)' }}>
+                        <span style={{ fontSize: '0.88rem', fontWeight: '900', color: 'var(--accent-navy)' }}>
                           ₹{finalTotal.toLocaleString('en-IN')}
                         </span>
                       </div>
 
-                      {/* Subview of UPI Apps */}
+                      {/* UPI APPS VERTICAL COLUMN LIST WITH BRAND LOGOS */}
                       {paymentCategory === 'UPI' && (
                         <div
                           style={{
-                            marginTop: '14px',
-                            paddingTop: '14px',
+                            marginTop: '16px',
+                            paddingTop: '16px',
                             borderTop: '1px solid var(--border-subtle)',
                             display: 'flex',
                             flexDirection: 'column',
@@ -923,145 +1041,214 @@ export default function CheckoutModal({
                           }}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <div style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                            Select UPI App:
+                          <span style={{ fontSize: '0.78rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                            Choose UPI Application:
+                          </span>
+
+                          {/* 1. PhonePe Row */}
+                          <div
+                            onClick={() => setSelectedUpiApp('phonepe')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '12px 14px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedUpiApp === 'phonepe' ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              background: selectedUpiApp === 'phonepe' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  border: selectedUpiApp === 'phonepe' ? '5px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
+                              />
+                              <PhonePeLogo />
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block' }}>
+                                  PhonePe UPI
+                                </strong>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                  Instant verification via PhonePe App
+                                </span>
+                              </div>
+                            </div>
+                            {selectedUpiApp === 'phonepe' && (
+                              <CheckCircle2 size={18} style={{ color: 'var(--accent-navy)' }} />
+                            )}
                           </div>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
-                            {/* PhonePe */}
-                            <label
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: selectedUpiApp === 'phonepe' ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
-                                background: selectedUpiApp === 'phonepe' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
-                                cursor: 'pointer',
-                                fontSize: '0.84rem',
-                                fontWeight: '700',
-                                color: 'var(--text-primary)'
-                              }}
-                            >
-                              <input
-                                type="radio"
-                                name="upiApp"
-                                checked={selectedUpiApp === 'phonepe'}
-                                onChange={() => setSelectedUpiApp('phonepe')}
-                                style={{ accentColor: 'var(--accent-navy)' }}
-                              />
-                              <span>PhonePe</span>
-                            </label>
 
-                            {/* Google Pay */}
-                            <label
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: selectedUpiApp === 'gpay' ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
-                                background: selectedUpiApp === 'gpay' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
-                                cursor: 'pointer',
-                                fontSize: '0.84rem',
-                                fontWeight: '700',
-                                color: 'var(--text-primary)'
-                              }}
-                            >
-                              <input
-                                type="radio"
-                                name="upiApp"
-                                checked={selectedUpiApp === 'gpay'}
-                                onChange={() => setSelectedUpiApp('gpay')}
-                                style={{ accentColor: 'var(--accent-navy)' }}
+                          {/* 2. Google Pay Row */}
+                          <div
+                            onClick={() => setSelectedUpiApp('gpay')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '12px 14px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedUpiApp === 'gpay' ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              background: selectedUpiApp === 'gpay' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  border: selectedUpiApp === 'gpay' ? '5px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
                               />
-                              <span>Google Pay</span>
-                            </label>
+                              <GooglePayLogo />
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block' }}>
+                                  Google Pay (GPay)
+                                </strong>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                  Pay with Google Pay UPI intent
+                                </span>
+                              </div>
+                            </div>
+                            {selectedUpiApp === 'gpay' && (
+                              <CheckCircle2 size={18} style={{ color: 'var(--accent-navy)' }} />
+                            )}
+                          </div>
 
-                            {/* Paytm */}
-                            <label
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: selectedUpiApp === 'paytm' ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
-                                background: selectedUpiApp === 'paytm' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
-                                cursor: 'pointer',
-                                fontSize: '0.84rem',
-                                fontWeight: '700',
-                                color: 'var(--text-primary)'
-                              }}
-                            >
-                              <input
-                                type="radio"
-                                name="upiApp"
-                                checked={selectedUpiApp === 'paytm'}
-                                onChange={() => setSelectedUpiApp('paytm')}
-                                style={{ accentColor: 'var(--accent-navy)' }}
+                          {/* 3. Paytm UPI Row */}
+                          <div
+                            onClick={() => setSelectedUpiApp('paytm')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '12px 14px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedUpiApp === 'paytm' ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              background: selectedUpiApp === 'paytm' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  border: selectedUpiApp === 'paytm' ? '5px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
                               />
-                              <span>Paytm</span>
-                            </label>
+                              <PaytmLogo />
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block' }}>
+                                  Paytm UPI
+                                </strong>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                  Pay via linked Paytm bank account
+                                </span>
+                              </div>
+                            </div>
+                            {selectedUpiApp === 'paytm' && (
+                              <CheckCircle2 size={18} style={{ color: 'var(--accent-navy)' }} />
+                            )}
+                          </div>
 
-                            {/* Amazon Pay */}
-                            <label
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: selectedUpiApp === 'amazonpay' ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
-                                background: selectedUpiApp === 'amazonpay' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
-                                cursor: 'pointer',
-                                fontSize: '0.84rem',
-                                fontWeight: '700',
-                                color: 'var(--text-primary)'
-                              }}
-                            >
-                              <input
-                                type="radio"
-                                name="upiApp"
-                                checked={selectedUpiApp === 'amazonpay'}
-                                onChange={() => setSelectedUpiApp('amazonpay')}
-                                style={{ accentColor: 'var(--accent-navy)' }}
+                          {/* 4. Amazon Pay UPI Row */}
+                          <div
+                            onClick={() => setSelectedUpiApp('amazonpay')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '12px 14px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedUpiApp === 'amazonpay' ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              background: selectedUpiApp === 'amazonpay' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  border: selectedUpiApp === 'amazonpay' ? '5px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
                               />
-                              <span>Amazon Pay</span>
-                            </label>
+                              <AmazonPayLogo />
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block' }}>
+                                  Amazon Pay UPI
+                                </strong>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                  1-click Amazon Pay UPI gateway
+                                </span>
+                              </div>
+                            </div>
+                            {selectedUpiApp === 'amazonpay' && (
+                              <CheckCircle2 size={18} style={{ color: 'var(--accent-navy)' }} />
+                            )}
+                          </div>
 
-                            {/* Other UPI ID */}
-                            <label
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                padding: '10px 12px',
-                                borderRadius: 'var(--radius-md)',
-                                border: selectedUpiApp === 'other' ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
-                                background: selectedUpiApp === 'other' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
-                                cursor: 'pointer',
-                                fontSize: '0.84rem',
-                                fontWeight: '700',
-                                color: 'var(--text-primary)'
-                              }}
-                            >
-                              <input
-                                type="radio"
-                                name="upiApp"
-                                checked={selectedUpiApp === 'other'}
-                                onChange={() => setSelectedUpiApp('other')}
-                                style={{ accentColor: 'var(--accent-navy)' }}
+                          {/* 5. Other UPI ID Row */}
+                          <div
+                            onClick={() => setSelectedUpiApp('other')}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '12px 14px',
+                              borderRadius: 'var(--radius-md)',
+                              border: selectedUpiApp === 'other' ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              background: selectedUpiApp === 'other' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  border: selectedUpiApp === 'other' ? '5px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
                               />
-                              <span>Other UPI ID</span>
-                            </label>
+                              <BhimUpiLogo />
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block' }}>
+                                  Any Other UPI ID / VPA
+                                </strong>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                  Enter VPA like username@okhdfcbank, @ybl, @icici
+                                </span>
+                              </div>
+                            </div>
+                            {selectedUpiApp === 'other' && (
+                              <CheckCircle2 size={18} style={{ color: 'var(--accent-navy)' }} />
+                            )}
                           </div>
 
                           {selectedUpiApp === 'other' && (
-                            <div style={{ marginTop: '8px' }}>
-                              <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                                Enter UPI ID / VPA
+                            <div style={{ marginTop: '6px', padding: '10px 14px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+                              <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
+                                Enter Your Virtual Payment Address (VPA) *
                               </label>
                               <div style={{ display: 'flex', gap: '8px' }}>
                                 <input
@@ -1070,18 +1257,18 @@ export default function CheckoutModal({
                                   value={customUpiId}
                                   onChange={(e) => setCustomUpiId(e.target.value)}
                                   className="form-input"
-                                  style={{ flex: 1, padding: '8px 12px', fontSize: '0.88rem' }}
+                                  style={{ flex: 1, padding: '10px 14px', fontSize: '0.9rem' }}
                                 />
                                 <button
                                   type="button"
-                                  onClick={() => alert(`UPI ID ${customUpiId || 'demo@upi'} verified!`)}
+                                  onClick={() => alert(`UPI ID ${customUpiId || 'verified@upi'} verified successfully!`)}
                                   style={{
-                                    padding: '8px 14px',
+                                    padding: '8px 16px',
                                     borderRadius: 'var(--radius-md)',
                                     background: 'var(--accent-navy)',
                                     color: '#FAF7F2',
-                                    fontWeight: '700',
-                                    fontSize: '0.8rem',
+                                    fontWeight: '800',
+                                    fontSize: '0.82rem',
                                     border: 'none',
                                     cursor: 'pointer'
                                   }}
@@ -1109,22 +1296,25 @@ export default function CheckoutModal({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <input
-                            type="radio"
-                            name="paymentCategory"
-                            checked={paymentCategory === 'CARD'}
-                            onChange={() => setPaymentCategory('CARD')}
-                            style={{ accentColor: 'var(--accent-navy)', width: '18px', height: '18px' }}
+                          <div
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: paymentCategory === 'CARD' ? '6px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                              background: '#FFFFFF',
+                              flexShrink: 0
+                            }}
                           />
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <CreditCard size={18} style={{ color: 'var(--accent-navy)' }} />
-                              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                              <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
                                 Credit or Debit Card
                               </strong>
                             </div>
                             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                              Visa, MasterCard, RuPay, Maestro & Amex
+                              Visa, MasterCard, RuPay, Maestro & American Express
                             </span>
                           </div>
                         </div>
@@ -1233,17 +1423,20 @@ export default function CheckoutModal({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <input
-                            type="radio"
-                            name="paymentCategory"
-                            checked={paymentCategory === 'COD'}
-                            onChange={() => setPaymentCategory('COD')}
-                            style={{ accentColor: 'var(--accent-navy)', width: '18px', height: '18px' }}
+                          <div
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: paymentCategory === 'COD' ? '6px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                              background: '#FFFFFF',
+                              flexShrink: 0
+                            }}
                           />
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Banknote size={18} style={{ color: 'var(--accent-navy)' }} />
-                              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                              <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
                                 Cash on Delivery (COD)
                               </strong>
                               <span
@@ -1267,7 +1460,7 @@ export default function CheckoutModal({
                       </div>
                     </div>
 
-                    {/* OPTION 4: Wallets */}
+                    {/* OPTION 4: Wallets in Vertical Column */}
                     <div
                       onClick={() => setPaymentCategory('WALLET')}
                       style={{
@@ -1281,89 +1474,111 @@ export default function CheckoutModal({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <input
-                            type="radio"
-                            name="paymentCategory"
-                            checked={paymentCategory === 'WALLET'}
-                            onChange={() => setPaymentCategory('WALLET')}
-                            style={{ accentColor: 'var(--accent-navy)', width: '18px', height: '18px' }}
+                          <div
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: paymentCategory === 'WALLET' ? '6px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                              background: '#FFFFFF',
+                              flexShrink: 0
+                            }}
                           />
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Wallet size={18} style={{ color: 'var(--accent-navy)' }} />
-                              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                                Wallets
+                              <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
+                                Digital Wallets (Amazon Pay, Paytm, PhonePe)
                               </strong>
                             </div>
                             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                              Amazon Pay Balance, Paytm Wallet, PhonePe Wallet
+                              Pay seamlessly using your linked wallet balances
                             </span>
                           </div>
                         </div>
                       </div>
 
+                      {/* Wallet Column with Logos */}
                       {paymentCategory === 'WALLET' && (
                         <div
                           style={{
-                            marginTop: '12px',
-                            paddingTop: '12px',
+                            marginTop: '14px',
+                            paddingTop: '14px',
                             borderTop: '1px solid var(--border-subtle)',
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: '8px'
+                            gap: '10px'
                           }}
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <label
+                          {/* Amazon Pay Balance */}
+                          <div
+                            onClick={() => setSelectedWallet('amazonpay_wallet')}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
-                              padding: '8px 12px',
+                              padding: '12px 14px',
                               borderRadius: 'var(--radius-md)',
-                              background: 'var(--bg-primary)',
-                              border: selectedWallet === 'amazonpay_wallet' ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              border: selectedWallet === 'amazonpay_wallet' ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              background: selectedWallet === 'amazonpay_wallet' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
                               cursor: 'pointer'
                             }}
                           >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <input
-                                type="radio"
-                                name="walletChoice"
-                                checked={selectedWallet === 'amazonpay_wallet'}
-                                onChange={() => setSelectedWallet('amazonpay_wallet')}
-                                style={{ accentColor: 'var(--accent-navy)' }}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  border: selectedWallet === 'amazonpay_wallet' ? '5px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
                               />
-                              <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>Amazon Pay Balance</span>
+                              <AmazonPayLogo />
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Amazon Pay Balance</strong>
+                                <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', display: 'block' }}>Instant 1-click checkout</span>
+                              </div>
                             </div>
-                            <span style={{ fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: '700' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--accent-green)', fontWeight: '800' }}>
                               Available: ₹1,450
                             </span>
-                          </label>
+                          </div>
 
-                          <label
+                          {/* Paytm Wallet */}
+                          <div
+                            onClick={() => setSelectedWallet('paytm_wallet')}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
-                              padding: '8px 12px',
+                              padding: '12px 14px',
                               borderRadius: 'var(--radius-md)',
-                              background: 'var(--bg-primary)',
-                              border: selectedWallet === 'paytm_wallet' ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              border: selectedWallet === 'paytm_wallet' ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                              background: selectedWallet === 'paytm_wallet' ? 'rgba(15, 28, 63, 0.05)' : 'var(--bg-primary)',
                               cursor: 'pointer'
                             }}
                           >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <input
-                                type="radio"
-                                name="walletChoice"
-                                checked={selectedWallet === 'paytm_wallet'}
-                                onChange={() => setSelectedWallet('paytm_wallet')}
-                                style={{ accentColor: 'var(--accent-navy)' }}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <div
+                                style={{
+                                  width: '18px',
+                                  height: '18px',
+                                  borderRadius: '50%',
+                                  border: selectedWallet === 'paytm_wallet' ? '5px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
                               />
-                              <span style={{ fontSize: '0.85rem', fontWeight: '700' }}>Paytm Wallet</span>
+                              <PaytmLogo />
+                              <div>
+                                <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>Paytm Wallet</strong>
+                                <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', display: 'block' }}>Direct Paytm wallet deduction</span>
+                              </div>
                             </div>
-                          </label>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1382,17 +1597,20 @@ export default function CheckoutModal({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <input
-                            type="radio"
-                            name="paymentCategory"
-                            checked={paymentCategory === 'NETBANKING'}
-                            onChange={() => setPaymentCategory('NETBANKING')}
-                            style={{ accentColor: 'var(--accent-navy)', width: '18px', height: '18px' }}
+                          <div
+                            style={{
+                              width: '20px',
+                              height: '20px',
+                              borderRadius: '50%',
+                              border: paymentCategory === 'NETBANKING' ? '6px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                              background: '#FFFFFF',
+                              flexShrink: 0
+                            }}
                           />
                           <div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Building size={18} style={{ color: 'var(--accent-navy)' }} />
-                              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                              <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
                                 Net Banking
                               </strong>
                             </div>
@@ -1446,9 +1664,9 @@ export default function CheckoutModal({
                   >
                     <div>
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>
-                        Selected Payment:
+                        Selected Mode:
                       </span>
-                      <strong style={{ fontSize: '0.88rem', color: 'var(--accent-navy)' }}>
+                      <strong style={{ fontSize: '0.9rem', color: 'var(--accent-navy)' }}>
                         {getPaymentMethodDisplay()}
                       </strong>
                     </div>
@@ -1474,7 +1692,7 @@ export default function CheckoutModal({
               )}
 
               {/* ======================================================== */}
-              {/* STEP 2: ADDRESS SELECTION                                */}
+              {/* STEP 2: ADDRESS SELECTION (POLISHED & NON-WRAPPING)      */}
               {/* ======================================================== */}
               {currentStep === 2 && (
                 <div>
@@ -1492,7 +1710,7 @@ export default function CheckoutModal({
                         Select Delivery Address
                       </h3>
                       <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                        Select your destination, or add/edit your delivery address.
+                        Choose your delivery destination, or add/edit a location.
                       </p>
                     </div>
 
@@ -1547,7 +1765,7 @@ export default function CheckoutModal({
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
                         <strong style={{ fontSize: '0.95rem', color: 'var(--accent-navy)' }}>
-                          {editingAddressId ? 'Edit Address' : 'Add New Delivery Address'}
+                          {editingAddressId ? 'Update Delivery Address' : 'Add New Delivery Address'}
                         </strong>
                         <button
                           type="button"
@@ -1582,7 +1800,7 @@ export default function CheckoutModal({
                               value={addressForm.fullName}
                               onChange={handleAddressInputChange}
                               className="form-input"
-                              placeholder="e.g. Fateh Prajapati"
+                              placeholder="Fateh Prajapati"
                               style={{ width: '100%', padding: '8px 12px', fontSize: '0.88rem' }}
                             />
                           </div>
@@ -1599,7 +1817,7 @@ export default function CheckoutModal({
                               value={addressForm.phone}
                               onChange={handleAddressInputChange}
                               className="form-input"
-                              placeholder="e.g. 9876543210"
+                              placeholder="9876543210"
                               style={{ width: '100%', padding: '8px 12px', fontSize: '0.88rem' }}
                             />
                           </div>
@@ -1617,7 +1835,7 @@ export default function CheckoutModal({
                             value={addressForm.addressLine}
                             onChange={handleAddressInputChange}
                             className="form-input"
-                            placeholder="e.g. Flat 402, High Street Boulevard, Bandra West"
+                            placeholder="Flat 402, High Street Boulevard, Bandra West"
                             style={{ width: '100%', padding: '8px 12px', fontSize: '0.88rem', resize: 'vertical' }}
                           />
                         </div>
@@ -1715,7 +1933,7 @@ export default function CheckoutModal({
                             <span>
                               {deliveryStatus.isDeliverable
                                 ? `Estimated Delivery: ${deliveryStatus.standardDays} days (${deliveryStatus.city}, ${deliveryStatus.state})`
-                                : 'Pincode deliverability being verified.'}
+                                : 'Pincode deliverability check.'}
                             </span>
                           </div>
                         )}
@@ -1729,7 +1947,7 @@ export default function CheckoutModal({
                               onChange={handleAddressInputChange}
                               style={{ accentColor: 'var(--accent-navy)' }}
                             />
-                            <span>Make this my Primary / Default Delivery Address</span>
+                            <span>Make this my Primary Address</span>
                           </label>
 
                           <div style={{ display: 'flex', gap: '8px' }}>
@@ -1771,7 +1989,7 @@ export default function CheckoutModal({
                     </div>
                   )}
 
-                  {/* Saved Address Cards */}
+                  {/* Saved Address Cards List */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {addresses.map((addr) => {
                       const isSelected = addr.id === selectedAddressId;
@@ -1792,16 +2010,19 @@ export default function CheckoutModal({
                             transition: 'all var(--transition-fast)'
                           }}
                         >
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <input
-                                type="radio"
-                                name="selectedAddress"
-                                checked={isSelected}
-                                onChange={() => setSelectedAddressId(addr.id)}
-                                style={{ accentColor: 'var(--accent-navy)', width: '18px', height: '18px' }}
+                              <div
+                                style={{
+                                  width: '20px',
+                                  height: '20px',
+                                  borderRadius: '50%',
+                                  border: isSelected ? '6px solid var(--accent-navy)' : '2px solid var(--border-subtle)',
+                                  background: '#fff',
+                                  flexShrink: 0
+                                }}
                               />
-                              <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                              <strong style={{ fontSize: '0.98rem', color: 'var(--text-primary)' }}>
                                 {addr.fullName}
                               </strong>
                               {addr.tag && (
@@ -1824,10 +2045,12 @@ export default function CheckoutModal({
                                   style={{
                                     fontSize: '0.7rem',
                                     fontWeight: '800',
-                                    padding: '2px 8px',
+                                    padding: '3px 10px',
                                     borderRadius: 'var(--radius-full)',
-                                    background: 'rgba(15, 28, 63, 0.1)',
-                                    color: 'var(--accent-navy)'
+                                    background: 'var(--accent-navy)',
+                                    color: '#FAF7F2',
+                                    whiteSpace: 'nowrap',
+                                    flexShrink: 0
                                   }}
                                 >
                                   ★ PRIMARY LOCATION
@@ -1843,12 +2066,12 @@ export default function CheckoutModal({
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: '4px',
-                                  padding: '4px 10px',
+                                  padding: '5px 12px',
                                   borderRadius: 'var(--radius-md)',
                                   background: 'var(--bg-primary)',
                                   border: '1px solid var(--border-subtle)',
                                   color: 'var(--text-primary)',
-                                  fontSize: '0.76rem',
+                                  fontSize: '0.78rem',
                                   fontWeight: '700',
                                   cursor: 'pointer'
                                 }}
@@ -1862,7 +2085,7 @@ export default function CheckoutModal({
                                   type="button"
                                   onClick={(e) => handleDeleteAddress(addr.id, e)}
                                   style={{
-                                    padding: '4px 8px',
+                                    padding: '5px 8px',
                                     borderRadius: 'var(--radius-md)',
                                     background: 'rgba(239, 68, 68, 0.08)',
                                     border: '1px solid rgba(239, 68, 68, 0.2)',
@@ -1877,12 +2100,12 @@ export default function CheckoutModal({
                             </div>
                           </div>
 
-                          <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', paddingLeft: '28px' }}>
+                          <div style={{ fontSize: '0.86rem', color: 'var(--text-secondary)', paddingLeft: '30px' }}>
                             {addr.addressLine}, {addr.city}, {addr.state} - <strong>{addr.pincode}</strong>
                           </div>
 
-                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', paddingLeft: '28px' }}>
-                            Phone: {addr.phone}
+                          <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', paddingLeft: '30px' }}>
+                            Mobile: {addr.phone}
                           </div>
                         </div>
                       );
@@ -1949,7 +2172,7 @@ export default function CheckoutModal({
               )}
 
               {/* ======================================================== */}
-              {/* STEP 3: ORDER SUMMARY SCREEN (With Change Options)       */}
+              {/* STEP 3: ORDER SUMMARY SCREEN (With Direct Change Option) */}
               {/* ======================================================== */}
               {currentStep === 3 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -2010,7 +2233,7 @@ export default function CheckoutModal({
                           {activeAddress?.addressLine}, {activeAddress?.city}, {activeAddress?.state} - <strong>{activeAddress?.pincode}</strong>
                         </div>
                         <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                          Phone: {activeAddress?.phone}
+                          Mobile: {activeAddress?.phone}
                         </div>
                       </div>
                     </div>
@@ -2075,7 +2298,7 @@ export default function CheckoutModal({
                           {getPaymentMethodDisplay()}
                         </div>
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                          256-bit Bank Grade Encrypted • Zero Extra Fees
+                          256-bit Bank Grade Encrypted • Zero Surcharges
                         </div>
                       </div>
                     </div>
@@ -2117,7 +2340,7 @@ export default function CheckoutModal({
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: '0.76rem', textTransform: 'uppercase', fontWeight: '800', color: 'var(--text-muted)' }}>
-                        Items in Order ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})
+                        Items in Drop ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})
                       </span>
                       <span style={{ fontSize: '0.78rem', color: 'var(--accent-navy)', fontWeight: '700' }}>
                         Polorse Heavyweight Drop
