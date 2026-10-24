@@ -70,8 +70,14 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
         overflow: 'hidden'
       }}>
         <img
-          src={product.imageUrl || '/products/hoodie-charcoal.jpg'}
-          alt={product.title}
+          src={product.imageUrl || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80'}
+          alt=""
+          aria-label={product.title}
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80';
+          }}
           style={{
             position: 'absolute',
             top: 0,

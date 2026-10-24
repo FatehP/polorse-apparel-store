@@ -181,8 +181,13 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
           {/* Full-Bleed Main Image Filling Entire Height */}
           <img
             key={activeImageIndex}
-            src={imageList[activeImageIndex]}
-            alt={`${product.title} - Angle ${activeImageIndex + 1}`}
+            src={imageList[activeImageIndex] || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=900&q=80'}
+            alt=""
+            aria-label={`${product.title} - Angle ${activeImageIndex + 1}`}
+            onError={(e) => {
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=900&q=80';
+            }}
             className="animate-fade"
             style={{
               position: 'absolute',
@@ -536,7 +541,8 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                     <strong style={{ fontSize: '0.8rem', color: 'var(--text-primary)' }}>Polorse Boxy Fit Chart (Inches)</strong>
                     <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Oversized Drape</span>
                   </div>
-                  <table style={{ width: '100%', fontSize: '0.75rem', borderCollapse: 'collapse', textAlign: 'center' }}>
+                  <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <table style={{ width: '100%', minWidth: '240px', fontSize: '0.75rem', borderCollapse: 'collapse', textAlign: 'center' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}>
                         <th style={{ padding: '3px 6px', textAlign: 'left' }}>Size</th>
@@ -571,7 +577,8 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                         <td style={{ padding: '3px 6px' }}>24"</td>
                       </tr>
                     </tbody>
-                  </table>
+                    </table>
+                  </div>
                   <p style={{ margin: '6px 0 0 0', fontSize: '0.68rem', color: 'var(--text-secondary)', lineHeight: 1.3 }}>
                     💡 <em>Generous dropped-shoulder drape. Stay true to size for boxy fit, or size down for standard fit.</em>
                   </p>
@@ -646,6 +653,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                 onChange={(e) => handlePincodeChange(e.target.value)}
                 style={{
                   flex: 1,
+                  minWidth: '0',
                   fontSize: '0.82rem',
                   padding: '7px 10px',
                   background: 'var(--bg-secondary)',

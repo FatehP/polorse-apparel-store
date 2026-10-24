@@ -364,6 +364,8 @@ input:focus, textarea:focus, select:focus {
   .product-modal-overlay {
     padding: 0 !important;
     align-items: flex-end !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
   }
 
   .product-modal-dialog {
@@ -371,23 +373,38 @@ input:focus, textarea:focus, select:focus {
     flex-direction: column !important;
     max-width: 100vw !important;
     width: 100% !important;
-    max-height: 88vh !important;
+    max-height: 85vh !important;
     border-radius: 22px 22px 0 0 !important;
     border-bottom: none !important;
     border-left: none !important;
     border-right: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-x: none !important;
+  }
+
+  .product-modal-dialog * {
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .product-modal-image-col {
-    min-height: 280px !important;
-    height: 280px !important;
+    min-height: 260px !important;
+    height: 260px !important;
     width: 100% !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
   }
 
   .product-modal-details-col {
-    padding: 16px 14px 32px !important;
+    padding: 16px 16px 36px !important;
     width: 100% !important;
+    max-width: 100% !important;
     gap: 14px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
   }
 
   .product-modal-value-props {
@@ -406,4 +423,73 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
+/* Continuous Smooth Marquee Ticker */
+@keyframes marqueeScroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
 
+.announcement-marquee-wrapper {
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+  background: linear-gradient(90deg, #0F1C3F 0%, #162A4F 60%, #C21A2C 100%);
+  color: #FAF7F2;
+  padding: 8px 0;
+  display: flex;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.announcement-marquee-track {
+  display: inline-flex;
+  gap: 40px;
+  animation: marqueeScroll 24s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.announcement-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.announcement-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Image fallback styling to prevent alt text bleed on loading or broken images */
+img {
+  text-indent: -9999px;
+  color: transparent;
+  font-size: 0;
+}
+
+/* Navbar responsive structure */
+.navbar-main-row {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .navbar-main-row {
+    padding: 8px 12px !important;
+    gap: 8px !important;
+  }
+  
+  .nav-desktop-only {
+    display: none !important;
+  }
+}

@@ -30,39 +30,30 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40 glass-panel" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-      {/* Top micro-announcement bar */}
-      <div style={{
-        background: 'linear-gradient(90deg, #0F1C3F 0%, #162A4F 60%, #C21A2C 100%)',
-        color: '#fff',
-        padding: '6px 12px',
-        fontSize: '0.74rem',
-        fontWeight: '600',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '6px',
-        letterSpacing: '0.04em',
-        width: '100%',
-        maxWidth: '100vw',
-        overflow: 'hidden',
-        boxSizing: 'border-box'
-      }}>
-        <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
-        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE SHIPPING
-        </span>
+      {/* Top micro-announcement bar (Continuous Smooth Marquee Ticker) */}
+      <div className="announcement-marquee-wrapper">
+        <div className="announcement-marquee-track">
+          <div className="announcement-item">
+            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
+            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
+          </div>
+          <div className="announcement-item">
+            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
+            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
+          </div>
+          <div className="announcement-item">
+            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
+            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
+          </div>
+          <div className="announcement-item">
+            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
+            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
+          </div>
+        </div>
       </div>
 
       {/* Main Navbar Row */}
-      <div style={{
-        maxWidth: '1360px',
-        margin: '0 auto',
-        padding: '12px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '16px'
-      }}>
+      <div className="navbar-main-row">
         {/* Official Brand Logo */}
         <div 
           onClick={() => {
@@ -193,8 +184,8 @@ export default function Navbar({
 
         {/* Right Actions & View Switcher */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          {/* View Switcher: Store vs Brother's Admin Hub */}
-          <div style={{
+          {/* View Switcher: Store vs Brother's Admin Hub (Desktop Only) */}
+          <div className="nav-desktop-only" style={{
             display: 'flex',
             background: 'var(--bg-secondary)',
             padding: '3px',
