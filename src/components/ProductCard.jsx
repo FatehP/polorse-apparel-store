@@ -92,20 +92,24 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
           left: '12px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '6px',
+          gap: '5px',
           zIndex: 2
         }}>
-          {product.tags?.map((tag, idx) => (
+          {product.tags?.slice(0, 2).map((tag, idx) => (
             <span
               key={idx}
-              className={`badge-tag ${idx === 0 ? 'badge-orange' : ''}`}
+              className={`badge-tag ${idx === 0 ? 'badge-navy' : ''}`}
+              style={{
+                letterSpacing: '0.08em',
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)'
+              }}
             >
-              {tag}
+              [{tag}]
             </span>
           ))}
           {discountPercent > 0 && (
-            <span className="badge-tag badge-lime">
-              {discountPercent}% OFF
+            <span className="badge-tag badge-red" style={{ boxShadow: '0 2px 6px rgba(194, 26, 44, 0.25)' }}>
+              [{discountPercent}% OFF]
             </span>
           )}
         </div>

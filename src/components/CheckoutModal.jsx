@@ -191,6 +191,9 @@ export default function CheckoutModal({
           position: 'relative'
         }}
       >
+        {/* iOS Native Modal Pull Handle */}
+        <div className="sheet-handle" style={{ margin: '10px auto 4px auto' }} />
+
         {/* Close Button */}
         <button
           onClick={onClose}

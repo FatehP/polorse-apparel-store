@@ -75,6 +75,19 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
   const currentSizeObj = product.sizes?.find(s => s.size === selectedSize);
   const currentStock = currentSizeObj?.stock ?? 10;
 
+  const handlePincodeChange = async (val) => {
+    const clean = val.replace(/[^0-9]/g, '').slice(0, 6);
+    setPincodeInput(clean);
+    if (clean.length === 6) {
+      setIsCheckingPincode(true);
+      const res = await checkPincodeDeliverability(clean);
+      setPincodeResult(res);
+      setIsCheckingPincode(false);
+    } else if (clean.length < 6 && pincodeResult) {
+      setPincodeResult(null);
+    }
+  };
+
   const handleCheckPincode = async (e) => {
     if (e) e.preventDefault();
     if (!pincodeInput.trim()) return;
@@ -161,6 +174,9 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
           position: 'relative'
         }}
       >
+        {/* iOS Native Modal Pull Handle */}
+        <div className="sheet-handle" style={{ gridColumn: '1 / -1', margin: '10px auto 4px auto' }} />
+
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -421,6 +437,46 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                 </>
               )}
             </div>
+
+            {/* Streetwear Silhouette & Model Spec */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginTop: '12px',
+              padding: '7px 11px',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '0.74rem',
+              color: 'var(--text-secondary)'
+            }}>
+              <span style={{
+                fontFamily: 'monospace',
+                fontWeight: 800,
+                color: 'var(--accent-navy)',
+                letterSpacing: '0.08em',
+                fontSize: '0.68rem',
+                textTransform: 'uppercase'
+              }}>
+                [ARCHIVE FIT]
+              </span>
+              <span>•</span>
+              <span>Model is 6'1" (185cm) wearing Size L (Signature Boxy Drape)</span>
+            </div>
+
+            {/* Heavyweight Fabric Matrix & Scarcity */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', flexWrap: 'wrap' }}>
+              <span className="badge-tag">
+                {product.gsm ? `${product.gsm} GSM Custom Milled` : '480 GSM Heavyweight Terry'}
+              </span>
+              <span className="badge-tag" style={{ background: 'transparent' }}>
+                Pre-Shrunk 100% Combed Cotton
+              </span>
+              <span className="badge-tag" style={{ color: 'var(--accent-red)', borderColor: 'rgba(194, 26, 44, 0.25)', background: 'rgba(194, 26, 44, 0.04)' }}>
+                ⚡ Only {currentStock} left in {selectedSize}
+              </span>
+            </div>
           </div>
 
           {/* Description */}
@@ -615,9 +671,9 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               <input
                 type="text"
                 maxLength={6}
-                placeholder="Enter 6-digit Indian PIN"
+                placeholder="Enter 6-digit Indian PIN (e.g. 110001)"
                 value={pincodeInput}
-                onChange={(e) => setPincodeInput(e.target.value.replace(/[^0-9]/g, ''))}
+                onChange={(e) => handlePincodeChange(e.target.value)}
                 style={{
                   flex: 1,
                   fontSize: '0.82rem',
@@ -637,13 +693,16 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
                   fontWeight: '700',
                   borderRadius: 'var(--radius-sm)',
                   border: 'none',
-                  background: pincodeInput.length === 6 ? 'var(--accent-navy)' : 'var(--bg-card)',
+                  background: pincodeResult?.isDeliverable ? 'var(--accent-green)' : (pincodeInput.length === 6 ? 'var(--accent-navy)' : 'var(--bg-card)'),
                   color: pincodeInput.length === 6 ? '#FAF7F2' : 'var(--text-muted)',
                   cursor: pincodeInput.length === 6 ? 'pointer' : 'default',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
                 }}
               >
-                {isCheckingPincode ? 'Checking...' : 'Check'}
+                {isCheckingPincode ? 'Checking...' : (pincodeResult?.isDeliverable ? '✓ Verified' : 'Check')}
               </button>
             </form>
 
@@ -803,17 +862,17 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             paddingTop: '16px',
             marginTop: '8px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              <Truck size={16} style={{ color: 'var(--accent-orange)' }} />
-              <span>Fast Pan-India Delivery</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+              <Truck size={16} style={{ color: 'var(--accent-navy)' }} />
+              <span>Express Pan-India (2-3 Days)</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              <RefreshCw size={16} style={{ color: 'var(--accent-lime)' }} />
-              <span>7-Day Free Size Exchange</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+              <RefreshCw size={16} style={{ color: 'var(--accent-green)' }} />
+              <span>7-Day Doorstep Size Exchange</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-              <ShieldCheck size={16} style={{ color: 'var(--accent-cyan)' }} />
-              <span>100% Authentic Quality</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+              <ShieldCheck size={16} style={{ color: 'var(--accent-red)' }} />
+              <span>Zero-Risk Cash on Delivery</span>
             </div>
           </div>
         </div>

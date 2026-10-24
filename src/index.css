@@ -40,6 +40,7 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-spring: 0.45s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 * {
@@ -117,19 +118,37 @@ input:focus, textarea:focus, select:focus {
   border: 1px solid var(--border-subtle);
 }
 
+/* Native iOS-style sheet pull bar */
+.sheet-handle {
+  width: 44px;
+  height: 5px;
+  background: #D5CBB9;
+  border-radius: 999px;
+  margin: 10px auto 14px auto;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sheet-handle:hover {
+  opacity: 1;
+  transform: scaleX(1.08);
+}
+
 .badge-tag {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  font-size: 0.72rem;
+  padding: 3px 8px;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-radius: var(--radius-full);
+  letter-spacing: 0.08em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  border-radius: 3px;
   background: var(--bg-primary);
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(15, 28, 63, 0.04);
 }
 
 .badge-orange, .badge-red {
@@ -140,7 +159,7 @@ input:focus, textarea:focus, select:focus {
 
 .badge-navy {
   background: var(--accent-navy);
-  color: #fff;
+  color: #FAF7F2;
   border-color: var(--accent-navy);
 }
 

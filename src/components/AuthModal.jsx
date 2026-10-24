@@ -189,9 +189,12 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         <div style={{
           background: 'linear-gradient(135deg, #0F1C3F 0%, #162A4F 60%, #1B3566 100%)',
           color: '#FAF7F2',
-          padding: '24px 24px 20px',
+          padding: '16px 24px 20px',
           position: 'relative'
         }}>
+          {/* iOS Sheet Pull Bar */}
+          <div className="sheet-handle" style={{ background: 'rgba(255, 255, 255, 0.3)', margin: '0 auto 12px auto' }} />
+
           <button
             onClick={onClose}
             style={{
