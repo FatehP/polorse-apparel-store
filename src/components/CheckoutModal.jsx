@@ -16,14 +16,11 @@ import {
   Navigation,
   Clock,
   AlertCircle,
-  UserCheck,
   Sparkles,
   Edit2,
   Plus,
   Trash2,
-  ChevronRight,
-  Lock,
-  Package
+  Lock
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { createOrder } from '../services/storeService';
@@ -31,8 +28,7 @@ import { checkPincodeDeliverability, autoDetectLocation } from '../services/pinc
 import {
   getUserAddresses,
   addOrUpdateUserAddress,
-  deleteUserAddress,
-  saveUserAddresses
+  deleteUserAddress
 } from '../services/authService';
 
 export default function CheckoutModal({
@@ -46,11 +42,14 @@ export default function CheckoutModal({
 }) {
   if (!isOpen) return null;
 
-  // Checkout Steps: 1: Payment Selection, 2: Address Selection, 3: Order Summary & Confirmation
+  // Checkout Steps:
+  // Step 1: Payment Method Selection
+  // Step 2: Address Selection
+  // Step 3: Order Summary & Confirmation
   const [currentStep, setCurrentStep] = useState(1);
 
   // --- Payment States ---
-  // Category: 'UPI', 'CARD', 'COD', 'WALLET', 'NETBANKING'
+  // Categories: 'UPI', 'CARD', 'COD', 'WALLET', 'NETBANKING'
   const [paymentCategory, setPaymentCategory] = useState('UPI');
   const [selectedUpiApp, setSelectedUpiApp] = useState('phonepe'); // 'phonepe', 'gpay', 'paytm', 'amazonpay', 'other'
   const [customUpiId, setCustomUpiId] = useState('');
@@ -85,11 +84,11 @@ export default function CheckoutModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [completedOrder, setCompletedOrder] = useState(null);
 
-  // Load addresses on mount and when currentUser changes
+  // Load addresses on mount or when currentUser updates
   useEffect(() => {
     if (currentUser) {
       const userAddrs = getUserAddresses();
-      if (userAddrs.length > 0) {
+      if (userAddrs && userAddrs.length > 0) {
         setAddresses(userAddrs);
         const primary = userAddrs.find(a => a.isPrimary) || userAddrs[0];
         setSelectedAddressId(primary.id);
@@ -148,14 +147,13 @@ export default function CheckoutModal({
   const shipping = subtotal >= 1999 ? 0 : 99;
   const finalTotal = Math.max(0, subtotal - discountAmount + shipping);
 
-  // Selected address object
+  // Active selected address
   const activeAddress = addresses.find(a => a.id === selectedAddressId) || addresses[0] || null;
 
-  // Handle Address Form Input
+  // Handle address form changes
   const handleAddressInputChange = async (e) => {
     const { name, value, type, checked } = e.target;
     const val = type === 'checkbox' ? checked : value;
-
     setAddressForm(prev => ({ ...prev, [name]: val }));
 
     if (name === 'pincode') {
@@ -195,7 +193,7 @@ export default function CheckoutModal({
   const handleSaveAddress = (e) => {
     e.preventDefault();
     if (!addressForm.fullName || !addressForm.phone || !addressForm.addressLine || !addressForm.pincode) {
-      alert('Please fill in all required address fields.');
+      alert('Please fill in all address details.');
       return;
     }
 
@@ -210,7 +208,6 @@ export default function CheckoutModal({
       setAddresses(updatedList);
       if (saved) setSelectedAddressId(saved.id);
     } else {
-      // Local state update for guests
       if (editingAddressId) {
         setAddresses(prev => prev.map(a => (a.id === editingAddressId ? { ...payload, id: editingAddressId } : a)));
         setSelectedAddressId(editingAddressId);
@@ -272,7 +269,6 @@ export default function CheckoutModal({
     }
   };
 
-  // Get human readable payment method label
   const getPaymentMethodDisplay = () => {
     switch (paymentCategory) {
       case 'UPI':
@@ -296,13 +292,12 @@ export default function CheckoutModal({
     }
   };
 
-  // Final Order Placement Handler
   const handlePlaceOrder = async () => {
     if (!currentUser) {
       if (onOpenAuth) {
         onOpenAuth();
       } else {
-        alert('Please Sign In or Register to place your order.');
+        alert('Please login or register to place your order.');
       }
       return;
     }
@@ -345,7 +340,6 @@ export default function CheckoutModal({
       const newOrder = await createOrder(orderPayload);
       setCompletedOrder(newOrder);
 
-      // Trigger high-energy celebratory confetti
       confetti({
         particleCount: 110,
         spread: 80,
@@ -371,7 +365,7 @@ export default function CheckoutModal({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(15, 28, 63, 0.82)',
+        backgroundColor: 'rgba(15, 28, 63, 0.85)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
         zIndex: 70,
@@ -399,10 +393,10 @@ export default function CheckoutModal({
           overflow: 'hidden'
         }}
       >
-        {/* iOS Native Modal Pull Handle */}
+        {/* iOS Pull Handle */}
         <div className="sheet-handle" style={{ margin: '8px auto 0 auto' }} />
 
-        {/* Modal Top Bar & 3-Step Breadcrumbs */}
+        {/* Top Header & 3-Step Navigation Bar */}
         <div
           style={{
             padding: '16px 20px 14px 20px',
@@ -413,7 +407,7 @@ export default function CheckoutModal({
             gap: '12px'
           }}
         >
-          {/* Top Title & Close Button */}
+          {/* Header row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span
@@ -462,7 +456,7 @@ export default function CheckoutModal({
             </button>
           </div>
 
-          {/* Amazon-like 3-Step Progress Bar (Only when not in Order Confirmed state) */}
+          {/* 3-Step Indicator Bar */}
           {!completedOrder && (
             <div
               style={{
@@ -470,7 +464,6 @@ export default function CheckoutModal({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: '8px',
-                position: 'relative',
                 padding: '4px 0'
               }}
             >
@@ -518,7 +511,7 @@ export default function CheckoutModal({
                     Payment
                   </span>
                   <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                    Amazon-style options
+                    UPI / Card / COD
                   </span>
                 </div>
               </button>
@@ -576,7 +569,7 @@ export default function CheckoutModal({
                     Address
                   </span>
                   <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                    Primary location
+                    Primary Location
                   </span>
                 </div>
               </button>
@@ -634,7 +627,7 @@ export default function CheckoutModal({
                     Summary
                   </span>
                   <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-                    Review & Confirm
+                    Change & Confirm
                   </span>
                 </div>
               </button>
@@ -642,7 +635,7 @@ export default function CheckoutModal({
           )}
         </div>
 
-        {/* Scrollable Main Body */}
+        {/* Scrollable Content Area */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px', boxSizing: 'border-box' }}>
           {completedOrder ? (
             /* ============================================================ */
@@ -680,7 +673,7 @@ export default function CheckoutModal({
                   marginBottom: '10px'
                 }}
               >
-                ORDER CONFIRMED & DISPATCH PREPPED
+                ORDER CONFIRMED
               </span>
 
               <h2
@@ -699,7 +692,6 @@ export default function CheckoutModal({
                 <strong style={{ color: 'var(--accent-navy)' }}>{completedOrder.id}</strong>
               </p>
 
-              {/* Order Summary Cards */}
               <div
                 style={{
                   background: 'var(--bg-card)',
@@ -714,7 +706,6 @@ export default function CheckoutModal({
                   boxShadow: 'var(--shadow-sm)'
                 }}
               >
-                {/* Delivery Address */}
                 <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>
                     Delivery Destination
@@ -727,7 +718,6 @@ export default function CheckoutModal({
                   </div>
                 </div>
 
-                {/* Payment Method */}
                 <div style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>
                     Payment Summary
@@ -740,7 +730,6 @@ export default function CheckoutModal({
                   </div>
                 </div>
 
-                {/* Items */}
                 <div>
                   <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800' }}>
                     Items in Order ({completedOrder.items?.length || 0})
@@ -799,7 +788,7 @@ export default function CheckoutModal({
             /* MULTI-STEP CHECKOUT WIZARD                                   */
             /* ============================================================ */
             <div>
-              {/* Member Auth Prompt Banner if not logged in */}
+              {/* Only show Login or Register if NOT logged in */}
               {!currentUser && (
                 <div
                   style={{
@@ -820,10 +809,10 @@ export default function CheckoutModal({
                     <ShieldCheck size={20} style={{ color: 'var(--accent-red)', flexShrink: 0 }} />
                     <div>
                       <strong style={{ display: 'block', color: 'var(--accent-navy)', fontSize: '0.88rem' }}>
-                        Sign In Recommended for Express Ordering
+                        Login or Register to Complete Order
                       </strong>
                       <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
-                        Log in with OTP to access your saved addresses & live doorstep tracking.
+                        Sign in for live doorstep tracking and instant address retrieval.
                       </span>
                     </div>
                   </div>
@@ -843,7 +832,7 @@ export default function CheckoutModal({
                       boxShadow: 'var(--shadow-sm)'
                     }}
                   >
-                    Sign In / Register
+                    Login / Register
                   </button>
                 </div>
               )}
@@ -853,7 +842,7 @@ export default function CheckoutModal({
               {/* ======================================================== */}
               {currentStep === 1 && (
                 <div>
-                  <div style={{ marginBottom: '18px' }}>
+                  <div style={{ marginBottom: '16px' }}>
                     <h3
                       style={{
                         fontFamily: 'var(--font-display)',
@@ -866,13 +855,12 @@ export default function CheckoutModal({
                       Select Payment Method
                     </h3>
                     <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                      Choose your preferred payment mode. Encrypted with 256-bit bank-grade security.
+                      Choose your payment mode. Instant confirmation and encrypted security.
                     </p>
                   </div>
 
-                  {/* Payment Methods Accordion List */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    {/* OPTION 1: UPI (Recommended) */}
+                    {/* OPTION 1: UPI with Subviews (PhonePe, Google Pay, Paytm, Amazon Pay, Other) */}
                     <div
                       onClick={() => setPaymentCategory('UPI')}
                       style={{
@@ -897,7 +885,7 @@ export default function CheckoutModal({
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <Smartphone size={18} style={{ color: 'var(--accent-navy)' }} />
                               <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
-                                UPI (Instant & Zero Surcharge)
+                                UPI (PhonePe, GPay, Paytm, Amazon Pay)
                               </strong>
                               <span
                                 style={{
@@ -913,7 +901,7 @@ export default function CheckoutModal({
                               </span>
                             </div>
                             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                              Pay via PhonePe, Google Pay, Paytm, Amazon Pay or any UPI app
+                              Pay instantly with your preferred UPI app
                             </span>
                           </div>
                         </div>
@@ -922,7 +910,7 @@ export default function CheckoutModal({
                         </span>
                       </div>
 
-                      {/* Expanded UPI App Selector */}
+                      {/* Subview of UPI Apps */}
                       {paymentCategory === 'UPI' && (
                         <div
                           style={{
@@ -936,7 +924,7 @@ export default function CheckoutModal({
                           onClick={(e) => e.stopPropagation()}
                         >
                           <div style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                            Choose UPI App:
+                            Select UPI App:
                           </div>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
                             {/* PhonePe */}
@@ -1014,7 +1002,7 @@ export default function CheckoutModal({
                                 onChange={() => setSelectedUpiApp('paytm')}
                                 style={{ accentColor: 'var(--accent-navy)' }}
                               />
-                              <span>Paytm UPI</span>
+                              <span>Paytm</span>
                             </label>
 
                             {/* Amazon Pay */}
@@ -1078,7 +1066,7 @@ export default function CheckoutModal({
                               <div style={{ display: 'flex', gap: '8px' }}>
                                 <input
                                   type="text"
-                                  placeholder="e.g. yourname@okaxis"
+                                  placeholder="e.g. username@okhdfcbank"
                                   value={customUpiId}
                                   onChange={(e) => setCustomUpiId(e.target.value)}
                                   className="form-input"
@@ -1107,7 +1095,7 @@ export default function CheckoutModal({
                       )}
                     </div>
 
-                    {/* OPTION 2: Credit or Debit Cards */}
+                    {/* OPTION 2: Credit or Debit Card */}
                     <div
                       onClick={() => setPaymentCategory('CARD')}
                       style={{
@@ -1136,13 +1124,12 @@ export default function CheckoutModal({
                               </strong>
                             </div>
                             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                              Visa, MasterCard, RuPay, Maestro & American Express
+                              Visa, MasterCard, RuPay, Maestro & Amex
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Card Input Fields (Following modern-web-guidance) */}
                       {paymentCategory === 'CARD' && (
                         <div
                           style={{
@@ -1194,7 +1181,7 @@ export default function CheckoutModal({
                             </div>
                             <div>
                               <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', display: 'block', marginBottom: '2px' }}>
-                                CVV / CVC
+                                CVV
                               </span>
                               <input
                                 id="cc-csc"
@@ -1273,7 +1260,7 @@ export default function CheckoutModal({
                               </span>
                             </div>
                             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                              Pay in cash or scan QR code when your package arrives at your doorstep
+                              Pay via cash or UPI scan when your parcel is delivered to your doorstep
                             </span>
                           </div>
                         </div>
@@ -1410,7 +1397,7 @@ export default function CheckoutModal({
                               </strong>
                             </div>
                             <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                              All major Indian banks supported (HDFC, ICICI, SBI, Axis, Kotak)
+                              All major banks supported (HDFC, ICICI, SBI, Axis, Kotak)
                             </span>
                           </div>
                         </div>
@@ -1439,17 +1426,16 @@ export default function CheckoutModal({
                             <option value="SBI">State Bank of India</option>
                             <option value="Axis">Axis Bank</option>
                             <option value="Kotak">Kotak Mahindra Bank</option>
-                            <option value="PNB">Punjab National Bank</option>
                           </select>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Step 1 Action Footer */}
+                  {/* Step 1 Footer */}
                   <div
                     style={{
-                      marginTop: '24px',
+                      marginTop: '22px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -1488,11 +1474,11 @@ export default function CheckoutModal({
               )}
 
               {/* ======================================================== */}
-              {/* STEP 2: ADDRESS SELECTION (Primary & Multiple Addresses) */}
+              {/* STEP 2: ADDRESS SELECTION                                */}
               {/* ======================================================== */}
               {currentStep === 2 && (
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                     <div>
                       <h3
                         style={{
@@ -1506,7 +1492,7 @@ export default function CheckoutModal({
                         Select Delivery Address
                       </h3>
                       <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                        Choose where you want your limited drop delivered, or add a new location.
+                        Select your destination, or add/edit your delivery address.
                       </p>
                     </div>
 
@@ -1548,8 +1534,8 @@ export default function CheckoutModal({
                     )}
                   </div>
 
-                  {/* Add / Edit Address Form View */}
-                  {isAddingNewAddress ? (
+                  {/* Add / Edit Form */}
+                  {isAddingNewAddress && (
                     <div
                       style={{
                         background: 'var(--bg-card)',
@@ -1603,7 +1589,7 @@ export default function CheckoutModal({
 
                           <div>
                             <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                              Mobile Number (for delivery OTP) *
+                              Mobile Number *
                             </label>
                             <input
                               type="tel"
@@ -1711,7 +1697,6 @@ export default function CheckoutModal({
                           </div>
                         </div>
 
-                        {/* Deliverability Badge */}
                         {deliveryStatus && (
                           <div
                             style={{
@@ -1730,7 +1715,7 @@ export default function CheckoutModal({
                             <span>
                               {deliveryStatus.isDeliverable
                                 ? `Estimated Delivery: ${deliveryStatus.standardDays} days (${deliveryStatus.city}, ${deliveryStatus.state})`
-                                : 'Pincode deliverability being checked.'}
+                                : 'Pincode deliverability being verified.'}
                             </span>
                           </div>
                         )}
@@ -1784,9 +1769,9 @@ export default function CheckoutModal({
                         </button>
                       </form>
                     </div>
-                  ) : null}
+                  )}
 
-                  {/* Saved Address Cards Listing */}
+                  {/* Saved Address Cards */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {addresses.map((addr) => {
                       const isSelected = addr.id === selectedAddressId;
@@ -1850,7 +1835,6 @@ export default function CheckoutModal({
                               )}
                             </div>
 
-                            {/* Edit / Delete Buttons */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                               <button
                                 type="button"
@@ -1905,10 +1889,10 @@ export default function CheckoutModal({
                     })}
                   </div>
 
-                  {/* Step 2 Action Footer */}
+                  {/* Step 2 Footer */}
                   <div
                     style={{
-                      marginTop: '24px',
+                      marginTop: '22px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
@@ -1957,7 +1941,7 @@ export default function CheckoutModal({
                         gap: '8px'
                       }}
                     >
-                      <span>Deliver to this Address • Continue to Summary</span>
+                      <span>Continue to Order Summary</span>
                       <ArrowRight size={16} />
                     </button>
                   </div>
@@ -1965,7 +1949,7 @@ export default function CheckoutModal({
               )}
 
               {/* ======================================================== */}
-              {/* STEP 3: ORDER SUMMARY & FINAL REVIEW (Amazon-Style)      */}
+              {/* STEP 3: ORDER SUMMARY SCREEN (With Change Options)       */}
               {/* ======================================================== */}
               {currentStep === 3 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -1982,11 +1966,11 @@ export default function CheckoutModal({
                       Order Details & Review
                     </h3>
                     <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                      Review your delivery destination, payment method, and streetwear items before placing order.
+                      Review your address, payment option, and items before placing your order.
                     </p>
                   </div>
 
-                  {/* SUMMARY CARD 1: DELIVERY ADDRESS (With Direct Change Option) */}
+                  {/* SUMMARY CARD 1: DELIVERY ADDRESS (With Change Address button) */}
                   <div
                     style={{
                       background: 'var(--bg-card)',
@@ -2031,7 +2015,6 @@ export default function CheckoutModal({
                       </div>
                     </div>
 
-                    {/* Change Address Action Button */}
                     <button
                       type="button"
                       onClick={() => setCurrentStep(2)}
@@ -2055,7 +2038,7 @@ export default function CheckoutModal({
                     </button>
                   </div>
 
-                  {/* SUMMARY CARD 2: PAYMENT METHOD (With Direct Change Option) */}
+                  {/* SUMMARY CARD 2: PAYMENT OPTION (With Change Payment Option button) */}
                   <div
                     style={{
                       background: 'var(--bg-card)',
@@ -2086,18 +2069,17 @@ export default function CheckoutModal({
                       </div>
                       <div>
                         <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: '800', color: 'var(--text-muted)' }}>
-                          Payment Method
+                          Payment Option
                         </span>
                         <div style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--text-primary)', marginTop: '2px' }}>
                           {getPaymentMethodDisplay()}
                         </div>
                         <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
-                          Encrypted 256-bit Secure Gateway • No Hidden Convenience Fees
+                          256-bit Bank Grade Encrypted • Zero Extra Fees
                         </div>
                       </div>
                     </div>
 
-                    {/* Change Payment Action Button */}
                     <button
                       type="button"
                       onClick={() => setCurrentStep(1)}
@@ -2117,11 +2099,11 @@ export default function CheckoutModal({
                       }}
                     >
                       <Edit2 size={12} />
-                      <span>Change Payment</span>
+                      <span>Change Payment Option</span>
                     </button>
                   </div>
 
-                  {/* SUMMARY CARD 3: ORDER ITEMS BREAKDOWN */}
+                  {/* SUMMARY CARD 3: ORDER ITEMS */}
                   <div
                     style={{
                       background: 'var(--bg-card)',
@@ -2135,10 +2117,10 @@ export default function CheckoutModal({
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: '0.76rem', textTransform: 'uppercase', fontWeight: '800', color: 'var(--text-muted)' }}>
-                        Items in Drop ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})
+                        Items in Order ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})
                       </span>
                       <span style={{ fontSize: '0.78rem', color: 'var(--accent-navy)', fontWeight: '700' }}>
-                        Polorse Heavyweight Archive
+                        Polorse Heavyweight Drop
                       </span>
                     </div>
 
@@ -2180,7 +2162,7 @@ export default function CheckoutModal({
                     </div>
                   </div>
 
-                  {/* SUMMARY CARD 4: BILLING BREAKDOWN */}
+                  {/* SUMMARY CARD 4: BILLING */}
                   <div
                     style={{
                       background: 'var(--bg-card)',
@@ -2228,7 +2210,7 @@ export default function CheckoutModal({
                     </div>
                   </div>
 
-                  {/* Trust & Exchange Assurance */}
+                  {/* Trust Badge */}
                   <div
                     style={{
                       display: 'flex',
@@ -2248,15 +2230,8 @@ export default function CheckoutModal({
                     </span>
                   </div>
 
-                  {/* Final Place Order Action Button (Customized to Payment Method) */}
-                  <div
-                    style={{
-                      marginTop: '8px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '10px'
-                    }}
-                  >
+                  {/* Dynamic Final Checkout CTA Button */}
+                  <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     <button
                       type="button"
                       disabled={isSubmitting}
@@ -2281,12 +2256,12 @@ export default function CheckoutModal({
                       {isSubmitting ? (
                         <>
                           <Clock size={18} className="animate-spin" />
-                          <span>Processing Secure Order...</span>
+                          <span>Processing Order...</span>
                         </>
                       ) : !currentUser ? (
                         <>
                           <Lock size={18} />
-                          <span>Sign In to Place Order • ₹{finalTotal.toLocaleString('en-IN')}</span>
+                          <span>Login / Register to Place Order • ₹{finalTotal.toLocaleString('en-IN')}</span>
                         </>
                       ) : paymentCategory === 'COD' ? (
                         <>
@@ -2301,13 +2276,13 @@ export default function CheckoutModal({
                       ) : (
                         <>
                           <CreditCard size={18} />
-                          <span>Pay ₹{finalTotal.toLocaleString('en-IN')} with {getPaymentMethodDisplay()}</span>
+                          <span>Pay ₹{finalTotal.toLocaleString('en-IN')} via {getPaymentMethodDisplay()}</span>
                         </>
                       )}
                     </button>
 
                     <div style={{ textAlign: 'center', fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                      By confirming, you agree to Polorse Terms of Drop, Authentic Garment Guarantee & Return Policy.
+                      By confirming, you agree to Polorse Authentic Garment Guarantee & 7-Day Return Policy.
                     </div>
                   </div>
                 </div>
