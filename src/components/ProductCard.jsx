@@ -205,16 +205,17 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
           </div>
         </div>
 
-        {/* Pricing & Add to Bag Action */}
+        {/* Pricing & CTA Actions (Buttons placed cleanly below the price) */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
           marginTop: 'auto',
-          paddingTop: '10px',
-          borderTop: '1px solid var(--border-subtle)'
+          paddingTop: '12px',
+          borderTop: '1px solid var(--border-subtle)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px'
         }}>
-          <div>
+          {/* Price Row */}
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
               <span style={{
                 fontFamily: 'var(--font-display)',
@@ -234,26 +235,41 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
                 </span>
               )}
             </div>
+            {discountPercent > 0 && (
+              <span style={{
+                fontSize: '0.72rem',
+                fontWeight: '700',
+                color: 'var(--accent-red)',
+                background: 'rgba(194, 26, 44, 0.08)',
+                padding: '2px 7px',
+                borderRadius: 'var(--radius-sm)'
+              }}>
+                {discountPercent}% OFF
+              </span>
+            )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          {/* Action Buttons Below Price */}
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
             {/* Add to Bag Button */}
             <button
+              type="button"
               onClick={handleQuickAddClick}
               disabled={!product.inStock}
               style={{
+                flex: 1,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '4px',
-                height: '32px',
-                padding: '0 10px',
-                background: isAdded ? 'var(--accent-green)' : 'var(--bg-secondary)',
-                color: isAdded ? '#fff' : 'var(--text-primary)',
-                border: '1px solid',
+                gap: '5px',
+                height: '36px',
+                padding: '0 8px',
+                background: isAdded ? 'rgba(46, 125, 50, 0.12)' : 'var(--bg-primary)',
+                color: isAdded ? 'var(--accent-green)' : 'var(--text-primary)',
+                border: '1.5px solid',
                 borderColor: isAdded ? 'var(--accent-green)' : 'var(--border-subtle)',
-                fontSize: '0.78rem',
-                fontWeight: '600',
+                fontSize: '0.82rem',
+                fontWeight: '700',
                 borderRadius: 'var(--radius-md)',
                 boxShadow: 'var(--shadow-sm)',
                 cursor: product.inStock ? 'pointer' : 'not-allowed',
@@ -267,33 +283,35 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
             >
               {isAdded ? (
                 <>
-                  <Check size={13} />
+                  <Check size={14} style={{ color: 'var(--accent-green)' }} />
                   <span>Added</span>
                 </>
               ) : (
                 <>
-                  <Plus size={13} />
-                  <span>Add</span>
+                  <Plus size={14} />
+                  <span>Add to Bag</span>
                 </>
               )}
             </button>
 
             {/* Buy Now Button */}
             <button
+              type="button"
               onClick={handleBuyNowClick}
               disabled={!product.inStock}
               style={{
+                flex: 1,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '4px',
-                height: '32px',
-                padding: '0 10px',
+                gap: '5px',
+                height: '36px',
+                padding: '0 8px',
                 background: 'var(--accent-navy)',
-                color: '#fff',
-                border: '1px solid var(--accent-navy)',
-                fontSize: '0.78rem',
-                fontWeight: '700',
+                color: '#FAF7F2',
+                border: '1.5px solid var(--accent-navy)',
+                fontSize: '0.82rem',
+                fontWeight: '800',
                 borderRadius: 'var(--radius-md)',
                 boxShadow: '0 2px 8px rgba(15, 28, 63, 0.2)',
                 cursor: product.inStock ? 'pointer' : 'not-allowed',
@@ -305,7 +323,7 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
               }}
               title="Buy Now (Direct Checkout)"
             >
-              <Zap size={13} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
+              <Zap size={14} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
               <span>Buy Now</span>
             </button>
           </div>
