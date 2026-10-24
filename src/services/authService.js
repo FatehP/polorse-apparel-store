@@ -16,13 +16,40 @@ const INITIAL_DEMO_USERS = [
     tier: 'Polorse VIP Member',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
     savedAddress: {
+      id: 'addr-primary',
       fullName: 'Fateh Prajapati',
       phone: '9876543210',
       addressLine: 'Aura Studio 402, High Street Boulevard',
       city: 'Mumbai',
       state: 'Maharashtra',
-      pincode: '400001'
+      pincode: '400001',
+      tag: 'Home / Studio',
+      isPrimary: true
     },
+    savedAddresses: [
+      {
+        id: 'addr-primary',
+        fullName: 'Fateh Prajapati',
+        phone: '9876543210',
+        addressLine: 'Aura Studio 402, High Street Boulevard',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        pincode: '400001',
+        tag: 'Home',
+        isPrimary: true
+      },
+      {
+        id: 'addr-office',
+        fullName: 'Fateh Prajapati',
+        phone: '9876543210',
+        addressLine: 'Polorse Design Labs, Block B, BKC Complex',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        pincode: '400051',
+        tag: 'Work',
+        isPrimary: false
+      }
+    ],
     joinedDate: 'October 2026'
   }
 ];
@@ -233,23 +260,100 @@ export async function loginWithGoogle() {
   return demoGoogleProfile;
 }
 
-// 5. Update user profile or saved address
-export function updateUserAddress(addressData) {
+// 5. Address Management (Multiple Addresses & Primary Location)
+export function getUserAddresses() {
+  const current = getCurrentUser();
+  if (!current) return [];
+
+  if (Array.isArray(current.savedAddresses) && current.savedAddresses.length > 0) {
+    return current.savedAddresses;
+  }
+
+  if (current.savedAddress) {
+    const singleAddr = {
+      id: current.savedAddress.id || 'addr-default',
+      fullName: current.savedAddress.fullName || current.name || '',
+      phone: current.savedAddress.phone || current.phone || '',
+      addressLine: current.savedAddress.addressLine || '',
+      city: current.savedAddress.city || 'Mumbai',
+      state: current.savedAddress.state || 'Maharashtra',
+      pincode: current.savedAddress.pincode || '400001',
+      tag: current.savedAddress.tag || 'Home',
+      isPrimary: true
+    };
+    return [singleAddr];
+  }
+
+  return [];
+}
+
+export function saveUserAddresses(addresses) {
   const current = getCurrentUser();
   if (!current) return;
 
-  const updated = {
+  const primaryAddr = addresses.find(a => a.isPrimary) || addresses[0] || null;
+  const updatedUser = {
     ...current,
-    savedAddress: addressData
+    savedAddresses: addresses,
+    savedAddress: primaryAddr
   };
-  setCurrentUser(updated);
+
+  setCurrentUser(updatedUser);
 
   const users = getStoredUsers();
   const idx = users.findIndex(u => u.id === current.id);
   if (idx !== -1) {
-    users[idx] = { ...users[idx], savedAddress: addressData };
+    users[idx] = {
+      ...users[idx],
+      savedAddresses: addresses,
+      savedAddress: primaryAddr
+    };
     saveUsers(users);
   }
+}
+
+export function addOrUpdateUserAddress(addressData) {
+  const current = getCurrentUser();
+  if (!current) return null;
+
+  const existingAddresses = getUserAddresses();
+  const isEditing = Boolean(addressData.id);
+  const targetId = addressData.id || `addr-${Date.now()}`;
+
+  let updatedList;
+  if (isEditing) {
+    updatedList = existingAddresses.map(a =>
+      a.id === targetId ? { ...a, ...addressData } : (addressData.isPrimary ? { ...a, isPrimary: false } : a)
+    );
+  } else {
+    // New address
+    const newAddr = {
+      ...addressData,
+      id: targetId,
+      isPrimary: addressData.isPrimary || existingAddresses.length === 0
+    };
+    const prevList = addressData.isPrimary
+      ? existingAddresses.map(a => ({ ...a, isPrimary: false }))
+      : existingAddresses;
+    updatedList = [newAddr, ...prevList];
+  }
+
+  saveUserAddresses(updatedList);
+  return updatedList.find(a => a.id === targetId);
+}
+
+export function deleteUserAddress(addressId) {
+  const existingAddresses = getUserAddresses();
+  const remaining = existingAddresses.filter(a => a.id !== addressId);
+  if (remaining.length > 0 && !remaining.some(a => a.isPrimary)) {
+    remaining[0].isPrimary = true;
+  }
+  saveUserAddresses(remaining);
+  return remaining;
+}
+
+export function updateUserAddress(addressData) {
+  return addOrUpdateUserAddress({ ...addressData, isPrimary: true });
 }
 
 // 6. Sign Out
