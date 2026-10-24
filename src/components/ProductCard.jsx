@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Plus, Eye, Check } from 'lucide-react';
+import { Plus, Eye, Check, Zap } from 'lucide-react';
 
-export default function ProductCard({ product, onSelectProduct, onQuickAdd }) {
+export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBuyNow }) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.size || '');
   const [isAdded, setIsAdded] = useState(false);
@@ -21,6 +21,18 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd }) {
     });
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 1500);
+  };
+
+  const handleBuyNowClick = (e) => {
+    e.stopPropagation();
+    if (onBuyNow) {
+      onBuyNow({
+        ...product,
+        selectedColor,
+        selectedSize,
+        quantity: 1
+      });
+    }
   };
 
   return (
@@ -224,36 +236,68 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd }) {
             </div>
           </div>
 
-          <button
-            onClick={handleQuickAddClick}
-            disabled={!product.inStock}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 14px',
-              background: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
-              color: '#fff',
-              fontSize: '0.82rem',
-              fontWeight: '600',
-              borderRadius: 'var(--radius-md)',
-              boxShadow: isAdded ? '0 2px 10px rgba(5, 150, 105, 0.3)' : '0 2px 10px rgba(15, 28, 63, 0.15)',
-              cursor: product.inStock ? 'pointer' : 'not-allowed',
-              opacity: product.inStock ? 1 : 0.5
-            }}
-          >
-            {isAdded ? (
-              <>
-                <Check size={14} />
-                <span>Added</span>
-              </>
-            ) : (
-              <>
-                <Plus size={14} />
-                <span>Add</span>
-              </>
-            )}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            {/* Add to Bag Button */}
+            <button
+              onClick={handleQuickAddClick}
+              disabled={!product.inStock}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '6px 10px',
+                background: isAdded ? 'var(--accent-green)' : 'var(--bg-secondary)',
+                color: isAdded ? '#fff' : 'var(--text-primary)',
+                border: '1px solid',
+                borderColor: isAdded ? 'var(--accent-green)' : 'var(--border-subtle)',
+                fontSize: '0.78rem',
+                fontWeight: '600',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-sm)',
+                cursor: product.inStock ? 'pointer' : 'not-allowed',
+                opacity: product.inStock ? 1 : 0.5,
+                transition: 'all var(--transition-fast)'
+              }}
+              title="Add to Bag"
+            >
+              {isAdded ? (
+                <>
+                  <Check size={13} />
+                  <span>Added</span>
+                </>
+              ) : (
+                <>
+                  <Plus size={13} />
+                  <span>Add</span>
+                </>
+              )}
+            </button>
+
+            {/* Buy Now Button */}
+            <button
+              onClick={handleBuyNowClick}
+              disabled={!product.inStock}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '6px 11px',
+                background: 'var(--accent-navy)',
+                color: '#fff',
+                fontSize: '0.78rem',
+                fontWeight: '700',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: '0 2px 8px rgba(15, 28, 63, 0.2)',
+                cursor: product.inStock ? 'pointer' : 'not-allowed',
+                opacity: product.inStock ? 1 : 0.5,
+                transition: 'all var(--transition-fast)'
+              }}
+              title="Buy Now (Direct Checkout)"
+            >
+              <Zap size={13} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
+              <span>Buy Now</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

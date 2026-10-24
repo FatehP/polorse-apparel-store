@@ -13,11 +13,12 @@ import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
-  Maximize2
+  Maximize2,
+  Zap
 } from 'lucide-react';
 import { checkPincodeDeliverability, autoDetectLocation } from '../services/pincodeService';
 
-export default function ProductModal({ product, onClose, onAddToCart }) {
+export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }) {
   if (!product) return null;
 
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || '');
@@ -104,6 +105,23 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
       setIsAdded(false);
       onClose();
     }, 900);
+  };
+
+  const handleBuyNow = () => {
+    if (!product.inStock) return;
+    const itemData = {
+      ...product,
+      selectedColor,
+      selectedSize,
+      quantity,
+      imageUrl: imageList[activeImageIndex] || product.imageUrl
+    };
+    if (onBuyNow) {
+      onBuyNow(itemData);
+    } else {
+      onAddToCart(itemData);
+      onClose();
+    }
   };
 
   return (
@@ -567,53 +585,101 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
             )}
           </div>
 
-          {/* Quantity Selector and Add Button */}
-          <div style={{ display: 'flex', gap: '14px', marginTop: '10px' }}>
+          {/* Quantity Selector and Action Buttons (Add to Bag & Buy Now) */}
+          <div style={{ display: 'flex', gap: '12px', marginTop: '10px', alignItems: 'stretch' }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               background: 'var(--bg-primary)',
-              border: '1px solid var(--border-subtle)',
+              border: '1.5px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
-              padding: '0 8px'
+              padding: '0 6px'
             }}>
               <button
+                type="button"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                style={{ padding: '10px 12px', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '700' }}
+                style={{ padding: '8px 10px', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer' }}
+                aria-label="Decrease quantity"
               >
                 -
               </button>
-              <span style={{ minWidth: '30px', textAlign: 'center', fontWeight: '700', color: 'var(--text-primary)' }}>
+              <span style={{ minWidth: '24px', textAlign: 'center', fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.95rem' }}>
                 {quantity}
               </span>
               <button
+                type="button"
                 onClick={() => setQuantity(quantity + 1)}
-                style={{ padding: '10px 12px', color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '700' }}
+                style={{ padding: '8px 10px', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer' }}
+                aria-label="Increase quantity"
               >
                 +
               </button>
             </div>
 
+            {/* Add to Bag Button */}
             <button
+              type="button"
               onClick={handleAdd}
               disabled={!product.inStock}
-              className="btn-primary"
+              id="modal-add-to-bag-btn"
               style={{
                 flex: 1,
-                background: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px 14px',
+                fontWeight: '700',
+                fontSize: '0.9rem',
+                borderRadius: 'var(--radius-md)',
+                background: isAdded ? 'rgba(46, 125, 50, 0.12)' : 'var(--bg-primary)',
+                color: isAdded ? 'var(--accent-green)' : 'var(--text-primary)',
+                border: isAdded ? '1.5px solid var(--accent-green)' : '1.5px solid var(--border-subtle)',
+                cursor: !product.inStock ? 'not-allowed' : 'pointer',
+                transition: 'all var(--transition-fast)'
               }}
+              title="Add item to Bag"
             >
               {isAdded ? (
                 <>
-                  <Check size={18} />
-                  <span>Added to Polorse Bag!</span>
+                  <Check size={17} style={{ color: 'var(--accent-green)' }} />
+                  <span>Added!</span>
                 </>
               ) : (
                 <>
-                  <ShoppingBag size={18} />
-                  <span>Add to Bag • ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
+                  <ShoppingBag size={17} />
+                  <span>Add to Bag</span>
                 </>
               )}
+            </button>
+
+            {/* Buy Now Button */}
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={!product.inStock}
+              id="modal-buy-now-btn"
+              style={{
+                flex: 1.25,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '12px 16px',
+                fontWeight: '800',
+                fontSize: '0.92rem',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--accent-navy)',
+                color: '#FAF7F2',
+                border: 'none',
+                cursor: !product.inStock ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 14px rgba(15, 28, 63, 0.25)',
+                transition: 'all var(--transition-fast)'
+              }}
+              title="Direct Instant Checkout"
+            >
+              <Zap size={16} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
+              <span>Buy Now • ₹{(product.price * quantity).toLocaleString('en-IN')}</span>
             </button>
           </div>
 

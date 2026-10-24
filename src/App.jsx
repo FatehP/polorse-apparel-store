@@ -185,6 +185,14 @@ export default function App() {
     setIsCheckoutOpen(true);
   };
 
+  const handleBuyNow = (productWithSelection) => {
+    handleAddToCart(productWithSelection);
+    if (selectedProduct) {
+      setSelectedProduct(null);
+    }
+    setIsCheckoutOpen(true);
+  };
+
   const handleOrderSuccess = () => {
     setCart([]);
     setAppliedCoupon(null);
@@ -478,6 +486,7 @@ export default function App() {
                     product={product}
                     onSelectProduct={setSelectedProduct}
                     onQuickAdd={handleAddToCart}
+                    onBuyNow={handleBuyNow}
                   />
                 ))}
               </div>
@@ -683,6 +692,7 @@ export default function App() {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onAddToCart={handleAddToCart}
+          onBuyNow={handleBuyNow}
         />
       )}
 
