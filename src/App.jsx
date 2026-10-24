@@ -58,6 +58,18 @@ export default function App() {
       console.error("Failed to load products", err);
     } finally {
       setLoading(false);
+      // Smoothly dismiss initial brand preloader
+      const preloader = document.getElementById('polorse-preloader');
+      if (preloader) {
+        setTimeout(() => {
+          preloader.classList.add('preloader-fade-out');
+          setTimeout(() => {
+            if (preloader && preloader.parentNode) {
+              preloader.parentNode.removeChild(preloader);
+            }
+          }, 650);
+        }, 400);
+      }
     }
   };
 

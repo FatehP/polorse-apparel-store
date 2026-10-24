@@ -10,6 +10,100 @@
     <title>POLORSE | Heavyweight Streetwear & Apparel</title>
   </head>
   <body>
+    <!-- Immediate Frame-0 Luxury Splash Preloader -->
+    <div id="polorse-preloader" style="
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background-color: #FAF7F2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s ease;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    ">
+      <style>
+        @keyframes polorsePulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.03); opacity: 0.92; }
+        }
+        @keyframes polorseTrackSlide {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(20%); }
+          100% { transform: translateX(100%); }
+        }
+        .preloader-fade-out {
+          opacity: 0 !important;
+          visibility: hidden !important;
+          pointer-events: none !important;
+        }
+      </style>
+      <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 320px;
+        animation: polorsePulse 2.4s ease-in-out infinite;
+      ">
+        <img
+          src="/polorse-logo.jpg"
+          alt="POLORSE"
+          style="
+            height: 64px;
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 16px rgba(15, 28, 63, 0.08));
+          "
+        />
+        <div style="
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: #0F1C3F;
+          margin-bottom: 6px;
+        ">
+          POLORSE • ARCHIVE
+        </div>
+        <div style="
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-size: 0.65rem;
+          font-weight: 600;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #8E99A8;
+          margin-bottom: 24px;
+        ">
+          Heavyweight Streetwear • Crafted in India
+        </div>
+        <!-- Minimalist Luxury Progress Bar -->
+        <div style="
+          width: 140px;
+          height: 2.5px;
+          background: #EBE4D8;
+          border-radius: 9999px;
+          overflow: hidden;
+          position: relative;
+        ">
+          <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 50%;
+            background: linear-gradient(90deg, #0F1C3F 0%, #C21A2C 100%);
+            border-radius: 9999px;
+            animation: polorseTrackSlide 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+          "></div>
+        </div>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
