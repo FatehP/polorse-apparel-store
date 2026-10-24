@@ -20,14 +20,35 @@ import {
 } from 'lucide-react';
 import { checkPincodeDeliverability, autoDetectLocation } from '../services/pincodeService';
 
-export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }) {
+export default function ProductModal({
+  product,
+  cart = [],
+  onClose,
+  onAddToCart,
+  onUpdateQuantity,
+  onBuyNow
+}) {
   if (!product) return null;
 
-  const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || '');
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.size || '');
-  const [quantity, setQuantity] = useState(1);
+  // Find any existing cart item for this product to default to user's cart selection
+  const existingCartItem = cart?.find(item => item.id === product.id);
+
+  const [selectedColor, setSelectedColor] = useState(
+    existingCartItem?.selectedColor || product.colors?.[0]?.name || ''
+  );
+  const [selectedSize, setSelectedSize] = useState(
+    existingCartItem?.selectedSize || product.sizes?.[0]?.size || ''
+  );
   const [isAdded, setIsAdded] = useState(false);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+
+  // Check if this product + selected size & color is in the cart
+  const cartItem = cart?.find(
+    item => item.id === product.id && 
+            item.selectedSize === selectedSize && 
+            (!selectedColor || item.selectedColor === selectedColor)
+  );
+  const inCartQty = cartItem ? cartItem.quantity : 0;
 
   // Multi-image list
   const imageList = (Array.isArray(product.images) && product.images.length > 0)
@@ -136,14 +157,13 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
       ...product,
       selectedColor,
       selectedSize,
-      quantity,
+      quantity: 1,
       imageUrl: imageList[activeImageIndex] || product.imageUrl
     });
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
-      onClose();
-    }, 900);
+    }, 1200);
   };
 
   const handleBuyNow = () => {
@@ -152,7 +172,7 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
       ...product,
       selectedColor,
       selectedSize,
-      quantity,
+      quantity: inCartQty > 0 ? inCartQty : 1,
       imageUrl: imageList[activeImageIndex] || product.imageUrl
     };
     if (onBuyNow) {
@@ -771,82 +791,111 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
             )}
           </div>
 
-          {/* Quantity Selector and Action Buttons (Add to Bag & Buy Now) */}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '10px', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              background: 'var(--bg-primary)',
-              border: '1.5px solid var(--border-subtle)',
-              borderRadius: 'var(--radius-md)',
-              padding: '0 4px',
-              height: '46px',
-              flexShrink: 0,
-              boxSizing: 'border-box'
-            }}>
+          {/* Action Buttons (Add to Bag / Stepper & Buy Now) */}
+          <div style={{ display: 'flex', gap: '10px', marginTop: '12px', alignItems: 'center', width: '100%', boxSizing: 'border-box' }}>
+            {inCartQty > 0 ? (
+              /* High-Contrast Interactive Quantity Stepper */
+              <div
+                style={{
+                  flex: '1 1 0',
+                  minWidth: '0',
+                  height: '48px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0 8px',
+                  background: 'var(--accent-navy)',
+                  color: '#FAF7F2',
+                  border: '1.5px solid var(--accent-navy)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-sm)',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => onUpdateQuantity?.(cartItem, inCartQty - 1)}
+                  style={{
+                    padding: '0 12px',
+                    height: '100%',
+                    color: '#FAF7F2',
+                    fontSize: '1.25rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  aria-label="Decrease quantity"
+                >
+                  -
+                </button>
+                <span style={{ fontSize: '0.88rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <ShoppingBag size={14} style={{ color: '#FCD34D' }} />
+                  <span>{inCartQty} in Bag</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onUpdateQuantity?.(cartItem, inCartQty + 1)}
+                  style={{
+                    padding: '0 12px',
+                    height: '100%',
+                    color: '#FAF7F2',
+                    fontSize: '1.25rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+            ) : (
               <button
                 type="button"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                style={{ padding: '0 8px', height: '100%', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                aria-label="Decrease quantity"
+                onClick={handleAdd}
+                disabled={!product.inStock}
+                id="modal-add-to-bag-btn"
+                style={{
+                  flex: '1 1 0',
+                  minWidth: '0',
+                  height: '48px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '0 14px',
+                  fontWeight: '800',
+                  fontSize: '0.88rem',
+                  borderRadius: 'var(--radius-md)',
+                  background: isAdded ? 'rgba(46, 125, 50, 0.12)' : '#FFFFFF',
+                  color: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
+                  border: isAdded ? '1.5px solid var(--accent-green)' : '1.5px solid var(--accent-navy)',
+                  boxSizing: 'border-box',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1,
+                  cursor: !product.inStock ? 'not-allowed' : 'pointer',
+                  boxShadow: 'var(--shadow-sm)',
+                  transition: 'all var(--transition-fast)'
+                }}
+                title="Add item to Bag"
               >
-                -
+                {isAdded ? (
+                  <>
+                    <Check size={16} style={{ color: 'var(--accent-green)' }} />
+                    <span>Added!</span>
+                  </>
+                ) : (
+                  <>
+                    <ShoppingBag size={16} />
+                    <span>Add to Bag</span>
+                  </>
+                )}
               </button>
-              <span style={{ minWidth: '20px', textAlign: 'center', fontWeight: '700', color: 'var(--text-primary)', fontSize: '0.9rem' }}>
-                {quantity}
-              </span>
-              <button
-                type="button"
-                onClick={() => setQuantity(quantity + 1)}
-                style={{ padding: '0 8px', height: '100%', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                aria-label="Increase quantity"
-              >
-                +
-              </button>
-            </div>
-
-            {/* High-Contrast Luxury Add to Bag Button */}
-            <button
-              type="button"
-              onClick={handleAdd}
-              disabled={!product.inStock}
-              id="modal-add-to-bag-btn"
-              style={{
-                flex: '1 1 0',
-                minWidth: '0',
-                height: '46px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                padding: '0 8px',
-                fontWeight: '800',
-                fontSize: '0.84rem',
-                borderRadius: 'var(--radius-md)',
-                background: isAdded ? 'rgba(46, 125, 50, 0.12)' : '#FFFFFF',
-                color: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
-                border: isAdded ? '1.5px solid var(--accent-green)' : '1.5px solid var(--accent-navy)',
-                boxSizing: 'border-box',
-                whiteSpace: 'nowrap',
-                lineHeight: 1,
-                cursor: !product.inStock ? 'not-allowed' : 'pointer',
-                boxShadow: 'var(--shadow-sm)',
-                transition: 'all var(--transition-fast)'
-              }}
-              title="Add item to Bag"
-            >
-              {isAdded ? (
-                <>
-                  <Check size={16} style={{ color: 'var(--accent-green)' }} />
-                  <span>Added!</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingBag size={16} />
-                  <span>Add to Bag</span>
-                </>
-              )}
-            </button>
+            )}
 
             {/* Buy Now Button */}
             <button
@@ -857,14 +906,14 @@ export default function ProductModal({ product, onClose, onAddToCart, onBuyNow }
               style={{
                 flex: '1 1 0',
                 minWidth: '0',
-                height: '46px',
+                height: '48px',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                padding: '0 8px',
+                padding: '0 14px',
                 fontWeight: '800',
-                fontSize: '0.85rem',
+                fontSize: '0.88rem',
                 borderRadius: 'var(--radius-md)',
                 background: 'var(--accent-navy)',
                 color: '#FAF7F2',

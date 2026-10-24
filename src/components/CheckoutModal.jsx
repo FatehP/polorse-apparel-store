@@ -104,6 +104,16 @@ export default function CheckoutModal({
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
+
+    if (!currentUser) {
+      if (onOpenAuth) {
+        onOpenAuth();
+      } else {
+        alert("Please Sign In or Register to place your order.");
+      }
+      return;
+    }
+
     if (!formData.customerName || !formData.phone || !formData.address || !formData.pincode) {
       alert("Please fill in all delivery details");
       return;
@@ -384,18 +394,25 @@ export default function CheckoutModal({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '10px',
-                padding: '10px 14px',
-                background: 'rgba(252, 211, 77, 0.1)',
-                border: '1px solid rgba(252, 211, 77, 0.3)',
+                gap: '12px',
+                padding: '14px 16px',
+                background: 'rgba(194, 26, 44, 0.06)',
+                border: '1.5px solid rgba(194, 26, 44, 0.25)',
                 borderRadius: 'var(--radius-md)',
                 marginBottom: '20px',
-                fontSize: '0.82rem',
+                fontSize: '0.84rem',
                 color: 'var(--text-primary)'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={16} style={{ color: '#D97706', flexShrink: 0 }} />
-                  <span>Have an account? Sign in for 1-click address autofill, or continue as Guest.</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <ShieldCheck size={20} style={{ color: 'var(--accent-red)', flexShrink: 0 }} />
+                  <div>
+                    <strong style={{ display: 'block', color: 'var(--accent-navy)', fontSize: '0.88rem' }}>
+                      Sign In Required to Complete Order
+                    </strong>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+                      Please log in or register with your mobile number for live tracking & doorstep exchange.
+                    </span>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -404,15 +421,16 @@ export default function CheckoutModal({
                     background: 'var(--accent-navy)',
                     color: '#FAF7F2',
                     border: 'none',
-                    padding: '4px 10px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
+                    padding: '8px 16px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.82rem',
                     fontWeight: '700',
                     cursor: 'pointer',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    boxShadow: 'var(--shadow-sm)'
                   }}
                 >
-                  Sign In
+                  Sign In / Register
                 </button>
               </div>
             )}
@@ -647,9 +665,15 @@ export default function CheckoutModal({
                   type="submit"
                   disabled={isSubmitting}
                   className="btn-primary"
-                  style={{ width: '100%', padding: '14px', fontSize: '1rem' }}
+                  style={{ width: '100%', padding: '14px', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
-                  {isSubmitting ? 'Placing Order...' : `Confirm Order • ₹${finalTotal.toLocaleString('en-IN')}`}
+                  {isSubmitting ? (
+                    'Placing Order...'
+                  ) : !currentUser ? (
+                    `Sign In to Place Order • ₹${finalTotal.toLocaleString('en-IN')}`
+                  ) : (
+                    `Confirm Order • ₹${finalTotal.toLocaleString('en-IN')}`
+                  )}
                 </button>
               </div>
             </form>

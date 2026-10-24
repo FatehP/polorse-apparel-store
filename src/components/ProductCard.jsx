@@ -1,10 +1,25 @@
 import React, { useState } from 'react';
 import { Plus, Eye, Check, Zap } from 'lucide-react';
 
-export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBuyNow }) {
+export default function ProductCard({
+  product,
+  cart = [],
+  onSelectProduct,
+  onQuickAdd,
+  onUpdateQuantity,
+  onBuyNow
+}) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.size || '');
   const [isAdded, setIsAdded] = useState(false);
+
+  // Check if this product + selected size & color is in the cart
+  const cartItem = cart?.find(
+    item => item.id === product.id && 
+            item.selectedSize === selectedSize && 
+            (!selectedColor || item.selectedColor === selectedColor)
+  );
+  const inCartQty = cartItem ? cartItem.quantity : 0;
 
   // Calculate discount percentage
   const discountPercent = product.originalPrice
@@ -20,7 +35,7 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
       quantity: 1
     });
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1500);
+    setTimeout(() => setIsAdded(false), 1200);
   };
 
   const handleBuyNowClick = (e) => {
@@ -266,48 +281,114 @@ export default function ProductCard({ product, onSelectProduct, onQuickAdd, onBu
 
           {/* Action Buttons Below Price */}
           <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-            {/* Add to Bag Button */}
-            <button
-              type="button"
-              onClick={handleQuickAddClick}
-              disabled={!product.inStock}
-              style={{
-                flex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '5px',
-                height: '36px',
-                padding: '0 8px',
-                background: isAdded ? 'rgba(46, 125, 50, 0.12)' : 'var(--bg-primary)',
-                color: isAdded ? 'var(--accent-green)' : 'var(--text-primary)',
-                border: '1.5px solid',
-                borderColor: isAdded ? 'var(--accent-green)' : 'var(--border-subtle)',
-                fontSize: '0.82rem',
-                fontWeight: '700',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: 'var(--shadow-sm)',
-                cursor: product.inStock ? 'pointer' : 'not-allowed',
-                opacity: product.inStock ? 1 : 0.5,
-                whiteSpace: 'nowrap',
-                boxSizing: 'border-box',
-                lineHeight: 1,
-                transition: 'all var(--transition-fast)'
-              }}
-              title="Add to Bag"
-            >
-              {isAdded ? (
-                <>
-                  <Check size={14} style={{ color: 'var(--accent-green)' }} />
-                  <span>Added</span>
-                </>
-              ) : (
-                <>
-                  <Plus size={14} />
-                  <span>Add to Bag</span>
-                </>
-              )}
-            </button>
+            {/* Add to Bag Button / Reactive Quantity Stepper */}
+            {inCartQty > 0 ? (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  flex: 1,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  height: '36px',
+                  padding: '0 4px',
+                  background: 'var(--accent-navy)',
+                  color: '#FAF7F2',
+                  border: '1.5px solid var(--accent-navy)',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-sm)',
+                  boxSizing: 'border-box'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUpdateQuantity?.(cartItem, inCartQty - 1);
+                  }}
+                  style={{
+                    padding: '0 8px',
+                    height: '100%',
+                    color: '#FAF7F2',
+                    fontSize: '1rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  aria-label="Decrease quantity"
+                >
+                  -
+                </button>
+                <span style={{ fontSize: '0.85rem', fontWeight: '800', minWidth: '18px', textAlign: 'center' }}>
+                  {inCartQty}
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUpdateQuantity?.(cartItem, inCartQty + 1);
+                  }}
+                  style={{
+                    padding: '0 8px',
+                    height: '100%',
+                    color: '#FAF7F2',
+                    fontSize: '1rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleQuickAddClick}
+                disabled={!product.inStock}
+                style={{
+                  flex: 1,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '5px',
+                  height: '36px',
+                  padding: '0 8px',
+                  background: isAdded ? 'rgba(46, 125, 50, 0.12)' : 'var(--bg-primary)',
+                  color: isAdded ? 'var(--accent-green)' : 'var(--text-primary)',
+                  border: '1.5px solid',
+                  borderColor: isAdded ? 'var(--accent-green)' : 'var(--border-subtle)',
+                  fontSize: '0.82rem',
+                  fontWeight: '700',
+                  borderRadius: 'var(--radius-md)',
+                  boxShadow: 'var(--shadow-sm)',
+                  cursor: product.inStock ? 'pointer' : 'not-allowed',
+                  opacity: product.inStock ? 1 : 0.5,
+                  whiteSpace: 'nowrap',
+                  boxSizing: 'border-box',
+                  lineHeight: 1,
+                  transition: 'all var(--transition-fast)'
+                }}
+                title="Add to Bag"
+              >
+                {isAdded ? (
+                  <>
+                    <Check size={14} style={{ color: 'var(--accent-green)' }} />
+                    <span>Added</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus size={14} />
+                    <span>Add to Bag</span>
+                  </>
+                )}
+              </button>
+            )}
 
             {/* Buy Now Button */}
             <button

@@ -531,8 +531,10 @@ export default function App() {
                   <ProductCard
                     key={product.id}
                     product={product}
+                    cart={cart}
                     onSelectProduct={setSelectedProduct}
                     onQuickAdd={handleAddToCart}
+                    onUpdateQuantity={handleUpdateQuantity}
                     onBuyNow={handleBuyNow}
                   />
                 ))}
@@ -737,8 +739,10 @@ export default function App() {
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
+          cart={cart}
           onClose={() => setSelectedProduct(null)}
           onAddToCart={handleAddToCart}
+          onUpdateQuantity={handleUpdateQuantity}
           onBuyNow={handleBuyNow}
         />
       )}
