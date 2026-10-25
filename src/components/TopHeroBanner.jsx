@@ -48,17 +48,15 @@ const BANNER_SLIDES = [
 
 export default function TopHeroBanner({ onSelectCategory }) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef(null);
 
-  // Auto-play timer
+  // Auto-play timer: auto-scrolls exactly every 3 seconds
   useEffect(() => {
-    if (isPaused) return;
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % BANNER_SLIDES.length);
-    }, 5500);
+    }, 3000);
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [currentSlide]);
 
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev === 0 ? BANNER_SLIDES.length - 1 : prev - 1));
@@ -97,8 +95,6 @@ export default function TopHeroBanner({ onSelectCategory }) {
         padding: '0 16px',
         boxSizing: 'border-box'
       }}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -145,6 +141,8 @@ export default function TopHeroBanner({ onSelectCategory }) {
 
         {/* Slide Content Box */}
         <div
+          key={slide.id}
+          className="animate-fade"
           style={{
             position: 'relative',
             zIndex: 2,
