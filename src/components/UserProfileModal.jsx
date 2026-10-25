@@ -378,15 +378,18 @@ export default function UserProfileModal({
                 user?.name ? user.name.charAt(0).toUpperCase() : 'U'
               )}
             </div>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <h2
                 style={{
                   fontFamily: 'var(--font-display)',
-                  fontSize: '1.15rem',
+                  fontSize: '1.1rem',
                   fontWeight: '900',
                   margin: 0,
                   color: 'var(--text-primary)',
-                  letterSpacing: '0.02em'
+                  letterSpacing: '0.02em',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
                 }}
               >
                 {user?.name || 'Polorse Member'}
@@ -398,29 +401,33 @@ export default function UserProfileModal({
                   alignItems: 'center',
                   gap: '6px',
                   cursor: 'pointer',
-                  padding: '2px 0',
-                  marginTop: '2px'
+                  marginTop: '3px',
+                  whiteSpace: 'nowrap'
                 }}
                 title="Click to view VIP Tier & Benefits"
               >
-                <Sparkles size={13} style={{ color: '#D97706' }} />
-                <span style={{ fontSize: '0.74rem', color: 'var(--accent-navy)', fontWeight: '800', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
-                  {user?.tier || 'Polorse VIP Member'}
-                </span>
-                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '600' }}>• Customer Hub</span>
                 <span
                   style={{
-                    fontSize: '0.65rem',
+                    fontSize: '0.68rem',
                     fontWeight: '800',
                     color: '#D97706',
-                    background: 'rgba(217, 119, 6, 0.1)',
-                    padding: '1px 6px',
-                    borderRadius: 'var(--radius-full)',
-                    marginLeft: '2px'
+                    background: 'rgba(217, 119, 6, 0.12)',
+                    border: '1px solid rgba(217, 119, 6, 0.28)',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    lineHeight: 1.2
                   }}
                 >
-                  PERKS →
+                  <Crown size={11} />
+                  <span>VIP Member</span>
                 </span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                  Account Hub
+                </span>
+                <ChevronRight size={13} style={{ color: '#D97706', marginLeft: '-2px' }} />
               </div>
             </div>
           </div>
