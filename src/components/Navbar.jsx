@@ -131,8 +131,11 @@ export default function Navbar({
 
   return (
     <header
-      className="sticky top-0 z-40"
+      className="navbar-sticky-header"
       style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
         background: isScrolled ? 'rgba(250, 247, 242, 0.96)' : 'var(--bg-glass)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
@@ -527,30 +530,31 @@ export default function Navbar({
             </button>
           </div>
 
-          {/* Orders Quick-Access Pill (Store View Only) */}
+          {/* Orders Quick-Access Button (Store View Only) */}
           {activeView === 'store' && (
             <button
               type="button"
               onClick={() => onOpenProfile?.('orders')}
               id="navbar-orders-shortcut-btn"
               style={{
-                display: 'inline-flex',
+                width: '38px',
+                height: '38px',
+                display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '7px 12px',
+                justifyContent: 'center',
                 background: 'var(--bg-secondary)',
                 border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-full)',
+                borderRadius: 'var(--radius-md)',
                 color: 'var(--text-primary)',
-                fontSize: '0.8rem',
-                fontWeight: '700',
+                boxShadow: 'var(--shadow-sm)',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                flexShrink: 0,
+                padding: 0
               }}
               title="Track Orders & Live Status"
             >
-              <Package size={14} style={{ color: 'var(--accent-navy)' }} />
-              <span className="nav-desktop-only">Orders</span>
+              <Package size={17} style={{ color: 'var(--accent-navy)' }} />
             </button>
           )}
 
@@ -567,18 +571,20 @@ export default function Navbar({
                 justifyContent: 'center',
                 background: isWishlistActive ? 'rgba(194, 26, 44, 0.08)' : 'var(--bg-secondary)',
                 border: isWishlistActive ? '1.5px solid var(--accent-red)' : '1px solid var(--border-subtle)',
-                width: isScrolled ? '36px' : '40px',
-                height: isScrolled ? '36px' : '40px',
+                width: '38px',
+                height: '38px',
                 borderRadius: 'var(--radius-md)',
                 color: isWishlistActive ? 'var(--accent-red)' : 'var(--text-primary)',
                 boxShadow: 'var(--shadow-sm)',
                 transition: 'all 0.2s ease',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0,
+                padding: 0
               }}
               title="Saved Wishlist Items"
             >
               <Heart
-                size={18}
+                size={17}
                 fill={isWishlistActive || wishlistCount > 0 ? 'var(--accent-red)' : 'none'}
                 style={{ color: isWishlistActive || wishlistCount > 0 ? 'var(--accent-red)' : 'currentColor' }}
               />
@@ -587,8 +593,8 @@ export default function Navbar({
                   className={wishlistBadgeAnimate ? 'animate-badge-bounce' : ''}
                   style={{
                     position: 'absolute',
-                    top: '-4px',
-                    right: '-4px',
+                    top: '-5px',
+                    right: '-5px',
                     background: 'var(--accent-red)',
                     color: '#fff',
                     fontSize: '0.68rem',
@@ -621,17 +627,19 @@ export default function Navbar({
                 justifyContent: 'center',
                 background: 'var(--bg-secondary)',
                 border: '1px solid var(--border-subtle)',
-                width: isScrolled ? '36px' : '40px',
-                height: isScrolled ? '36px' : '40px',
+                width: '38px',
+                height: '38px',
                 borderRadius: 'var(--radius-md)',
                 color: 'var(--text-primary)',
                 boxShadow: 'var(--shadow-sm)',
                 transition: 'all 0.2s ease',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0,
+                padding: 0
               }}
               title="View Shopping Bag"
             >
-              <ShoppingBag size={18} />
+              <ShoppingBag size={17} />
               {cartCount > 0 && (
                 <span
                   className={cartBadgeAnimate ? 'animate-badge-bounce' : ''}
@@ -641,15 +649,15 @@ export default function Navbar({
                     right: '-5px',
                     background: 'var(--accent-red)',
                     color: '#fff',
-                    fontSize: '0.7rem',
+                    fontSize: '0.68rem',
                     fontWeight: '800',
-                    minWidth: '20px',
-                    height: '20px',
-                    borderRadius: '10px',
+                    minWidth: '18px',
+                    height: '18px',
+                    borderRadius: '9px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 2px 8px var(--accent-red-glow)',
+                    boxShadow: '0 2px 6px var(--accent-red-glow)',
                     padding: '0 4px'
                   }}
                 >
@@ -668,24 +676,24 @@ export default function Navbar({
                   onClick={onOpenAuth}
                   id="navbar-sign-in-btn"
                   style={{
+                    width: '38px',
+                    height: '38px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '6px',
-                    padding: isScrolled ? '7px 12px' : '8px 14px',
+                    justifyContent: 'center',
                     background: 'var(--bg-secondary)',
-                    border: '1.5px solid var(--border-subtle)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: 'var(--radius-md)',
                     color: 'var(--text-primary)',
-                    fontSize: '0.82rem',
-                    fontWeight: '700',
                     cursor: 'pointer',
                     boxShadow: 'var(--shadow-sm)',
-                    transition: 'all 0.2s ease'
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0,
+                    padding: 0
                   }}
                   title="Sign In / Register"
                 >
-                  <User size={15} style={{ color: 'var(--accent-navy)' }} />
-                  <span className="nav-desktop-only">Sign In</span>
+                  <User size={17} style={{ color: 'var(--accent-navy)' }} />
                 </button>
               ) : (
                 <div>
@@ -694,18 +702,19 @@ export default function Navbar({
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                     id="navbar-user-profile-btn"
                     style={{
+                      width: '38px',
+                      height: '38px',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
-                      padding: '4px 10px 4px 5px',
+                      justifyContent: 'center',
                       background: 'var(--bg-secondary)',
-                      border: '1.5px solid var(--border-subtle)',
-                      borderRadius: 'var(--radius-full)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: 'var(--radius-md)',
                       color: 'var(--text-primary)',
-                      fontSize: '0.82rem',
-                      fontWeight: '700',
                       cursor: 'pointer',
-                      boxShadow: 'var(--shadow-sm)'
+                      boxShadow: 'var(--shadow-sm)',
+                      flexShrink: 0,
+                      padding: 0
                     }}
                     title="User Account Hub"
                   >
@@ -734,10 +743,6 @@ export default function Navbar({
                         currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'
                       )}
                     </div>
-                    <span className="nav-desktop-only" style={{ maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {currentUser.name ? currentUser.name.split(' ')[0] : 'Member'}
-                    </span>
-                    <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} />
                   </button>
 
                   {/* Dropdown Menu */}
@@ -749,13 +754,14 @@ export default function Navbar({
                         right: 0,
                         background: 'var(--bg-secondary)',
                         border: '1.5px solid var(--border-subtle)',
-                        borderRadius: 'var(--radius-md)',
-                        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.2)',
+                        borderRadius: 'var(--radius-lg)',
+                        boxShadow: '0 16px 40px rgba(15, 28, 63, 0.25)',
                         minWidth: '240px',
                         padding: '6px 0',
-                        zIndex: 60
+                        zIndex: 1000
                       }}
                     >
+
                       <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-subtle)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <div
