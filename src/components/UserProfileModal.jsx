@@ -340,7 +340,7 @@ export default function UserProfileModal({
         }}
       >
         {/* iOS Pull Handle */}
-        <div className="sheet-handle" style={{ margin: '8px auto 0 auto' }} />
+        <div className="sheet-handle" style={{ margin: '8px auto 0 auto', flexShrink: 0 }} />
 
         {/* Modal Top Bar */}
         <div
@@ -350,7 +350,8 @@ export default function UserProfileModal({
             background: 'var(--bg-card)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexShrink: 0
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -456,23 +457,29 @@ export default function UserProfileModal({
         <div
           style={{
             display: 'flex',
+            alignItems: 'center',
             borderBottom: '1px solid var(--border-subtle)',
             background: 'var(--bg-primary)',
-            padding: '4px 12px',
-            gap: '6px',
-            overflowX: 'auto'
+            padding: '8px 16px',
+            gap: '8px',
+            overflowX: 'auto',
+            flexShrink: 0,
+            minHeight: '52px',
+            boxSizing: 'border-box',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch'
           }}
         >
           <button
             type="button"
             onClick={() => setActiveTab('profile')}
             style={{
-              flex: '1 0 auto',
-              display: 'flex',
+              flexShrink: 0,
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px 14px',
+              padding: '8px 14px',
               borderRadius: 'var(--radius-md)',
               border: 'none',
               background: activeTab === 'profile' ? 'var(--accent-navy)' : 'transparent',
@@ -480,6 +487,7 @@ export default function UserProfileModal({
               fontSize: '0.84rem',
               fontWeight: '800',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
               transition: 'all var(--transition-fast)'
             }}
           >
@@ -491,12 +499,12 @@ export default function UserProfileModal({
             type="button"
             onClick={() => setActiveTab('orders')}
             style={{
-              flex: '1 0 auto',
-              display: 'flex',
+              flexShrink: 0,
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px 14px',
+              padding: '8px 14px',
               borderRadius: 'var(--radius-md)',
               border: 'none',
               background: activeTab === 'orders' ? 'var(--accent-navy)' : 'transparent',
@@ -504,6 +512,7 @@ export default function UserProfileModal({
               fontSize: '0.84rem',
               fontWeight: '800',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
               transition: 'all var(--transition-fast)'
             }}
           >
@@ -515,12 +524,12 @@ export default function UserProfileModal({
             type="button"
             onClick={() => setActiveTab('addresses')}
             style={{
-              flex: '1 0 auto',
-              display: 'flex',
+              flexShrink: 0,
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px 14px',
+              padding: '8px 14px',
               borderRadius: 'var(--radius-md)',
               border: 'none',
               background: activeTab === 'addresses' ? 'var(--accent-navy)' : 'transparent',
@@ -528,6 +537,7 @@ export default function UserProfileModal({
               fontSize: '0.84rem',
               fontWeight: '800',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
               transition: 'all var(--transition-fast)'
             }}
           >
@@ -539,12 +549,12 @@ export default function UserProfileModal({
             type="button"
             onClick={() => setActiveTab('payments')}
             style={{
-              flex: '1 0 auto',
-              display: 'flex',
+              flexShrink: 0,
+              display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '6px',
-              padding: '10px 14px',
+              padding: '8px 14px',
               borderRadius: 'var(--radius-md)',
               border: 'none',
               background: activeTab === 'payments' ? 'var(--accent-navy)' : 'transparent',
@@ -552,6 +562,7 @@ export default function UserProfileModal({
               fontSize: '0.84rem',
               fontWeight: '800',
               cursor: 'pointer',
+              whiteSpace: 'nowrap',
               transition: 'all var(--transition-fast)'
             }}
           >

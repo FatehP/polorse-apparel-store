@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Flame, ShieldCheck, Truck } from 'lucide-react';
+import { Sparkles, ArrowRight, Flame, ShieldCheck, Truck } from 'lucide-react';
 
 const BANNER_SLIDES = [
   {
@@ -282,62 +282,6 @@ export default function TopHeroBanner({ onSelectCategory }) {
           </div>
         </div>
 
-        {/* Carousel Arrow Controls (Desktop Only) */}
-        <button
-          type="button"
-          onClick={handlePrev}
-          aria-label="Previous Slide"
-          className="nav-desktop-only"
-          style={{
-            position: 'absolute',
-            left: '14px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            background: 'rgba(15, 28, 63, 0.6)',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            color: '#FAF7F2',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 5,
-            transition: 'background 0.2s ease'
-          }}
-        >
-          <ChevronLeft size={18} />
-        </button>
-
-        <button
-          type="button"
-          onClick={handleNext}
-          aria-label="Next Slide"
-          className="nav-desktop-only"
-          style={{
-            position: 'absolute',
-            right: '14px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            background: 'rgba(15, 28, 63, 0.6)',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            color: '#FAF7F2',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            zIndex: 5,
-            transition: 'background 0.2s ease'
-          }}
-        >
-          <ChevronRight size={18} />
-        </button>
 
         {/* Slide Indicator Dots */}
         <div
