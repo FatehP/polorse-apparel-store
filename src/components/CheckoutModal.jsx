@@ -30,6 +30,7 @@ import {
   deleteUserAddress,
   getUserCards
 } from '../services/authService';
+import { formatCardExpiry } from '../utils/paymentUtils';
 
 // Crisp Vector Brand Logos for Payment Options
 function PhonePeLogo() {
@@ -1370,7 +1371,10 @@ export default function CheckoutModal({
                                 maxLength={5}
                                 placeholder="MM/YY"
                                 value={cardDetails.expiry}
-                                onChange={(e) => setCardDetails(prev => ({ ...prev, expiry: e.target.value }))}
+                                onChange={(e) => {
+                                  const formatted = formatCardExpiry(e.target.value, cardDetails.expiry);
+                                  setCardDetails(prev => ({ ...prev, expiry: formatted }));
+                                }}
                                 className="form-input"
                                 style={{ width: '100%', padding: '8px 12px', fontSize: '0.88rem' }}
                               />
@@ -2050,17 +2054,22 @@ export default function CheckoutModal({
                               {addr.isPrimary && (
                                 <span
                                   style={{
-                                    fontSize: '0.7rem',
+                                    fontSize: '0.68rem',
                                     fontWeight: '800',
-                                    padding: '3px 10px',
+                                    letterSpacing: '0.06em',
+                                    padding: '3px 9px',
                                     borderRadius: 'var(--radius-full)',
                                     background: 'var(--accent-navy)',
                                     color: '#FAF7F2',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    lineHeight: 1.1,
                                     whiteSpace: 'nowrap',
                                     flexShrink: 0
                                   }}
                                 >
-                                  ★ PRIMARY LOCATION
+                                  ★ PRIMARY
                                 </span>
                               )}
                             </div>

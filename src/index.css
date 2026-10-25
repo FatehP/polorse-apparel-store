@@ -84,7 +84,7 @@ button {
   transition: all var(--transition-normal);
 }
 
-input, textarea, select {
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
   font-family: var(--font-body);
   background-color: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
@@ -97,9 +97,75 @@ input, textarea, select {
   width: 100%;
 }
 
-input:focus, textarea:focus, select:focus {
+input:not([type="checkbox"]):not([type="radio"]):focus, textarea:focus, select:focus {
   border-color: var(--accent-navy);
   box-shadow: 0 0 0 3px rgba(15, 28, 63, 0.12);
+}
+
+/* Luxury Modern Checkboxes and Radio Toggles (Creme #FAF7F2 & Navy #0F1C3F) */
+input[type="checkbox"], input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  min-height: 18px !important;
+  max-width: 18px !important;
+  max-height: 18px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1.5px solid #CBD5E1;
+  background-color: var(--bg-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-grid;
+  place-content: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  vertical-align: middle;
+  position: relative;
+  outline: none;
+  flex-shrink: 0;
+}
+
+input[type="radio"] {
+  border-radius: 50%;
+}
+
+input[type="checkbox"]:hover, input[type="radio"]:hover {
+  border-color: var(--accent-navy);
+  background-color: #FFFFFF;
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--accent-navy) !important;
+  border-color: var(--accent-navy) !important;
+}
+
+input[type="checkbox"]:checked::before {
+  content: "";
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid #FAF7F2;
+  border-bottom: 2px solid #FAF7F2;
+  transform: rotate(-45deg) translate(1px, -1px);
+}
+
+input[type="radio"]:checked {
+  border-color: var(--accent-navy) !important;
+  background-color: #FFFFFF !important;
+}
+
+input[type="radio"]:checked::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-navy);
+}
+
+input[type="checkbox"]:focus-visible, input[type="radio"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(15, 28, 63, 0.18);
 }
 
 /* Custom scrollbars */

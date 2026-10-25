@@ -401,13 +401,19 @@ export default function App() {
                     onChange={(e) => setSelectedSort(e.target.value)}
                     style={{
                       width: 'auto',
-                      padding: '8px 14px',
+                      padding: '8px 36px 8px 16px',
                       fontSize: '0.84rem',
                       fontWeight: '600',
                       borderRadius: 'var(--radius-full)',
                       background: 'var(--bg-secondary)',
                       borderColor: 'var(--border-subtle)',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230F1C3F' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'calc(100% - 14px) center'
                     }}
                   >
                     <option value="featured">Featured / Recommended</option>

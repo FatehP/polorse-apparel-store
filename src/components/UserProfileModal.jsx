@@ -20,8 +20,15 @@ import {
   Sparkles,
   Download,
   RotateCcw,
-  Navigation
+  Navigation,
+  Crown,
+  Award,
+  ChevronRight,
+  Zap,
+  Star,
+  Gift
 } from 'lucide-react';
+import { formatCardExpiry } from '../utils/paymentUtils';
 import {
   getCurrentUser,
   updateUserProfile,
@@ -56,6 +63,7 @@ export default function UserProfileModal({
     phone: user?.phone || ''
   });
   const [profileSaveSuccess, setProfileSaveSuccess] = useState(false);
+  const [isVipModalOpen, setIsVipModalOpen] = useState(false);
 
   // Avatar presets for instant selection
   const AVATAR_PRESETS = [
@@ -383,9 +391,37 @@ export default function UserProfileModal({
               >
                 {user?.name || 'Polorse Member'}
               </h2>
-              <span style={{ fontSize: '0.74rem', color: 'var(--accent-navy)', fontWeight: '800' }}>
-                {user?.tier || 'Polorse VIP Member'} • Customer Account Hub
-              </span>
+              <div
+                onClick={() => setIsVipModalOpen(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  padding: '2px 0',
+                  marginTop: '2px'
+                }}
+                title="Click to view VIP Tier & Benefits"
+              >
+                <Sparkles size={13} style={{ color: '#D97706' }} />
+                <span style={{ fontSize: '0.74rem', color: 'var(--accent-navy)', fontWeight: '800', textDecoration: 'underline', textUnderlineOffset: '2px' }}>
+                  {user?.tier || 'Polorse VIP Member'}
+                </span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: '600' }}>• Customer Hub</span>
+                <span
+                  style={{
+                    fontSize: '0.65rem',
+                    fontWeight: '800',
+                    color: '#D97706',
+                    background: 'rgba(217, 119, 6, 0.1)',
+                    padding: '1px 6px',
+                    borderRadius: 'var(--radius-full)',
+                    marginLeft: '2px'
+                  }}
+                >
+                  PERKS →
+                </span>
+              </div>
             </div>
           </div>
 
@@ -708,24 +744,91 @@ export default function UserProfileModal({
                     </div>
 
                     <div>
-                      <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                        VIP Tier & Benefits
-                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                        <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
+                          VIP Tier & Benefits
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setIsVipModalOpen(true)}
+                          style={{
+                            fontSize: '0.74rem',
+                            fontWeight: '700',
+                            color: '#D97706',
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>View Tier Roadmap</span>
+                          <ChevronRight size={13} />
+                        </button>
+                      </div>
+
                       <div
+                        onClick={() => setIsVipModalOpen(true)}
                         style={{
-                          padding: '10px 12px',
-                          background: 'rgba(15, 28, 63, 0.05)',
+                          padding: '12px 14px',
+                          background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.08) 0%, rgba(15, 28, 63, 0.05) 100%)',
+                          border: '1px solid rgba(217, 119, 6, 0.28)',
                           borderRadius: 'var(--radius-md)',
-                          fontSize: '0.88rem',
-                          fontWeight: '800',
-                          color: 'var(--accent-navy)',
+                          cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '6px'
+                          justifyContent: 'space-between',
+                          transition: 'all 0.2s ease',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
                         }}
                       >
-                        <Sparkles size={16} style={{ color: '#D97706' }} />
-                        <span>{user?.tier || 'Polorse VIP Member (Active Drop Access)'}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '50%',
+                              background: 'rgba(217, 119, 6, 0.15)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: '#D97706',
+                              flexShrink: 0
+                            }}
+                          >
+                            <Crown size={18} />
+                          </div>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '0.88rem', fontWeight: '800', color: 'var(--accent-navy)' }}>
+                                {user?.tier || 'Polorse VIP Silver Member'}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: '0.64rem',
+                                  fontWeight: '800',
+                                  background: '#D97706',
+                                  color: '#fff',
+                                  padding: '1px 6px',
+                                  borderRadius: '999px',
+                                  letterSpacing: '0.04em',
+                                  textTransform: 'uppercase'
+                                }}
+                              >
+                                Active
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                              ₹6,498 spent • ₹3,502 to Black Label Tier • Click for perks & rewards
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#D97706', fontWeight: '700', fontSize: '0.76rem' }}>
+                          <span>Perks</span>
+                          <ChevronRight size={16} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1043,15 +1146,21 @@ export default function UserProfileModal({
                         {addr.isPrimary && (
                           <span
                             style={{
-                              fontSize: '0.7rem',
+                              fontSize: '0.68rem',
                               fontWeight: '800',
-                              padding: '2px 8px',
+                              letterSpacing: '0.06em',
+                              padding: '3px 9px',
                               borderRadius: 'var(--radius-full)',
                               background: 'var(--accent-navy)',
-                              color: '#FAF7F2'
+                              color: '#FAF7F2',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              lineHeight: 1.1,
+                              whiteSpace: 'nowrap'
                             }}
                           >
-                            ★ PRIMARY LOCATION
+                            ★ PRIMARY
                           </span>
                         )}
                       </div>
@@ -1570,9 +1679,12 @@ export default function UserProfileModal({
                       type="text"
                       required
                       maxLength={5}
-                      placeholder="08/28"
+                      placeholder="MM/YY"
                       value={cardForm.expiry}
-                      onChange={(e) => setCardForm(prev => ({ ...prev, expiry: e.target.value }))}
+                      onChange={(e) => {
+                        const formatted = formatCardExpiry(e.target.value, cardForm.expiry);
+                        setCardForm(prev => ({ ...prev, expiry: formatted }));
+                      }}
                       className="form-input"
                       style={{ width: '100%', padding: '8px 12px' }}
                     />
@@ -1595,14 +1707,13 @@ export default function UserProfileModal({
                   </div>
                 </div>
 
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.82rem', marginTop: '4px' }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.82rem', marginTop: '6px', userSelect: 'none' }}>
                   <input
                     type="checkbox"
                     checked={cardForm.isPrimary}
                     onChange={(e) => setCardForm(prev => ({ ...prev, isPrimary: e.target.checked }))}
-                    style={{ accentColor: 'var(--accent-navy)' }}
                   />
-                  <span>Set as default card for 1-click checkout</span>
+                  <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>Set as default card for 1-click checkout</span>
                 </label>
 
                 <button
@@ -1613,6 +1724,240 @@ export default function UserProfileModal({
                   Save Card
                 </button>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* VIP PRIVÉ CIRCLE & TIER BENEFITS MODAL                    */}
+        {/* ======================================================== */}
+        {isVipModalOpen && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              zIndex: 1100,
+              background: 'rgba(15, 28, 63, 0.72)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '16px'
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setIsVipModalOpen(false);
+            }}
+          >
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '480px',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                background: '#FAF7F2',
+                borderRadius: 'var(--radius-xl)',
+                border: '1px solid rgba(217, 119, 6, 0.3)',
+                boxShadow: '0 24px 60px rgba(15, 28, 63, 0.35)',
+                display: 'flex',
+                flexDirection: 'column',
+                animation: 'modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+              }}
+            >
+              {/* Luxury Header Banner */}
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #0F1C3F 0%, #1A2E63 60%, #2A1D34 100%)',
+                  padding: '24px 20px',
+                  color: '#FAF7F2',
+                  position: 'relative',
+                  borderTopLeftRadius: 'var(--radius-xl)',
+                  borderTopRightRadius: 'var(--radius-xl)'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setIsVipModalOpen(false)}
+                  style={{
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.12)',
+                    border: 'none',
+                    color: '#FAF7F2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <X size={16} />
+                </button>
+
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(217, 119, 6, 0.25)', border: '1px solid rgba(217, 119, 6, 0.5)', padding: '4px 10px', borderRadius: '999px', fontSize: '0.72rem', fontWeight: '800', color: '#FBBF24', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '10px' }}>
+                  <Crown size={13} />
+                  <span>Polorse Privé Circle</span>
+                </div>
+
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', fontWeight: '800', margin: '0 0 6px 0', letterSpacing: '0.02em', color: '#FAF7F2' }}>
+                  VIP Tier & Benefits
+                </h3>
+                <p style={{ fontSize: '0.84rem', color: '#CBD5E1', margin: 0, lineHeight: 1.4 }}>
+                  Exclusive member privileges, priority drops, and storewide rewards.
+                </p>
+              </div>
+
+              {/* Body Content */}
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
+                {/* Current Tier Status Card */}
+                <div
+                  style={{
+                    background: 'var(--bg-primary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 'var(--radius-lg)',
+                    padding: '16px',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(217, 119, 6, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D97706' }}>
+                        <Star size={15} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '700', letterSpacing: '0.05em', display: 'block' }}>
+                          Current Tier Status
+                        </span>
+                        <span style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--accent-navy)' }}>
+                          Silver VIP Member
+                        </span>
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '0.68rem', fontWeight: '800', padding: '3px 8px', borderRadius: '999px', background: '#D97706', color: '#fff', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                      Active
+                    </span>
+                  </div>
+
+                  {/* Spend Milestone Progress Bar */}
+                  <div style={{ marginTop: '12px', background: 'rgba(15, 28, 63, 0.04)', borderRadius: 'var(--radius-md)', padding: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '6px' }}>
+                      <span style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Lifetime Spending</span>
+                      <span style={{ fontWeight: '800', color: 'var(--accent-navy)' }}>₹6,498 / ₹10,000</span>
+                    </div>
+
+                    <div style={{ width: '100%', height: '8px', background: '#E2E8F0', borderRadius: '999px', overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: '65%',
+                          height: '100%',
+                          background: 'linear-gradient(90deg, #D97706 0%, #F59E0B 50%, #0F1C3F 100%)',
+                          borderRadius: '999px'
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      <span>Silver Tier (₹2,500)</span>
+                      <span style={{ color: '#D97706', fontWeight: '700' }}>₹3,502 to Black Label Tier 👑</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tier Perks Breakdown */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Unlocked Silver VIP Perks
+                  </span>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+                    {[
+                      { icon: <Zap size={15} style={{ color: '#D97706' }} />, title: '1-Hour Early Access', desc: 'Shop limited edition archive drops before public launch.' },
+                      { icon: <Award size={15} style={{ color: '#D97706' }} />, title: '5% Instant VIP Checkout Discount', desc: 'Automatically applied to every eligible cart.' },
+                      { icon: <RotateCcw size={15} style={{ color: '#D97706' }} />, title: 'Free Doorstep Size Exchanges', desc: 'No-questions-asked seamless pickup & re-delivery.' },
+                      { icon: <Gift size={15} style={{ color: '#D97706' }} />, title: '₹500 Birthday Month Drop Credit', desc: 'Annual gift loaded straight to your member account.' }
+                    ].map((perk, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '10px',
+                          padding: '10px 12px',
+                          borderRadius: 'var(--radius-md)',
+                          background: 'rgba(217, 119, 6, 0.05)',
+                          border: '1px solid rgba(217, 119, 6, 0.15)'
+                        }}
+                      >
+                        <div style={{ marginTop: '2px', flexShrink: 0 }}>{perk.icon}</div>
+                        <div>
+                          <div style={{ fontSize: '0.84rem', fontWeight: '700', color: 'var(--accent-navy)' }}>
+                            {perk.title}
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                            {perk.desc}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <span style={{ fontSize: '0.78rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '6px' }}>
+                    Next Milestone: Black Label VIP (At ₹10,000)
+                  </span>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+                    {[
+                      { title: 'Flat 10% Lifetime Storewide Discount', desc: 'Double your savings on heavyweight hoodies & accessories.' },
+                      { title: '2-Hour Priority Window + Secret Colorways', desc: 'Access unreleased vault colorways reserved for Black Label.' },
+                      { title: 'Free Priority Express Delivery', desc: 'Same-day Mumbai dispatch & 24hr delivery across metro India.' },
+                      { title: 'Complimentary Signature Polorse Canvas Tote', desc: 'Included as a gift in every Black Label order.' }
+                    ].map((perk, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '10px',
+                          padding: '10px 12px',
+                          borderRadius: 'var(--radius-md)',
+                          background: 'var(--bg-secondary)',
+                          border: '1px dashed var(--border-subtle)',
+                          opacity: 0.88
+                        }}
+                      >
+                        <Crown size={15} style={{ color: 'var(--text-muted)', marginTop: '2px', flexShrink: 0 }} />
+                        <div>
+                          <div style={{ fontSize: '0.84rem', fontWeight: '700', color: 'var(--text-primary)' }}>
+                            {perk.title}
+                          </div>
+                          <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                            {perk.desc}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer Close CTA */}
+                <button
+                  type="button"
+                  onClick={() => setIsVipModalOpen(false)}
+                  className="btn-primary"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    fontWeight: '800',
+                    fontSize: '0.9rem',
+                    letterSpacing: '0.02em',
+                    marginTop: '4px'
+                  }}
+                >
+                  Got It • Return to Profile
+                </button>
+              </div>
             </div>
           </div>
         )}
