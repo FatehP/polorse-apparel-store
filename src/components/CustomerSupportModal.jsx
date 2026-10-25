@@ -122,7 +122,7 @@ export default function CustomerSupportModal({
         backgroundColor: 'rgba(15, 28, 63, 0.85)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        zIndex: 95,
+        zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

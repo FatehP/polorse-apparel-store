@@ -63,7 +63,7 @@ export default function MobileMenuDrawer({
         backgroundColor: 'rgba(15, 28, 63, 0.75)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        zIndex: 95,
+        zIndex: 9999,
         display: 'flex',
         justifyContent: 'flex-start',
         overscrollBehavior: 'contain'

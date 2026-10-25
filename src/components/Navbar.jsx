@@ -187,7 +187,10 @@ export default function Navbar({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <button
             type="button"
-            onClick={onOpenMobileMenu}
+            onClick={() => {
+              setIsUserMenuOpen(false);
+              onOpenMobileMenu?.();
+            }}
             className="mobile-menu-btn"
             id="mobile-hamburger-btn"
             style={{
@@ -534,7 +537,10 @@ export default function Navbar({
           {activeView === 'store' && (
             <button
               type="button"
-              onClick={() => onOpenProfile?.('orders')}
+              onClick={() => {
+                setIsUserMenuOpen(false);
+                onOpenProfile?.('orders');
+              }}
               id="navbar-orders-shortcut-btn"
               style={{
                 width: '38px',
@@ -562,7 +568,10 @@ export default function Navbar({
           {activeView === 'store' && (
             <button
               type="button"
-              onClick={onOpenWishlist}
+              onClick={() => {
+                setIsUserMenuOpen(false);
+                onOpenWishlist?.();
+              }}
               id="navbar-wishlist-btn"
               style={{
                 position: 'relative',
@@ -618,7 +627,10 @@ export default function Navbar({
           {/* Cart Bag Trigger with Live Scale-Bounce Counter */}
           {activeView === 'store' && (
             <button
-              onClick={onOpenCart}
+              onClick={() => {
+                setIsUserMenuOpen(false);
+                onOpenCart?.();
+              }}
               id="navbar-cart-btn"
               style={{
                 position: 'relative',
@@ -744,6 +756,19 @@ export default function Navbar({
                       )}
                     </div>
                   </button>
+
+                  {/* Dropdown Menu Backdrop (Tap outside to close) */}
+                  {isUserMenuOpen && (
+                    <div
+                      style={{
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 998,
+                        background: 'transparent'
+                      }}
+                      onClick={() => setIsUserMenuOpen(false)}
+                    />
+                  )}
 
                   {/* Dropdown Menu */}
                   {isUserMenuOpen && (

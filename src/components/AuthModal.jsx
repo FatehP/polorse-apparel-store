@@ -162,7 +162,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         bottom: 0,
         backgroundColor: 'rgba(15, 28, 63, 0.75)',
         backdropFilter: 'blur(8px)',
-        zIndex: 100,
+        zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

@@ -120,6 +120,7 @@ export default function App() {
   };
 
   const handleOpenProfile = (tab = 'profile') => {
+    setIsMobileMenuOpen(false);
     setProfileModalInitialTab(tab);
     setIsProfileModalOpen(true);
   };

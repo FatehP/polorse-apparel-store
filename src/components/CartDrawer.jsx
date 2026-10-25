@@ -225,7 +225,7 @@ export default function CartDrawer({
         backgroundColor: 'rgba(15, 28, 63, 0.72)',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
-        zIndex: 90,
+        zIndex: 9999,
         display: 'flex',
         justifyContent: 'flex-end',
         overscrollBehavior: 'contain'

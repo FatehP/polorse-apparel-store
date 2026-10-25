@@ -302,13 +302,14 @@ export default function UserProfileModal({
 
   return (
     <div
+      className="user-profile-modal-overlay"
       style={{
         position: 'fixed',
         inset: 0,
         backgroundColor: 'rgba(15, 28, 63, 0.85)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        zIndex: 90,
+        zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -319,7 +320,7 @@ export default function UserProfileModal({
       onClick={onClose}
     >
       <div
-        className="animate-fade"
+        className="user-profile-modal-dialog animate-fade"
         onClick={(e) => e.stopPropagation()}
         style={{
           background: 'var(--bg-secondary)',

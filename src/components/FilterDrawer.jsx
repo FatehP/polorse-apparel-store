@@ -60,7 +60,7 @@ export default function FilterDrawer({
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 60,
+        zIndex: 9999,
         display: 'flex',
         justifyContent: 'flex-end',
         background: 'rgba(15, 28, 63, 0.45)',

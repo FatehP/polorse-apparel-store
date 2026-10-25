@@ -489,7 +489,7 @@ export default function CheckoutModal({
         backgroundColor: 'rgba(15, 28, 63, 0.85)',
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
-        zIndex: 70,
+        zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
