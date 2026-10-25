@@ -16,13 +16,17 @@ import {
   Maximize2,
   Zap,
   Ruler,
-  ArrowLeft
+  ArrowLeft,
+  Heart,
+  Sparkles
 } from 'lucide-react';
 import { checkPincodeDeliverability, autoDetectLocation } from '../services/pincodeService';
 
 export default function ProductModal({
   product,
   cart = [],
+  isWishlisted = false,
+  onToggleWishlist,
   onClose,
   onAddToCart,
   onUpdateQuantity,
@@ -218,32 +222,84 @@ export default function ProductModal({
             <ArrowLeft size={18} />
             <span>Back</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => onToggleWishlist?.(product.id)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              background: isWishlisted ? 'rgba(194, 26, 44, 0.08)' : 'var(--bg-secondary)',
+              border: isWishlisted ? '1.5px solid var(--accent-red)' : '1px solid var(--border-subtle)',
+              color: isWishlisted ? 'var(--accent-red)' : 'var(--text-secondary)',
+              cursor: 'pointer'
+            }}
+            title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          >
+            <Heart size={18} fill={isWishlisted ? 'var(--accent-red)' : 'none'} />
+          </button>
         </div>
 
-        {/* Desktop Floating Close Button */}
-        <button
+        {/* Desktop Floating Wishlist and Close Buttons */}
+        <div
           className="modal-desktop-close-btn"
-          onClick={onClose}
-          aria-label="Close modal"
           style={{
             position: 'absolute',
             top: '16px',
             right: '16px',
-            background: 'var(--bg-secondary)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '50%',
-            width: '36px',
-            height: '36px',
-            alignItems: 'center',
-            justifyContent: 'center',
             zIndex: 10,
-            boxShadow: 'var(--shadow-sm)',
-            cursor: 'pointer'
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}
         >
-          <X size={18} />
-        </button>
+          <button
+            type="button"
+            onClick={() => onToggleWishlist?.(product.id)}
+            aria-label="Wishlist"
+            style={{
+              background: isWishlisted ? 'rgba(194, 26, 44, 0.08)' : 'var(--bg-secondary)',
+              color: isWishlisted ? 'var(--accent-red)' : 'var(--text-secondary)',
+              border: isWishlisted ? '1.5px solid var(--accent-red)' : '1px solid var(--border-subtle)',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'var(--shadow-sm)',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease'
+            }}
+            title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          >
+            <Heart size={17} fill={isWishlisted ? 'var(--accent-red)' : 'none'} />
+          </button>
+
+          <button
+            onClick={onClose}
+            aria-label="Close modal"
+            style={{
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: 'var(--shadow-sm)',
+              cursor: 'pointer'
+            }}
+          >
+            <X size={18} />
+          </button>
+        </div>
 
         {/* Left Side: Product Image with Floating Thumbnail Grid */}
         <div className="product-modal-image-col">
@@ -676,6 +732,21 @@ export default function ProductModal({
                   </button>
                 ))}
               </div>
+
+              {/* Urgency Stock Status */}
+              {currentStock > 0 && currentStock <= 8 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', color: 'var(--accent-red)', fontWeight: '700', marginTop: '4px' }}>
+                  <span className="animate-pulse-dot" style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--accent-red)' }} />
+                  <span>Selling Fast: Only {currentStock} units available in size {selectedSize}!</span>
+                </div>
+              )}
+
+              {product.price >= 1999 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.76rem', color: 'var(--accent-green)', fontWeight: '700', marginTop: '2px' }}>
+                  <Truck size={14} />
+                  <span>Qualifies for FREE Pan-India Express Delivery</span>
+                </div>
+              )}
             </div>
           )}
 

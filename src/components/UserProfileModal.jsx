@@ -304,7 +304,9 @@ export default function UserProfileModal({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '12px'
+        padding: '12px',
+        overscrollBehavior: 'contain',
+        touchAction: 'none'
       }}
       onClick={onClose}
     >
@@ -317,12 +319,15 @@ export default function UserProfileModal({
           borderRadius: 'var(--radius-xl)',
           width: '100%',
           maxWidth: '860px',
-          maxHeight: '94vh',
+          height: '92vh',
+          maxHeight: '92vh',
           display: 'flex',
           flexDirection: 'column',
           boxShadow: 'var(--shadow-xl)',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          overscrollBehavior: 'contain',
+          touchAction: 'pan-y'
         }}
       >
         {/* iOS Pull Handle */}
@@ -511,8 +516,20 @@ export default function UserProfileModal({
           </button>
         </div>
 
-        {/* Scrollable Tab Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px', boxSizing: 'border-box' }}>
+        {/* Scrollable Tab Content with Smooth Mobile Momentum Scrolling */}
+        <div
+          className="modal-scrollable-content"
+          style={{
+            flex: '1 1 auto',
+            minHeight: 0,
+            overflowY: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            touchAction: 'pan-y',
+            padding: '20px',
+            boxSizing: 'border-box'
+          }}
+        >
           {/* ======================================================== */}
           {/* TAB 1: PROFILE DETAILS & AVATAR UPLOAD                   */}
           {/* ======================================================== */}

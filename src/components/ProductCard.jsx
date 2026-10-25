@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Plus, Eye, Check, Zap } from 'lucide-react';
+import { Plus, Eye, Check, Zap, Heart, Minus, ShoppingBag } from 'lucide-react';
 
 export default function ProductCard({
   product,
   cart = [],
+  isWishlisted = false,
+  onToggleWishlist,
   onSelectProduct,
   onQuickAdd,
   onUpdateQuantity,
@@ -12,11 +14,13 @@ export default function ProductCard({
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || '');
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0]?.size || '');
   const [isAdded, setIsAdded] = useState(false);
+  const [addedSize, setAddedSize] = useState(null);
+  const [wishlistPopped, setWishlistPopped] = useState(false);
 
   // Check if this product + selected size & color is in the cart
   const cartItem = cart?.find(
-    item => item.id === product.id && 
-            item.selectedSize === selectedSize && 
+    item => item.id === product.id &&
+            item.selectedSize === selectedSize &&
             (!selectedColor || item.selectedColor === selectedColor)
   );
   const inCartQty = cartItem ? cartItem.quantity : 0;
@@ -26,16 +30,22 @@ export default function ProductCard({
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  const handleQuickAddClick = (e) => {
+  const handleQuickAddClick = (e, sizeOverride) => {
     e.stopPropagation();
+    const sizeToUse = sizeOverride || selectedSize || product.sizes?.[0]?.size || 'M';
+    setSelectedSize(sizeToUse);
     onQuickAdd({
       ...product,
       selectedColor,
-      selectedSize,
+      selectedSize: sizeToUse,
       quantity: 1
     });
+    setAddedSize(sizeToUse);
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1200);
+    setTimeout(() => {
+      setIsAdded(false);
+      setAddedSize(null);
+    }, 1200);
   };
 
   const handleBuyNowClick = (e) => {
@@ -44,15 +54,28 @@ export default function ProductCard({
       onBuyNow({
         ...product,
         selectedColor,
-        selectedSize,
+        selectedSize: selectedSize || product.sizes?.[0]?.size || 'M',
         quantity: 1
       });
     }
   };
 
+  const handleWishlistClick = (e) => {
+    e.stopPropagation();
+    setWishlistPopped(true);
+    setTimeout(() => setWishlistPopped(false), 380);
+    onToggleWishlist?.(product.id);
+  };
+
+  // Determine inventory / status tag
+  const statusTag = product.tags?.find(t =>
+    ['BESTSELLER', 'LIMITED DROP', 'NEW ARRIVAL', 'DROP 01', 'OVERSIZED'].includes(t.toUpperCase())
+  ) || (product.isFeatured ? 'HOT DROP' : 'LIMITED');
+
   return (
     <div
       onClick={() => onSelectProduct(product)}
+      className="product-card-container"
       style={{
         background: 'var(--bg-card)',
         borderRadius: 'var(--radius-lg)',
@@ -75,15 +98,20 @@ export default function ProductCard({
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
-      {/* Product Image Frame */}
-      <div style={{
-        position: 'relative',
-        width: '100%',
-        paddingTop: '105%',
-        background: '#FAF7F2',
-        borderBottom: '1px solid var(--border-subtle)',
-        overflow: 'hidden'
-      }}>
+      {/* ======================================================== */}
+      {/* 4:5 HIGH-IMPACT PRODUCT IMAGE FRAME                      */}
+      {/* ======================================================== */}
+      <div
+        className="product-card-frame"
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '4 / 5',
+          background: '#FAF7F2',
+          borderBottom: '1px solid var(--border-subtle)',
+          overflow: 'hidden'
+        }}
+      >
         <img
           src={product.imageUrl || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80'}
           alt=""
@@ -106,323 +134,344 @@ export default function ProductCard({
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
         />
 
-        {/* Top Badges */}
-        <div style={{
-          position: 'absolute',
-          top: '12px',
-          left: '12px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '5px',
-          zIndex: 2
-        }}>
-          {product.tags?.slice(0, 2).map((tag, idx) => (
+        {/* Top Badges (Status + Discount) */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '10px',
+            left: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            zIndex: 2
+          }}
+        >
+          <span
+            className="badge-tag badge-navy"
+            style={{
+              letterSpacing: '0.08em',
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
+              fontSize: '0.64rem'
+            }}
+          >
+            [{statusTag}]
+          </span>
+
+          {discountPercent > 0 && (
             <span
-              key={idx}
-              className={`badge-tag ${idx === 0 ? 'badge-navy' : ''}`}
+              className="badge-tag badge-red"
               style={{
-                letterSpacing: '0.08em',
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)'
+                boxShadow: '0 2px 6px rgba(194, 26, 44, 0.25)',
+                fontSize: '0.64rem'
               }}
             >
-              [{tag}]
-            </span>
-          ))}
-          {discountPercent > 0 && (
-            <span className="badge-tag badge-red" style={{ boxShadow: '0 2px 6px rgba(194, 26, 44, 0.25)' }}>
               [{discountPercent}% OFF]
             </span>
           )}
         </div>
 
-        {/* Quick View Button on Hover */}
+        {/* Top-Right Wishlist Floating Heart Button */}
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSelectProduct(product);
-          }}
+          type="button"
+          onClick={handleWishlistClick}
+          className={wishlistPopped ? 'animate-heart-pop' : ''}
           style={{
             position: 'absolute',
-            bottom: '12px',
-            right: '12px',
-            background: 'rgba(10, 10, 12, 0.85)',
+            top: '10px',
+            right: '10px',
+            width: '34px',
+            height: '34px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.92)',
             backdropFilter: 'blur(8px)',
-            color: '#fff',
-            padding: '8px 12px',
-            borderRadius: 'var(--radius-full)',
-            fontSize: '0.75rem',
-            fontWeight: '600',
+            WebkitBackdropFilter: 'blur(8px)',
+            border: '1px solid var(--border-subtle)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.12)',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
-            border: '1px solid var(--border-subtle)',
-            zIndex: 2
+            justifyContent: 'center',
+            color: isWishlisted ? 'var(--accent-red)' : 'var(--text-secondary)',
+            cursor: 'pointer',
+            zIndex: 4,
+            transition: 'transform 0.18s ease'
           }}
+          title={isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
         >
-          <Eye size={13} />
-          <span>Quick View</span>
+          <Heart
+            size={16}
+            fill={isWishlisted ? 'var(--accent-red)' : 'none'}
+            style={{ color: isWishlisted ? 'var(--accent-red)' : 'currentColor' }}
+          />
         </button>
+
+        {/* Quick-Action Hover Overlay (Indian D2C Fashion Style) */}
+        <div className="product-card-quick-overlay">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <span style={{ fontSize: '0.68rem', fontWeight: '800', color: '#FAF7F2', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Quick Add Size
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectProduct(product);
+              }}
+              style={{
+                fontSize: '0.68rem',
+                color: '#FCD34D',
+                fontWeight: '700',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '3px'
+              }}
+            >
+              <Eye size={12} /> View Full
+            </button>
+          </div>
+
+          {/* Quick Size Select Pills */}
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            {product.sizes?.map((sz) => {
+              const isSelected = addedSize === sz.size;
+              return (
+                <button
+                  key={sz.size}
+                  type="button"
+                  onClick={(e) => handleQuickAddClick(e, sz.size)}
+                  disabled={sz.stock === 0}
+                  style={{
+                    flex: '1 0 auto',
+                    padding: '5px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.72rem',
+                    fontWeight: '800',
+                    background: isSelected ? 'var(--accent-green)' : 'rgba(255, 255, 255, 0.18)',
+                    backdropFilter: 'blur(4px)',
+                    color: '#FAF7F2',
+                    border: isSelected ? '1px solid var(--accent-green)' : '1px solid rgba(255, 255, 255, 0.25)',
+                    cursor: sz.stock === 0 ? 'not-allowed' : 'pointer',
+                    opacity: sz.stock === 0 ? 0.4 : 1,
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (sz.stock > 0 && !isSelected) {
+                      e.currentTarget.style.background = '#FFFFFF';
+                      e.currentTarget.style.color = 'var(--accent-navy)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSelected) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.18)';
+                      e.currentTarget.style.color = '#FAF7F2';
+                    }
+                  }}
+                >
+                  {isSelected ? <Check size={12} /> : sz.size}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* Product Content Details */}
-      <div style={{ padding: '16px 18px', display: 'flex', flexDirection: 'column', flexGrow: 1, gap: '10px' }}>
-        <div>
-          <span style={{
-            fontSize: '0.75rem',
-            color: 'var(--text-muted)',
-            fontWeight: '600',
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em'
-          }}>
-            {product.category}
+      {/* ======================================================== */}
+      {/* PRODUCT DETAILS & CARD FOOTER                            */}
+      {/* ======================================================== */}
+      <div style={{ padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
+        {/* Category & Color Swatches Row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+          <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', fontWeight: '700' }}>
+            {product.category || 'Apparel'}
           </span>
-          <h3 style={{
-            fontSize: '1.05rem',
-            color: 'var(--text-primary)',
-            marginTop: '3px',
-            lineHeight: '1.3'
-          }}>
-            {product.title}
-          </h3>
-        </div>
 
-        {/* Colors & Sizes Chips */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-          {/* Color Swatches */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={(e) => e.stopPropagation()}>
-            {product.colors?.map((col) => (
-              <button
-                key={col.name}
-                onClick={() => setSelectedColor(col.name)}
-                title={col.name}
-                style={{
-                  width: '18px',
-                  height: '18px',
-                  borderRadius: '50%',
-                  background: col.hex,
-                  border: selectedColor === col.name ? '2px solid var(--accent-navy)' : '1px solid rgba(15,28,63,0.15)',
-                  boxShadow: selectedColor === col.name ? '0 0 6px rgba(15,28,63,0.3)' : 'none',
-                  transform: selectedColor === col.name ? 'scale(1.15)' : 'scale(1)'
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Sizes Pill Selector */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={(e) => e.stopPropagation()}>
-            {product.sizes?.slice(0, 4).map((s) => (
-              <button
-                key={s.size}
-                onClick={() => setSelectedSize(s.size)}
-                style={{
-                  fontSize: '0.72rem',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  fontWeight: '600',
-                  background: selectedSize === s.size ? 'var(--accent-navy)' : 'var(--bg-primary)',
-                  color: selectedSize === s.size ? '#fff' : 'var(--text-secondary)',
-                  border: selectedSize === s.size ? '1px solid var(--accent-navy)' : '1px solid var(--border-subtle)'
-                }}
-              >
-                {s.size}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Pricing & CTA Actions (Buttons placed cleanly below the price) */}
-        <div style={{
-          marginTop: 'auto',
-          paddingTop: '12px',
-          borderTop: '1px solid var(--border-subtle)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px'
-        }}>
-          {/* Price Row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '1.25rem',
-                fontWeight: '700',
-                color: 'var(--text-primary)',
-                lineHeight: 1
-              }}>
-                ₹{product.price.toLocaleString('en-IN')}
-              </span>
-              {product.originalPrice && (
-                <span style={{
-                  fontSize: '0.85rem',
-                  color: 'var(--text-muted)',
-                  textDecoration: 'line-through',
-                  lineHeight: 1
-                }}>
-                  ₹{product.originalPrice.toLocaleString('en-IN')}
+          {/* Color Dots */}
+          {product.colors && product.colors.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              {product.colors.slice(0, 4).map((c, idx) => (
+                <span
+                  key={idx}
+                  title={c.name}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedColor(c.name);
+                  }}
+                  style={{
+                    width: '12px',
+                    height: '12px',
+                    borderRadius: '50%',
+                    background: c.hex || '#111',
+                    border: selectedColor === c.name ? '2px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                    cursor: 'pointer',
+                    display: 'inline-block'
+                  }}
+                />
+              ))}
+              {product.colors.length > 4 && (
+                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                  +{product.colors.length - 4}
                 </span>
               )}
             </div>
-            {discountPercent > 0 && (
-              <span style={{
-                fontSize: '0.72rem',
-                fontWeight: '700',
-                color: 'var(--accent-red)',
-                background: 'rgba(194, 26, 44, 0.08)',
-                padding: '3px 7px',
-                borderRadius: 'var(--radius-sm)',
-                lineHeight: 1,
-                display: 'inline-flex',
-                alignItems: 'center'
-              }}>
-                {discountPercent}% OFF
-              </span>
-            )}
-          </div>
+          )}
+        </div>
 
-          {/* Action Buttons Below Price */}
-          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-            {/* Add to Bag Button / Reactive Quantity Stepper */}
-            {inCartQty > 0 ? (
-              <div
-                onClick={(e) => e.stopPropagation()}
+        {/* Product Title */}
+        <h3
+          style={{
+            fontSize: '0.96rem',
+            fontWeight: '700',
+            color: 'var(--text-primary)',
+            lineHeight: 1.35,
+            overflow: 'hidden',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            minHeight: '2.7em'
+          }}
+        >
+          {product.title}
+        </h3>
+
+        {/* Pricing & Savings */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap', marginTop: 'auto' }}>
+          <span style={{ fontSize: '1.15rem', fontWeight: '800', color: 'var(--accent-navy)' }}>
+            ₹{product.price?.toLocaleString('en-IN')}
+          </span>
+          {product.originalPrice && (
+            <span style={{ fontSize: '0.84rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+              ₹{product.originalPrice?.toLocaleString('en-IN')}
+            </span>
+          )}
+          {discountPercent > 0 && (
+            <span style={{ fontSize: '0.74rem', fontWeight: '800', color: 'var(--accent-red)' }}>
+              ({discountPercent}% OFF)
+            </span>
+          )}
+        </div>
+
+        {/* Quick Stepper or Add to Bag Action Button */}
+        <div style={{ marginTop: '6px' }}>
+          {inCartQty > 0 ? (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'var(--bg-primary)',
+                border: '1.5px solid var(--accent-navy)',
+                borderRadius: 'var(--radius-md)',
+                padding: '4px 10px',
+                height: '38px'
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => onUpdateQuantity(cartItem, inCartQty - 1)}
                 style={{
-                  flex: 1,
-                  display: 'inline-flex',
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '50%',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)',
+                  display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
-                  height: '36px',
-                  padding: '0 4px',
-                  background: 'var(--accent-navy)',
-                  color: '#FAF7F2',
-                  border: '1.5px solid var(--accent-navy)',
-                  borderRadius: 'var(--radius-md)',
-                  boxShadow: 'var(--shadow-sm)',
-                  boxSizing: 'border-box'
+                  justifyContent: 'center',
+                  cursor: 'pointer'
                 }}
               >
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUpdateQuantity?.(cartItem, inCartQty - 1);
-                  }}
-                  style={{
-                    padding: '0 8px',
-                    height: '100%',
-                    color: '#FAF7F2',
-                    fontSize: '1rem',
-                    fontWeight: '800',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  aria-label="Decrease quantity"
-                >
-                  -
-                </button>
-                <span style={{ fontSize: '0.85rem', fontWeight: '800', minWidth: '18px', textAlign: 'center' }}>
-                  {inCartQty}
+                <Minus size={13} />
+              </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--accent-navy)' }}>
+                  {inCartQty} in Bag
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUpdateQuantity?.(cartItem, inCartQty + 1);
-                  }}
-                  style={{
-                    padding: '0 8px',
-                    height: '100%',
-                    color: '#FAF7F2',
-                    fontSize: '1rem',
-                    fontWeight: '800',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  aria-label="Increase quantity"
-                >
-                  +
-                </button>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                  ({selectedSize})
+                </span>
               </div>
-            ) : (
+
+              <button
+                type="button"
+                onClick={() => onUpdateQuantity(cartItem, inCartQty + 1)}
+                style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '50%',
+                  background: 'var(--accent-navy)',
+                  color: '#FAF7F2',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                <Plus size={13} />
+              </button>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px' }}>
               <button
                 type="button"
                 onClick={handleQuickAddClick}
-                disabled={!product.inStock}
                 style={{
-                  flex: 1,
+                  height: '38px',
+                  borderRadius: 'var(--radius-md)',
+                  background: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
+                  color: '#FAF7F2',
+                  fontSize: '0.82rem',
+                  fontWeight: '700',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '5px',
-                  height: '36px',
-                  padding: '0 8px',
-                  background: isAdded ? 'rgba(46, 125, 50, 0.12)' : 'var(--bg-primary)',
-                  color: isAdded ? 'var(--accent-green)' : 'var(--text-primary)',
-                  border: '1.5px solid',
-                  borderColor: isAdded ? 'var(--accent-green)' : 'var(--border-subtle)',
-                  fontSize: '0.82rem',
-                  fontWeight: '700',
-                  borderRadius: 'var(--radius-md)',
+                  gap: '6px',
                   boxShadow: 'var(--shadow-sm)',
-                  cursor: product.inStock ? 'pointer' : 'not-allowed',
-                  opacity: product.inStock ? 1 : 0.5,
-                  whiteSpace: 'nowrap',
-                  boxSizing: 'border-box',
-                  lineHeight: 1,
-                  transition: 'all var(--transition-fast)'
+                  transition: 'all 0.2s ease',
+                  cursor: 'pointer'
                 }}
-                title="Add to Bag"
               >
                 {isAdded ? (
                   <>
-                    <Check size={14} style={{ color: 'var(--accent-green)' }} />
+                    <Check size={15} />
                     <span>Added</span>
                   </>
                 ) : (
                   <>
-                    <Plus size={14} />
+                    <ShoppingBag size={14} />
                     <span>Add to Bag</span>
                   </>
                 )}
               </button>
-            )}
 
-            {/* Buy Now Button */}
-            <button
-              type="button"
-              onClick={handleBuyNowClick}
-              disabled={!product.inStock}
-              style={{
-                flex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '5px',
-                height: '36px',
-                padding: '0 8px',
-                background: 'var(--accent-navy)',
-                color: '#FAF7F2',
-                border: '1.5px solid var(--accent-navy)',
-                fontSize: '0.82rem',
-                fontWeight: '800',
-                borderRadius: 'var(--radius-md)',
-                boxShadow: '0 2px 8px rgba(15, 28, 63, 0.2)',
-                cursor: product.inStock ? 'pointer' : 'not-allowed',
-                opacity: product.inStock ? 1 : 0.5,
-                whiteSpace: 'nowrap',
-                boxSizing: 'border-box',
-                lineHeight: 1,
-                transition: 'all var(--transition-fast)'
-              }}
-              title="Buy Now (Direct Checkout)"
-            >
-              <Zap size={14} style={{ fill: '#FCD34D', color: '#FCD34D' }} />
-              <span>Buy Now</span>
-            </button>
-          </div>
+              <button
+                type="button"
+                onClick={handleBuyNowClick}
+                style={{
+                  height: '38px',
+                  padding: '0 12px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'rgba(194, 26, 44, 0.08)',
+                  border: '1px solid rgba(194, 26, 44, 0.25)',
+                  color: 'var(--accent-red)',
+                  fontSize: '0.8rem',
+                  fontWeight: '800',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+                title="Instant Buy Now with Express Checkout"
+              >
+                <Zap size={13} />
+                <span>Buy</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

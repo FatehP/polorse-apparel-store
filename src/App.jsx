@@ -39,6 +39,26 @@ export default function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [profileModalInitialTab, setProfileModalInitialTab] = useState('profile');
 
+  // Wishlist State with LocalStorage Persistence
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('polorse_wishlist') || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [isWishlistFilterActive, setIsWishlistFilterActive] = useState(false);
+
+  const handleToggleWishlist = (productId) => {
+    setWishlist(prev => {
+      const next = prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId];
+      localStorage.setItem('polorse_wishlist', JSON.stringify(next));
+      return next;
+    });
+  };
+
   useEffect(() => {
     const handleAuthChange = () => {
       setCurrentUser(getCurrentUser());
@@ -51,11 +71,23 @@ export default function App() {
   const isAnyModalActive = Boolean(selectedProduct || isCartOpen || isFilterOpen || isCheckoutOpen || isAuthModalOpen || isProfileModalOpen);
   useEffect(() => {
     if (isAnyModalActive) {
+      const scrollY = window.scrollY;
       const originalOverflow = document.body.style.overflow;
+      const originalPosition = document.body.style.position;
+      const originalTop = document.body.style.top;
+      const originalWidth = document.body.style.width;
+
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
 
       return () => {
+        document.body.style.position = originalPosition;
+        document.body.style.top = originalTop;
+        document.body.style.width = originalWidth;
         document.body.style.overflow = originalOverflow;
+        window.scrollTo(0, scrollY);
       };
     }
   }, [isAnyModalActive]);
@@ -133,13 +165,19 @@ export default function App() {
     setPriceRange('all');
     setSelectedSizes([]);
     setInStockOnly(false);
+    setIsWishlistFilterActive(false);
   };
 
   // Multi-criteria Filter & Sort
   const filteredProducts = products
     .filter(p => {
+      // 0. Wishlist Filter
+      if (isWishlistFilterActive && !wishlist.includes(p.id)) {
+        return false;
+      }
+
       // 1. Category
-      if (selectedCategory !== 'all' && p.category !== selectedCategory) {
+      if (!isWishlistFilterActive && selectedCategory !== 'all' && p.category !== selectedCategory) {
         return false;
       }
 
@@ -264,11 +302,23 @@ export default function App() {
         setActiveView={setActiveView}
         cartCount={cartTotalItems}
         onOpenCart={() => setIsCartOpen(true)}
+        wishlistCount={wishlist.length}
+        onOpenWishlist={() => {
+          setIsWishlistFilterActive(prev => !prev);
+          const catalogEl = document.getElementById('catalog');
+          if (catalogEl) catalogEl.scrollIntoView({ behavior: 'smooth' });
+        }}
+        isWishlistActive={isWishlistFilterActive}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+        setSelectedCategory={(cat) => {
+          setIsWishlistFilterActive(false);
+          setSelectedCategory(cat);
+        }}
         categories={categories}
+        products={products}
+        onSelectProduct={setSelectedProduct}
         onOpenFilter={() => setIsFilterOpen(true)}
         activeFiltersCount={activeFiltersCount}
         currentUser={currentUser}
@@ -293,12 +343,26 @@ export default function App() {
               marginBottom: '20px'
             }}>
               <div>
-                <span className="badge-tag badge-orange" style={{ marginBottom: '6px' }}>CATALOG DROP</span>
+                <span className={`badge-tag ${isWishlistFilterActive ? 'badge-red' : 'badge-navy'}`} style={{ marginBottom: '6px' }}>
+                  {isWishlistFilterActive ? 'SAVED DROPS' : 'CATALOG DROP'}
+                </span>
                 <h2 style={{ fontSize: '2.2rem' }}>
-                  {selectedCategory === 'all' ? 'All Streetwear Apparel' : selectedCategory}
+                  {isWishlistFilterActive ? 'My Saved Wishlist' : (selectedCategory === 'all' ? 'All Streetwear Apparel' : selectedCategory)}
                 </h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                  Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'piece' : 'pieces'} • Hand-crafted oversized silhouettes
+                  {isWishlistFilterActive ? (
+                    <>
+                      Showing {filteredProducts.length} saved {filteredProducts.length === 1 ? 'item' : 'items'} •{' '}
+                      <button
+                        onClick={() => setIsWishlistFilterActive(false)}
+                        style={{ color: 'var(--accent-navy)', fontWeight: '800', textDecoration: 'underline' }}
+                      >
+                        Explore All Drops
+                      </button>
+                    </>
+                  ) : (
+                    `Showing ${filteredProducts.length} ${filteredProducts.length === 1 ? 'piece' : 'pieces'} • Hand-crafted oversized silhouettes`
+                  )}
                 </p>
               </div>
 
@@ -545,6 +609,8 @@ export default function App() {
                     key={product.id}
                     product={product}
                     cart={cart}
+                    isWishlisted={wishlist.includes(product.id)}
+                    onToggleWishlist={handleToggleWishlist}
                     onSelectProduct={setSelectedProduct}
                     onQuickAdd={handleAddToCart}
                     onUpdateQuantity={handleUpdateQuantity}
@@ -753,6 +819,8 @@ export default function App() {
         <ProductModal
           product={selectedProduct}
           cart={cart}
+          isWishlisted={wishlist.includes(selectedProduct.id)}
+          onToggleWishlist={handleToggleWishlist}
           onClose={() => setSelectedProduct(null)}
           onAddToCart={handleAddToCart}
           onUpdateQuantity={handleUpdateQuantity}
@@ -760,13 +828,14 @@ export default function App() {
         />
       )}
 
-      {/* Slide-out Cart Drawer */}
+      {/* Slide-out Cart Drawer with Persistent Free Shipping Bar & Combo Recommendations */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cart}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveFromCart}
+        onAddToCart={handleAddToCart}
         onProceedToCheckout={handleProceedToCheckout}
         appliedCoupon={appliedCoupon}
         setAppliedCoupon={setAppliedCoupon}

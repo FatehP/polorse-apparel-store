@@ -1,16 +1,40 @@
-import React, { useState } from 'react';
-import { ShoppingBag, ShieldCheck, Flame, Search, SlidersHorizontal, Store, X, User, LogOut, ChevronDown, Package, MapPin, CreditCard } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  ShoppingBag,
+  ShieldCheck,
+  Flame,
+  Search,
+  SlidersHorizontal,
+  Store,
+  X,
+  User,
+  LogOut,
+  ChevronDown,
+  Package,
+  MapPin,
+  CreditCard,
+  Heart,
+  Sparkles,
+  ArrowRight,
+  TrendingUp,
+  Tag
+} from 'lucide-react';
 
 export default function Navbar({
   activeView,
   setActiveView,
-  cartCount,
+  cartCount = 0,
   onOpenCart,
+  wishlistCount = 0,
+  onOpenWishlist,
+  isWishlistActive = false,
   searchQuery,
   setSearchQuery,
   selectedCategory,
   setSelectedCategory,
   categories = [],
+  products = [],
+  onSelectProduct,
   onOpenFilter,
   activeFiltersCount = 0,
   currentUser = null,
@@ -19,98 +43,210 @@ export default function Navbar({
   onLogout
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [cartBadgeAnimate, setCartBadgeAnimate] = useState(false);
+  const [wishlistBadgeAnimate, setWishlistBadgeAnimate] = useState(false);
+  const searchContainerRef = useRef(null);
+
+  // Compact header on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Trigger scale-bounce animation when cart count changes
+  useEffect(() => {
+    if (cartCount > 0) {
+      setCartBadgeAnimate(true);
+      const timer = setTimeout(() => setCartBadgeAnimate(false), 450);
+      return () => clearTimeout(timer);
+    }
+  }, [cartCount]);
+
+  // Trigger scale-bounce animation when wishlist count changes
+  useEffect(() => {
+    if (wishlistCount > 0) {
+      setWishlistBadgeAnimate(true);
+      const timer = setTimeout(() => setWishlistBadgeAnimate(false), 450);
+      return () => clearTimeout(timer);
+    }
+  }, [wishlistCount]);
+
+  // Close search auto-suggestions on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
+        setIsSearchFocused(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
+      setIsSearchFocused(false);
       const catalogEl = document.getElementById('catalog');
       if (catalogEl) {
         catalogEl.scrollIntoView({ behavior: 'smooth' });
       }
     }
+    if (e.key === 'Escape') {
+      setIsSearchFocused(false);
+    }
   };
 
+  // Curated trending search terms
+  const TRENDING_TAGS = [
+    'Acid Wash Hoodie',
+    'Oversized Tee',
+    'Cargo Pants',
+    'Heavyweight',
+    'Varsity Jacket'
+  ];
+
+  // Matching drops for live search suggestions preview
+  const searchMatches = searchQuery.trim()
+    ? products.filter(p => {
+        const q = searchQuery.toLowerCase();
+        return (
+          p.title?.toLowerCase().includes(q) ||
+          p.category?.toLowerCase().includes(q) ||
+          p.tags?.some(t => t.toLowerCase().includes(q))
+        );
+      }).slice(0, 4)
+    : [];
+
   return (
-    <header className="sticky top-0 z-40 glass-panel" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-      {/* Top micro-announcement bar (Continuous Smooth Marquee Ticker) */}
-      <div className="announcement-marquee-wrapper">
+    <header
+      className="sticky top-0 z-40"
+      style={{
+        background: isScrolled ? 'rgba(250, 247, 242, 0.96)' : 'var(--bg-glass)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: '1px solid var(--border-subtle)',
+        boxShadow: isScrolled ? '0 4px 20px rgba(15, 28, 63, 0.08)' : 'none',
+        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+      }}
+    >
+      {/* ======================================================== */}
+      {/* TIER 1: LUXURY ANNOUNCEMENT TICKER (COLLAPSIBLE ON SCROLL) */}
+      {/* ======================================================== */}
+      <div
+        className="announcement-marquee-wrapper"
+        style={{
+          height: isScrolled ? '0px' : '32px',
+          padding: isScrolled ? '0' : '6px 0',
+          opacity: isScrolled ? 0 : 1,
+          overflow: 'hidden',
+          transition: 'all 0.28s ease'
+        }}
+      >
         <div className="announcement-marquee-track">
           <div className="announcement-item">
-            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
-            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
+            <Flame size={12} style={{ color: '#FCD34D', flexShrink: 0 }} />
+            <span>POLORSE SIGNATURE DROP • USE CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ON ₹1,999+ • 7-DAY DOORSTEP EXCHANGE</span>
           </div>
           <div className="announcement-item">
-            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
-            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
+            <Flame size={12} style={{ color: '#FCD34D', flexShrink: 0 }} />
+            <span>POLORSE SIGNATURE DROP • USE CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ON ₹1,999+ • 7-DAY DOORSTEP EXCHANGE</span>
           </div>
           <div className="announcement-item">
-            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
-            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
-          </div>
-          <div className="announcement-item">
-            <Flame size={13} style={{ color: '#FCD34D', flexShrink: 0 }} />
-            <span>POLORSE SIGNATURE DROP • CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ACROSS INDIA • 7-DAY DOORSTEP SIZE EXCHANGE</span>
+            <Flame size={12} style={{ color: '#FCD34D', flexShrink: 0 }} />
+            <span>POLORSE SIGNATURE DROP • USE CODE <strong>POLORSE500</strong> FOR ₹500 OFF • FREE EXPRESS SHIPPING ON ₹1,999+ • 7-DAY DOORSTEP EXCHANGE</span>
           </div>
         </div>
       </div>
 
-      {/* Main Navbar Row */}
-      <div className="navbar-main-row">
-        {/* Official Brand Logo */}
-        <div 
+      {/* ======================================================== */}
+      {/* TIER 2: MAIN BRAND HEADER ROW                             */}
+      {/* ======================================================== */}
+      <div
+        className="navbar-main-row"
+        style={{
+          padding: isScrolled ? '8px 24px' : '12px 24px',
+          transition: 'padding 0.25s ease'
+        }}
+      >
+        {/* Brand Logo & Tagline */}
+        <div
           onClick={() => {
             setActiveView('store');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}
+          style={{
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flexShrink: 0
+          }}
         >
           <img
             src="/polorse-logo.jpg"
-            alt="POLORSE - Made in India"
+            alt="POLORSE"
             style={{
-              height: '44px',
+              height: isScrolled ? '38px' : '44px',
               width: 'auto',
               objectFit: 'contain',
-              display: 'block'
+              display: 'block',
+              transition: 'height 0.2s ease'
             }}
           />
         </div>
 
-        {/* Center: Search Bar and Filter Option at the Top (Desktop) */}
+        {/* Center: Live Search Bar with Auto-Suggestions (Desktop) */}
         {activeView === 'store' && (
-          <div className="nav-search-container">
-            {/* Search Input Box */}
-            <div style={{
-              position: 'relative',
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center'
-            }}>
+          <div
+            ref={searchContainerRef}
+            className="nav-search-container"
+            style={{ position: 'relative' }}
+          >
+            <div
+              style={{
+                position: 'relative',
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
               <Search
                 size={16}
                 style={{
                   position: 'absolute',
                   left: '14px',
-                  color: 'var(--text-secondary)',
+                  color: isSearchFocused ? 'var(--accent-navy)' : 'var(--text-secondary)',
+                  transition: 'color 0.2s ease',
                   pointerEvents: 'none'
                 }}
               />
               <input
                 type="text"
-                placeholder="Search hoodies, cargo, shirts, tees, jeans..."
+                placeholder="Search hoodies, oversized tees, cargoes, jackets..."
                 value={searchQuery}
+                onFocus={() => setIsSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 style={{
                   paddingLeft: '38px',
                   paddingRight: searchQuery ? '36px' : '14px',
-                  paddingTop: '9px',
-                  paddingBottom: '9px',
-                  fontSize: '0.88rem',
+                  paddingTop: isScrolled ? '8px' : '10px',
+                  paddingBottom: isScrolled ? '8px' : '10px',
+                  fontSize: '0.86rem',
                   borderRadius: 'var(--radius-full)',
                   background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border-subtle)',
-                  boxShadow: 'var(--shadow-sm)',
-                  width: '100%'
+                  border: isSearchFocused ? '1.5px solid var(--accent-navy)' : '1px solid var(--border-subtle)',
+                  boxShadow: isSearchFocused ? '0 0 0 3px rgba(15, 28, 63, 0.08)' : 'var(--shadow-sm)',
+                  width: '100%',
+                  transition: 'all 0.2s ease'
                 }}
               />
               {searchQuery && (
@@ -127,8 +263,7 @@ export default function Navbar({
                     color: 'var(--text-secondary)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.75rem'
+                    justifyContent: 'center'
                   }}
                   title="Clear search"
                 >
@@ -137,7 +272,7 @@ export default function Navbar({
               )}
             </div>
 
-            {/* Filter Option Button */}
+            {/* Filter Trigger Button */}
             <button
               type="button"
               onClick={onOpenFilter}
@@ -145,54 +280,189 @@ export default function Navbar({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '7px',
-                padding: '9px 16px',
+                padding: isScrolled ? '8px 16px' : '9px 16px',
                 borderRadius: 'var(--radius-full)',
-                fontSize: '0.86rem',
-                fontWeight: '600',
+                fontSize: '0.84rem',
+                fontWeight: '700',
                 background: activeFiltersCount > 0 ? 'var(--accent-navy)' : 'var(--bg-secondary)',
-                color: activeFiltersCount > 0 ? '#fff' : 'var(--text-primary)',
+                color: activeFiltersCount > 0 ? '#FAF7F2' : 'var(--text-primary)',
                 border: '1px solid',
                 borderColor: activeFiltersCount > 0 ? 'var(--accent-navy)' : 'var(--border-subtle)',
                 boxShadow: 'var(--shadow-sm)',
                 flexShrink: 0,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
               }}
-              title="Open filters"
+              title="Filter catalog"
             >
-              <SlidersHorizontal size={15} style={{ color: activeFiltersCount > 0 ? '#fff' : 'var(--accent-red)' }} />
-              <span>Filters</span>
+              <SlidersHorizontal size={14} style={{ color: activeFiltersCount > 0 ? '#FAF7F2' : 'var(--accent-red)' }} />
+              <span>Filter</span>
               {activeFiltersCount > 0 && (
-                <span style={{
-                  background: 'var(--accent-red)',
-                  color: '#fff',
-                  fontSize: '0.7rem',
-                  fontWeight: '700',
-                  minWidth: '18px',
-                  height: '18px',
-                  borderRadius: '9px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: '0 4px',
-                  marginLeft: '2px'
-                }}>
+                <span
+                  style={{
+                    background: 'var(--accent-red)',
+                    color: '#fff',
+                    fontSize: '0.68rem',
+                    fontWeight: '800',
+                    minWidth: '18px',
+                    height: '18px',
+                    borderRadius: '9px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0 4px',
+                    marginLeft: '2px'
+                  }}
+                >
                   {activeFiltersCount}
                 </span>
               )}
             </button>
+
+            {/* Live Search Auto-Suggestions Dropdown */}
+            {isSearchFocused && (
+              <div className="search-suggestions-popover">
+                {/* Trending Tags Section */}
+                <div style={{ padding: '14px 16px 10px', borderBottom: '1px solid var(--border-subtle)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                    <TrendingUp size={13} style={{ color: 'var(--accent-red)' }} />
+                    <span style={{ fontSize: '0.74rem', textTransform: 'uppercase', fontWeight: '800', color: 'var(--text-muted)' }}>
+                      Trending Street Searches
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {TRENDING_TAGS.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setSearchQuery(tag);
+                          setIsSearchFocused(false);
+                          const catalogEl = document.getElementById('catalog');
+                          if (catalogEl) catalogEl.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        style={{
+                          padding: '4px 10px',
+                          background: 'var(--bg-primary)',
+                          border: '1px solid var(--border-subtle)',
+                          borderRadius: 'var(--radius-full)',
+                          fontSize: '0.78rem',
+                          color: 'var(--text-secondary)',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--accent-navy)';
+                          e.currentTarget.style.color = 'var(--accent-navy)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                          e.currentTarget.style.color = 'var(--text-secondary)';
+                        }}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Instant Matching Products Preview */}
+                {searchQuery.trim() && (
+                  <div style={{ padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '0.74rem', textTransform: 'uppercase', fontWeight: '800', color: 'var(--text-muted)' }}>
+                        Instant Matches ({searchMatches.length})
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        Press Enter for all
+                      </span>
+                    </div>
+
+                    {searchMatches.length === 0 ? (
+                      <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', padding: '8px 0' }}>
+                        No instant matches for "{searchQuery}". Press Enter to search catalog.
+                      </p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {searchMatches.map((item) => (
+                          <div
+                            key={item.id}
+                            onClick={() => {
+                              setIsSearchFocused(false);
+                              onSelectProduct?.(item);
+                            }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '12px',
+                              padding: '6px 8px',
+                              borderRadius: 'var(--radius-md)',
+                              cursor: 'pointer',
+                              transition: 'background 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-primary)'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          >
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title}
+                              style={{
+                                width: '40px',
+                                height: '48px',
+                                objectFit: 'cover',
+                                borderRadius: '4px',
+                                background: 'var(--bg-primary)',
+                                border: '1px solid var(--border-subtle)'
+                              }}
+                            />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <h4
+                                style={{
+                                  fontSize: '0.84rem',
+                                  fontWeight: '700',
+                                  color: 'var(--text-primary)',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                {item.title}
+                              </h4>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                                <span style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--accent-navy)' }}>
+                                  ₹{item.price?.toLocaleString('en-IN')}
+                                </span>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                  {item.category}
+                                </span>
+                              </div>
+                            </div>
+                            <ArrowRight size={14} style={{ color: 'var(--text-muted)' }} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Right Actions & View Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          {/* View Switcher: Store vs Brother's Admin Hub (Desktop Only) */}
-          <div className="nav-desktop-only" style={{
-            display: 'flex',
-            background: 'var(--bg-secondary)',
-            padding: '3px',
-            borderRadius: 'var(--radius-full)',
-            border: '1px solid var(--border-subtle)'
-          }}>
+        {/* Right Section: Actions & Navigation Triggers */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          {/* View Switcher: Store vs Admin (Desktop Only) */}
+          <div
+            className="nav-desktop-only"
+            style={{
+              display: 'flex',
+              background: 'var(--bg-secondary)',
+              padding: '3px',
+              borderRadius: 'var(--radius-full)',
+              border: '1px solid var(--border-subtle)'
+            }}
+          >
             <button
               onClick={() => setActiveView('store')}
               style={{
@@ -201,13 +471,13 @@ export default function Navbar({
                 gap: '5px',
                 padding: '6px 12px',
                 borderRadius: 'var(--radius-full)',
-                fontSize: '0.8rem',
-                fontWeight: '600',
+                fontSize: '0.78rem',
+                fontWeight: '700',
                 background: activeView === 'store' ? 'var(--accent-navy)' : 'transparent',
-                color: activeView === 'store' ? '#fff' : 'var(--text-secondary)'
+                color: activeView === 'store' ? '#FAF7F2' : 'var(--text-secondary)'
               }}
             >
-              <Store size={14} />
+              <Store size={13} />
               <span>Store</span>
             </button>
             <button
@@ -218,18 +488,18 @@ export default function Navbar({
                 gap: '5px',
                 padding: '6px 12px',
                 borderRadius: 'var(--radius-full)',
-                fontSize: '0.8rem',
-                fontWeight: '600',
+                fontSize: '0.78rem',
+                fontWeight: '700',
                 background: activeView === 'admin' ? 'var(--accent-red)' : 'transparent',
                 color: activeView === 'admin' ? '#fff' : 'var(--text-secondary)'
               }}
             >
-              <ShieldCheck size={14} />
+              <ShieldCheck size={13} />
               <span>Admin</span>
             </button>
           </div>
 
-          {/* Orders Quick-Access Pill (Always Accessible) */}
+          {/* Orders Quick-Access Pill (Store View Only) */}
           {activeView === 'store' && (
             <button
               type="button"
@@ -249,14 +519,119 @@ export default function Navbar({
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}
-              title="Track Orders & Delivery Status"
+              title="Track Orders & Live Status"
             >
               <Package size={14} style={{ color: 'var(--accent-navy)' }} />
               <span className="nav-desktop-only">Orders</span>
             </button>
           )}
 
-          {/* User Authentication Trigger / Profile Dropdown */}
+          {/* Wishlist Button with Live Scale-Bounce Counter */}
+          {activeView === 'store' && (
+            <button
+              type="button"
+              onClick={onOpenWishlist}
+              id="navbar-wishlist-btn"
+              style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: isWishlistActive ? 'rgba(194, 26, 44, 0.08)' : 'var(--bg-secondary)',
+                border: isWishlistActive ? '1.5px solid var(--accent-red)' : '1px solid var(--border-subtle)',
+                width: isScrolled ? '36px' : '40px',
+                height: isScrolled ? '36px' : '40px',
+                borderRadius: 'var(--radius-md)',
+                color: isWishlistActive ? 'var(--accent-red)' : 'var(--text-primary)',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              title="Saved Wishlist Items"
+            >
+              <Heart
+                size={18}
+                fill={isWishlistActive || wishlistCount > 0 ? 'var(--accent-red)' : 'none'}
+                style={{ color: isWishlistActive || wishlistCount > 0 ? 'var(--accent-red)' : 'currentColor' }}
+              />
+              {wishlistCount > 0 && (
+                <span
+                  className={wishlistBadgeAnimate ? 'animate-badge-bounce' : ''}
+                  style={{
+                    position: 'absolute',
+                    top: '-4px',
+                    right: '-4px',
+                    background: 'var(--accent-red)',
+                    color: '#fff',
+                    fontSize: '0.68rem',
+                    fontWeight: '800',
+                    minWidth: '18px',
+                    height: '18px',
+                    borderRadius: '9px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0 4px',
+                    boxShadow: '0 2px 6px var(--accent-red-glow)'
+                  }}
+                >
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* Cart Bag Trigger with Live Scale-Bounce Counter */}
+          {activeView === 'store' && (
+            <button
+              onClick={onOpenCart}
+              id="navbar-cart-btn"
+              style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                width: isScrolled ? '36px' : '40px',
+                height: isScrolled ? '36px' : '40px',
+                borderRadius: 'var(--radius-md)',
+                color: 'var(--text-primary)',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all 0.2s ease',
+                cursor: 'pointer'
+              }}
+              title="View Shopping Bag"
+            >
+              <ShoppingBag size={18} />
+              {cartCount > 0 && (
+                <span
+                  className={cartBadgeAnimate ? 'animate-badge-bounce' : ''}
+                  style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-5px',
+                    background: 'var(--accent-red)',
+                    color: '#fff',
+                    fontSize: '0.7rem',
+                    fontWeight: '800',
+                    minWidth: '20px',
+                    height: '20px',
+                    borderRadius: '10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px var(--accent-red-glow)',
+                    padding: '0 4px'
+                  }}
+                >
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* User Sign In / Profile Dropdown */}
           {activeView === 'store' && (
             <div style={{ position: 'relative' }}>
               {!currentUser ? (
@@ -268,7 +643,7 @@ export default function Navbar({
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    padding: '8px 14px',
+                    padding: isScrolled ? '7px 12px' : '8px 14px',
                     background: 'var(--bg-secondary)',
                     border: '1.5px solid var(--border-subtle)',
                     borderRadius: 'var(--radius-md)',
@@ -282,7 +657,7 @@ export default function Navbar({
                   title="Sign In / Register"
                 >
                   <User size={15} style={{ color: 'var(--accent-navy)' }} />
-                  <span>Sign In</span>
+                  <span className="nav-desktop-only">Sign In</span>
                 </button>
               ) : (
                 <div>
@@ -294,7 +669,7 @@ export default function Navbar({
                       display: 'flex',
                       alignItems: 'center',
                       gap: '8px',
-                      padding: '5px 12px 5px 6px',
+                      padding: '4px 10px 4px 5px',
                       background: 'var(--bg-secondary)',
                       border: '1.5px solid var(--border-subtle)',
                       borderRadius: 'var(--radius-full)',
@@ -306,19 +681,21 @@ export default function Navbar({
                     }}
                     title="User Account Hub"
                   >
-                    <div style={{
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '50%',
-                      background: 'var(--accent-navy)',
-                      color: '#FAF7F2',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.78rem',
-                      fontWeight: '800',
-                      overflow: 'hidden'
-                    }}>
+                    <div
+                      style={{
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: 'var(--accent-navy)',
+                        color: '#FAF7F2',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '0.78rem',
+                        fontWeight: '800',
+                        overflow: 'hidden'
+                      }}
+                    >
                       {currentUser.avatar ? (
                         <img
                           src={currentUser.avatar}
@@ -329,10 +706,10 @@ export default function Navbar({
                         currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'
                       )}
                     </div>
-                    <span style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span className="nav-desktop-only" style={{ maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {currentUser.name ? currentUser.name.split(' ')[0] : 'Member'}
                     </span>
-                    <ChevronDown size={14} style={{ color: 'var(--text-muted)' }} />
+                    <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} />
                   </button>
 
                   {/* Dropdown Menu */}
@@ -345,7 +722,7 @@ export default function Navbar({
                         background: 'var(--bg-secondary)',
                         border: '1.5px solid var(--border-subtle)',
                         borderRadius: 'var(--radius-md)',
-                        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.25)',
+                        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.2)',
                         minWidth: '240px',
                         padding: '6px 0',
                         zIndex: 60
@@ -353,50 +730,33 @@ export default function Navbar({
                     >
                       <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border-subtle)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div style={{
-                            width: '34px',
-                            height: '34px',
-                            borderRadius: '50%',
-                            background: 'var(--accent-navy)',
-                            color: '#fff',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '0.85rem',
-                            fontWeight: '800',
-                            overflow: 'hidden',
-                            flexShrink: 0
-                          }}>
-                            {currentUser.avatar ? (
-                              <img src={currentUser.avatar} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              currentUser.name?.charAt(0) || 'U'
-                            )}
+                          <div
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              background: 'var(--accent-navy)',
+                              color: '#FAF7F2',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '0.85rem',
+                              fontWeight: '800'
+                            }}
+                          >
+                            {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
                           </div>
-                          <div style={{ overflow: 'hidden' }}>
-                            <p style={{ margin: 0, fontWeight: '800', fontSize: '0.88rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {currentUser.name}
+                          <div>
+                            <p style={{ fontSize: '0.86rem', fontWeight: '800', color: 'var(--text-primary)' }}>
+                              {currentUser.name || 'Valued Member'}
                             </p>
-                            <p style={{ margin: '1px 0 0 0', fontSize: '0.72rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              {currentUser.email || currentUser.phone}
-                            </p>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--accent-navy)', fontWeight: '700' }}>
+                              Polorse VIP Member
+                            </span>
                           </div>
                         </div>
-                        <span style={{
-                          display: 'inline-block',
-                          marginTop: '6px',
-                          fontSize: '0.68rem',
-                          fontWeight: '800',
-                          background: 'rgba(252, 211, 77, 0.2)',
-                          color: '#B45309',
-                          padding: '2px 7px',
-                          borderRadius: 'var(--radius-sm)'
-                        }}>
-                          {currentUser.tier || 'Polorse VIP'}
-                        </span>
                       </div>
 
-                      {/* 1. Profile Details & Photo */}
                       <button
                         type="button"
                         onClick={() => {
@@ -409,20 +769,16 @@ export default function Navbar({
                           alignItems: 'center',
                           gap: '10px',
                           padding: '10px 14px',
-                          background: 'none',
-                          border: 'none',
                           color: 'var(--text-primary)',
-                          fontSize: '0.84rem',
+                          fontSize: '0.82rem',
                           fontWeight: '700',
-                          cursor: 'pointer',
                           textAlign: 'left'
                         }}
                       >
                         <User size={15} style={{ color: 'var(--accent-navy)' }} />
-                        <span>My Profile & Avatar</span>
+                        <span>Profile & Avatar</span>
                       </button>
 
-                      {/* 2. My Orders & Live Tracking */}
                       <button
                         type="button"
                         onClick={() => {
@@ -435,20 +791,16 @@ export default function Navbar({
                           alignItems: 'center',
                           gap: '10px',
                           padding: '10px 14px',
-                          background: 'none',
-                          border: 'none',
                           color: 'var(--text-primary)',
-                          fontSize: '0.84rem',
+                          fontSize: '0.82rem',
                           fontWeight: '700',
-                          cursor: 'pointer',
                           textAlign: 'left'
                         }}
                       >
                         <Package size={15} style={{ color: 'var(--accent-navy)' }} />
-                        <span>My Orders & Live Status</span>
+                        <span>My Orders & Live Tracking</span>
                       </button>
 
-                      {/* 3. Saved Addresses */}
                       <button
                         type="button"
                         onClick={() => {
@@ -461,20 +813,16 @@ export default function Navbar({
                           alignItems: 'center',
                           gap: '10px',
                           padding: '10px 14px',
-                          background: 'none',
-                          border: 'none',
                           color: 'var(--text-primary)',
-                          fontSize: '0.84rem',
+                          fontSize: '0.82rem',
                           fontWeight: '700',
-                          cursor: 'pointer',
                           textAlign: 'left'
                         }}
                       >
                         <MapPin size={15} style={{ color: 'var(--accent-navy)' }} />
-                        <span>Delivery Addresses</span>
+                        <span>Saved Delivery Addresses</span>
                       </button>
 
-                      {/* 4. Payment Cards & UPI */}
                       <button
                         type="button"
                         onClick={() => {
@@ -487,22 +835,18 @@ export default function Navbar({
                           alignItems: 'center',
                           gap: '10px',
                           padding: '10px 14px',
-                          background: 'none',
-                          border: 'none',
                           color: 'var(--text-primary)',
-                          fontSize: '0.84rem',
+                          fontSize: '0.82rem',
                           fontWeight: '700',
-                          cursor: 'pointer',
                           textAlign: 'left'
                         }}
                       >
                         <CreditCard size={15} style={{ color: 'var(--accent-navy)' }} />
-                        <span>Payment Cards & UPI</span>
+                        <span>Saved Cards & UPI</span>
                       </button>
 
                       <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '4px 0' }} />
 
-                      {/* Sign Out */}
                       <button
                         type="button"
                         onClick={() => {
@@ -515,12 +859,9 @@ export default function Navbar({
                           alignItems: 'center',
                           gap: '10px',
                           padding: '10px 14px',
-                          background: 'none',
-                          border: 'none',
                           color: 'var(--accent-red)',
                           fontSize: '0.82rem',
                           fontWeight: '700',
-                          cursor: 'pointer',
                           textAlign: 'left'
                         }}
                       >
@@ -533,54 +874,12 @@ export default function Navbar({
               )}
             </div>
           )}
-
-          {/* Cart Trigger */}
-          {activeView === 'store' && (
-            <button
-              onClick={onOpenCart}
-              style={{
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-subtle)',
-                width: '40px',
-                height: '40px',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--text-primary)',
-                boxShadow: 'var(--shadow-sm)'
-              }}
-              title="View Shopping Cart"
-            >
-              <ShoppingBag size={19} />
-              {cartCount > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  right: '-5px',
-                  background: 'var(--accent-red)',
-                  color: '#fff',
-                  fontSize: '0.72rem',
-                  fontWeight: '700',
-                  minWidth: '20px',
-                  height: '20px',
-                  borderRadius: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 2px 8px var(--accent-red-glow)',
-                  padding: '0 4px'
-                }}>
-                  {cartCount}
-                </span>
-              )}
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Mobile / Tablet Search & Filter Row */}
+      {/* ======================================================== */}
+      {/* MOBILE LIVE SEARCH & FILTER ROW                          */}
+      {/* ======================================================== */}
       {activeView === 'store' && (
         <div className="nav-mobile-search-row">
           <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
@@ -595,7 +894,7 @@ export default function Navbar({
             />
             <input
               type="text"
-              placeholder="Search hoodies, cargo, shirts..."
+              placeholder="Search hoodies, cargoes, tees..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -604,7 +903,7 @@ export default function Navbar({
                 paddingRight: searchQuery ? '32px' : '12px',
                 paddingTop: '8px',
                 paddingBottom: '8px',
-                fontSize: '0.85rem',
+                fontSize: '0.84rem',
                 borderRadius: 'var(--radius-full)',
                 background: 'var(--bg-secondary)',
                 border: '1px solid var(--border-subtle)'
@@ -642,30 +941,32 @@ export default function Navbar({
               padding: '8px 14px',
               borderRadius: 'var(--radius-full)',
               fontSize: '0.82rem',
-              fontWeight: '600',
+              fontWeight: '700',
               background: activeFiltersCount > 0 ? 'var(--accent-navy)' : 'var(--bg-secondary)',
-              color: activeFiltersCount > 0 ? '#fff' : 'var(--text-primary)',
+              color: activeFiltersCount > 0 ? '#FAF7F2' : 'var(--text-primary)',
               border: '1px solid',
               borderColor: activeFiltersCount > 0 ? 'var(--accent-navy)' : 'var(--border-subtle)',
               flexShrink: 0
             }}
           >
-            <SlidersHorizontal size={14} style={{ color: activeFiltersCount > 0 ? '#fff' : 'var(--accent-red)' }} />
+            <SlidersHorizontal size={14} style={{ color: activeFiltersCount > 0 ? '#FAF7F2' : 'var(--accent-red)' }} />
             <span>Filter</span>
             {activeFiltersCount > 0 && (
-              <span style={{
-                background: 'var(--accent-red)',
-                color: '#fff',
-                fontSize: '0.68rem',
-                fontWeight: '700',
-                minWidth: '16px',
-                height: '16px',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 3px'
-              }}>
+              <span
+                style={{
+                  background: 'var(--accent-red)',
+                  color: '#fff',
+                  fontSize: '0.68rem',
+                  fontWeight: '800',
+                  minWidth: '16px',
+                  height: '16px',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0 3px'
+                }}
+              >
                 {activeFiltersCount}
               </span>
             )}
@@ -673,58 +974,148 @@ export default function Navbar({
         </div>
       )}
 
-      {/* Quick Category Bar (when in store view) */}
+      {/* ======================================================== */}
+      {/* TIER 3: SCROLLABLE STICKY CATEGORY PILL BAR              */}
+      {/* ======================================================== */}
       {activeView === 'store' && (
-        <div style={{
-          borderTop: '1px solid var(--border-subtle)',
-          background: 'var(--bg-primary)',
-          padding: '6px 24px'
-        }}>
-          <div style={{
-            maxWidth: '1360px',
-            margin: '0 auto',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}>
+        <div
+          style={{
+            borderTop: '1px solid var(--border-subtle)',
+            background: 'var(--bg-primary)',
+            padding: '7px 24px'
+          }}
+        >
+          <div
+            className="category-scroll-bar"
+            style={{
+              maxWidth: '1360px',
+              margin: '0 auto'
+            }}
+          >
+            {/* All Drops Pill */}
             <button
-              onClick={() => setSelectedCategory('all')}
+              onClick={() => {
+                setSelectedCategory('all');
+                const catalogEl = document.getElementById('catalog');
+                if (catalogEl) catalogEl.scrollIntoView({ behavior: 'smooth' });
+              }}
               style={{
-                padding: '5px 14px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 16px',
                 borderRadius: 'var(--radius-full)',
                 fontSize: '0.8rem',
-                fontWeight: '600',
-                background: selectedCategory === 'all' ? 'var(--accent-navy)' : 'transparent',
-                color: selectedCategory === 'all' ? '#fff' : 'var(--text-secondary)',
+                fontWeight: '800',
+                background: selectedCategory === 'all' && !isWishlistActive ? 'var(--accent-navy)' : 'var(--bg-secondary)',
+                color: selectedCategory === 'all' && !isWishlistActive ? '#FAF7F2' : 'var(--text-secondary)',
                 border: '1px solid',
-                borderColor: selectedCategory === 'all' ? 'var(--accent-navy)' : 'var(--border-subtle)',
-                whiteSpace: 'nowrap'
+                borderColor: selectedCategory === 'all' && !isWishlistActive ? 'var(--accent-navy)' : 'var(--border-subtle)',
+                whiteSpace: 'nowrap',
+                boxShadow: selectedCategory === 'all' && !isWishlistActive ? '0 2px 8px rgba(15, 28, 63, 0.15)' : 'none',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
               }}
             >
-              All Drops
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
+              <Sparkles size={13} style={{ color: selectedCategory === 'all' && !isWishlistActive ? '#FCD34D' : 'var(--text-muted)' }} />
+              <span>All Drops</span>
+              <span
                 style={{
-                  padding: '5px 14px',
-                  borderRadius: 'var(--radius-full)',
-                  fontSize: '0.8rem',
-                  fontWeight: '600',
-                  background: selectedCategory === cat ? 'var(--accent-navy)' : 'transparent',
-                  color: selectedCategory === cat ? '#fff' : 'var(--text-secondary)',
-                  border: '1px solid',
-                  borderColor: selectedCategory === cat ? 'var(--accent-navy)' : 'var(--border-subtle)',
-                  whiteSpace: 'nowrap'
+                  fontSize: '0.7rem',
+                  opacity: 0.8,
+                  padding: '1px 5px',
+                  borderRadius: '10px',
+                  background: selectedCategory === 'all' && !isWishlistActive ? 'rgba(255, 255, 255, 0.2)' : 'var(--bg-primary)'
                 }}
               >
-                {cat}
+                {products.length}
+              </span>
+            </button>
+
+            {/* Dynamic Category Pills */}
+            {categories.map((cat) => {
+              const isSelected = selectedCategory === cat && !isWishlistActive;
+              const count = products.filter(p => p.category === cat).length;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    const catalogEl = document.getElementById('catalog');
+                    if (catalogEl) catalogEl.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '6px 15px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    background: isSelected ? 'var(--accent-navy)' : 'var(--bg-secondary)',
+                    color: isSelected ? '#FAF7F2' : 'var(--text-secondary)',
+                    border: '1px solid',
+                    borderColor: isSelected ? 'var(--accent-navy)' : 'var(--border-subtle)',
+                    whiteSpace: 'nowrap',
+                    boxShadow: isSelected ? '0 2px 8px rgba(15, 28, 63, 0.15)' : 'none',
+                    transition: 'all 0.2s ease',
+                    flexShrink: 0
+                  }}
+                >
+                  <span>{cat}</span>
+                  {count > 0 && (
+                    <span
+                      style={{
+                        fontSize: '0.7rem',
+                        opacity: 0.8,
+                        padding: '1px 5px',
+                        borderRadius: '10px',
+                        background: isSelected ? 'rgba(255, 255, 255, 0.2)' : 'var(--bg-primary)'
+                      }}
+                    >
+                      {count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+
+            {/* Wishlist Shortcut Pill */}
+            {wishlistCount > 0 && (
+              <button
+                onClick={onOpenWishlist}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 15px',
+                  borderRadius: 'var(--radius-full)',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  background: isWishlistActive ? 'var(--accent-red)' : 'var(--bg-secondary)',
+                  color: isWishlistActive ? '#FFFFFF' : 'var(--accent-red)',
+                  border: '1px solid',
+                  borderColor: isWishlistActive ? 'var(--accent-red)' : 'rgba(194, 26, 44, 0.25)',
+                  whiteSpace: 'nowrap',
+                  boxShadow: isWishlistActive ? '0 2px 8px var(--accent-red-glow)' : 'none',
+                  transition: 'all 0.2s ease',
+                  flexShrink: 0
+                }}
+              >
+                <Heart size={13} fill="currentColor" />
+                <span>Wishlist</span>
+                <span
+                  style={{
+                    fontSize: '0.7rem',
+                    padding: '1px 5px',
+                    borderRadius: '10px',
+                    background: isWishlistActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(194, 26, 44, 0.1)'
+                  }}
+                >
+                  {wishlistCount}
+                </span>
               </button>
-            ))}
+            )}
           </div>
         </div>
       )}
