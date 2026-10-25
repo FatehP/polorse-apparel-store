@@ -23,12 +23,15 @@ export default function CartDrawer({
   onAddToCart,
   onProceedToCheckout,
   appliedCoupon,
-  setAppliedCoupon
+  setAppliedCoupon,
+  suggestedProducts = [],
+  onSelectProduct
 }) {
   const [couponInput, setCouponInput] = useState('');
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState('');
   const [addedComboId, setAddedComboId] = useState(null);
+  const [addedSuggestionId, setAddedSuggestionId] = useState(null);
 
   if (!isOpen) return null;
 
@@ -133,6 +136,85 @@ export default function CartDrawer({
     });
     setAddedComboId(comboItem.id);
     setTimeout(() => setAddedComboId(null), 1200);
+  };
+
+  // Fallback curated suggestions if catalog products aren't passed
+  const DEFAULT_SUGGESTIONS = [
+    {
+      id: 'sug-hoodie-01',
+      title: 'Heavyweight Acid-Wash Boxy Hoodie',
+      category: 'Hoodies',
+      price: 2999,
+      originalPrice: 4999,
+      imageUrl: '/products/hoodie-charcoal.jpg',
+      tag: 'BESTSELLER',
+      selectedSize: 'L',
+      selectedColor: 'Vintage Charcoal'
+    },
+    {
+      id: 'sug-tee-02',
+      title: 'Raw Edge 280 GSM Oversized Tee',
+      category: 'T-Shirts',
+      price: 1499,
+      originalPrice: 2499,
+      imageUrl: '/products/tee-bone.jpg',
+      tag: 'HOT DROP',
+      selectedSize: 'M',
+      selectedColor: 'Bone Cream'
+    },
+    {
+      id: 'sug-cargo-03',
+      title: 'Tactical Multi-Pocket Parachute Cargo',
+      category: 'Pants',
+      price: 3499,
+      originalPrice: 5499,
+      imageUrl: '/products/cargo-olive.jpg',
+      tag: 'LIMITED',
+      selectedSize: '32',
+      selectedColor: 'Combat Olive'
+    },
+    {
+      id: 'sug-cap-04',
+      title: 'Heritage Washed Twill Dad Cap',
+      category: 'Headwear',
+      price: 899,
+      originalPrice: 1499,
+      imageUrl: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=400&q=80',
+      tag: 'ICONIC',
+      selectedSize: 'Adjustable',
+      selectedColor: 'Deep Navy'
+    }
+  ];
+
+  const emptyStateItems = (suggestedProducts && suggestedProducts.length > 0)
+    ? suggestedProducts.slice(0, 4).map(prod => ({
+        id: prod.id,
+        title: prod.title,
+        category: prod.category,
+        price: prod.price,
+        originalPrice: prod.originalPrice || Math.round(prod.price * 1.6),
+        imageUrl: prod.imageUrl || (prod.images && prod.images[0]) || '/products/hoodie-charcoal.jpg',
+        tag: (prod.tags && prod.tags[0]) || 'TRENDING',
+        selectedSize: prod.sizes && prod.sizes[0] ? (prod.sizes[0].size || prod.sizes[0]) : 'L',
+        selectedColor: prod.colors && prod.colors[0] ? (prod.colors[0].name || prod.colors[0]) : 'Standard',
+        rawProduct: prod
+      }))
+    : DEFAULT_SUGGESTIONS;
+
+  const handleAddSuggestion = (item) => {
+    onAddToCart?.({
+      id: item.id,
+      title: item.title,
+      category: item.category,
+      price: item.price,
+      originalPrice: item.originalPrice,
+      imageUrl: item.imageUrl,
+      selectedSize: item.selectedSize || 'L',
+      selectedColor: item.selectedColor || 'Standard',
+      quantity: 1
+    });
+    setAddedSuggestionId(item.id);
+    setTimeout(() => setAddedSuggestionId(null), 1200);
   };
 
   return (
@@ -298,42 +380,215 @@ export default function CartDrawer({
           }}
         >
           {cartItems.length === 0 ? (
-            <div
-              style={{
-                margin: 'auto',
-                textAlign: 'center',
-                padding: '40px 20px',
-                color: 'var(--text-muted)'
-              }}
-            >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* Compact Empty Bag Hero */}
               <div
                 style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '50%',
-                  background: 'var(--bg-primary)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 16px',
-                  color: 'var(--text-secondary)'
+                  textAlign: 'center',
+                  padding: '24px 16px 18px',
+                  background: 'var(--bg-card)',
+                  borderRadius: 'var(--radius-xl)',
+                  border: '1px solid var(--border-subtle)',
+                  boxShadow: 'var(--shadow-sm)'
                 }}
               >
-                <ShoppingBag size={28} />
+                <div
+                  style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    background: 'rgba(15, 28, 63, 0.06)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 12px',
+                    color: 'var(--accent-navy)'
+                  }}
+                >
+                  <ShoppingBag size={24} />
+                </div>
+                <h3 style={{ color: 'var(--text-primary)', fontSize: '1.15rem', fontWeight: '800', marginBottom: '4px' }}>
+                  Your Bag is Empty
+                </h3>
+                <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 auto 14px', maxWidth: '300px', lineHeight: 1.4 }}>
+                  Add your favorite fits to unlock <strong style={{ color: 'var(--accent-green)' }}>FREE Express Delivery</strong>.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    const el = document.getElementById('catalog');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="btn-primary"
+                  style={{
+                    borderRadius: 'var(--radius-full)',
+                    padding: '8px 20px',
+                    fontSize: '0.82rem',
+                    fontWeight: '700'
+                  }}
+                >
+                  Explore All Drops →
+                </button>
               </div>
-              <h3 style={{ color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: '800', marginBottom: '6px' }}>
-                Your Bag is Empty
-              </h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '20px', maxWidth: '280px', margin: '0 auto 20px' }}>
-                Explore hand-crafted heavyweight drops and add your favorite fits to unlock free delivery.
-              </p>
-              <button
-                onClick={onClose}
-                className="btn-primary"
-                style={{ borderRadius: 'var(--radius-full)', padding: '10px 24px', fontSize: '0.88rem' }}
-              >
-                Explore Polorse Catalog
-              </button>
+
+              {/* Default Item Suggestions Section */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Sparkles size={15} style={{ color: '#D97706' }} />
+                    <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                      Trending Picks For You
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', fontWeight: '700', color: 'var(--text-muted)' }}>
+                    Bestsellers
+                  </span>
+                </div>
+
+                {/* Suggestions List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {emptyStateItems.map((item) => {
+                    const discount = item.originalPrice && item.originalPrice > item.price
+                      ? Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)
+                      : null;
+                    const isAdded = addedSuggestionId === item.id;
+
+                    return (
+                      <div
+                        key={item.id}
+                        style={{
+                          display: 'flex',
+                          gap: '12px',
+                          background: 'var(--bg-card)',
+                          padding: '12px',
+                          borderRadius: 'var(--radius-lg)',
+                          border: '1px solid var(--border-subtle)',
+                          transition: 'all 0.2s ease',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <div
+                          onClick={() => onSelectProduct?.(item.rawProduct || item)}
+                          style={{ cursor: 'pointer', position: 'relative', flexShrink: 0 }}
+                        >
+                          <img
+                            src={item.imageUrl}
+                            alt={item.title}
+                            style={{
+                              width: '68px',
+                              height: '80px',
+                              objectFit: 'cover',
+                              borderRadius: 'var(--radius-md)',
+                              background: '#FAF7F2',
+                              border: '1px solid var(--border-subtle)'
+                            }}
+                          />
+                          {item.tag && (
+                            <span
+                              style={{
+                                position: 'absolute',
+                                top: '4px',
+                                left: '4px',
+                                fontSize: '0.6rem',
+                                fontWeight: '800',
+                                padding: '1px 5px',
+                                borderRadius: '3px',
+                                background: 'var(--accent-navy)',
+                                color: '#FAF7F2',
+                                letterSpacing: '0.04em'
+                              }}
+                            >
+                              {item.tag}
+                            </span>
+                          )}
+                        </div>
+
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div
+                            onClick={() => onSelectProduct?.(item.rawProduct || item)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <span style={{ fontSize: '0.68rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                              {item.category}
+                            </span>
+                            <h4
+                              style={{
+                                fontSize: '0.84rem',
+                                fontWeight: '700',
+                                color: 'var(--text-primary)',
+                                margin: '2px 0 4px',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                lineHeight: 1.3
+                              }}
+                              title={item.title}
+                            >
+                              {item.title}
+                            </h4>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                            <span style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--accent-navy)' }}>
+                              ₹{item.price.toLocaleString('en-IN')}
+                            </span>
+                            {item.originalPrice && item.originalPrice > item.price && (
+                              <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)', textDecoration: 'line-through' }}>
+                                ₹{item.originalPrice.toLocaleString('en-IN')}
+                              </span>
+                            )}
+                            {discount && (
+                              <span style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--accent-green)' }}>
+                                {discount}% OFF
+                              </span>
+                            )}
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+                              Size: <strong>{item.selectedSize || 'L'}</strong>
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() => handleAddSuggestion(item)}
+                              disabled={isAdded}
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                padding: '5px 12px',
+                                borderRadius: 'var(--radius-full)',
+                                background: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
+                                color: '#FAF7F2',
+                                border: 'none',
+                                fontSize: '0.74rem',
+                                fontWeight: '800',
+                                cursor: isAdded ? 'default' : 'pointer',
+                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                                transform: isAdded ? 'scale(0.96)' : 'scale(1)'
+                              }}
+                            >
+                              {isAdded ? (
+                                <>
+                                  <Check size={12} />
+                                  <span>Added</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Plus size={12} />
+                                  <span>Add</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           ) : (
             <>

@@ -868,6 +868,11 @@ export default function App() {
         onProceedToCheckout={handleProceedToCheckout}
         appliedCoupon={appliedCoupon}
         setAppliedCoupon={setAppliedCoupon}
+        suggestedProducts={products}
+        onSelectProduct={(product) => {
+          setIsCartOpen(false);
+          setSelectedProduct(product);
+        }}
       />
 
       {/* Checkout Modal */}
