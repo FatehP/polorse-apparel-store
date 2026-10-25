@@ -1070,7 +1070,7 @@ export default function Navbar({
           <div
             className="category-scroll-bar"
             style={{
-              maxWidth: '1360px',
+              maxWidth: '1680px',
               margin: '0 auto'
             }}
           >

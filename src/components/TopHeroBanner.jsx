@@ -90,9 +90,9 @@ export default function TopHeroBanner({ onSelectCategory }) {
   return (
     <div
       style={{
-        maxWidth: '1360px',
+        maxWidth: '1680px',
         margin: '16px auto 0',
-        padding: '0 16px',
+        padding: '0 24px',
         boxSizing: 'border-box'
       }}
       onTouchStart={handleTouchStart}
@@ -101,12 +101,12 @@ export default function TopHeroBanner({ onSelectCategory }) {
       <div
         style={{
           position: 'relative',
-          borderRadius: 'var(--radius-xl)',
+          borderRadius: '24px',
           overflow: 'hidden',
           background: slide.bgGradient,
-          minHeight: '220px',
-          boxShadow: '0 12px 36px rgba(15, 28, 63, 0.18)',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          minHeight: '230px',
+          boxShadow: '0 16px 40px rgba(15, 28, 63, 0.16)',
+          border: '1px solid rgba(255, 255, 255, 0.14)',
           transition: 'background 0.5s ease',
           display: 'flex',
           alignItems: 'center'

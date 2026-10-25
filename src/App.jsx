@@ -363,7 +363,7 @@ export default function App() {
           )}
 
           {/* Product Catalog Grid (Products First) */}
-          <section id="catalog" className="catalog-section" style={{ maxWidth: '1360px', margin: '0 auto', padding: '32px 24px 48px' }}>
+          <section id="catalog" className="catalog-section" style={{ maxWidth: '1680px', margin: '0 auto', padding: '32px 24px 48px' }}>
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
@@ -637,8 +637,8 @@ export default function App() {
             ) : (
               <div className="catalog-grid" style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '24px'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: '22px'
               }}>
                 {filteredProducts.map(product => (
                   <ProductCard
@@ -764,7 +764,7 @@ export default function App() {
         padding: '48px 24px 30px'
       }}>
         <div style={{
-          maxWidth: '1360px',
+          maxWidth: '1680px',
           margin: '0 auto',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
@@ -828,7 +828,7 @@ export default function App() {
         </div>
 
         <div style={{
-          maxWidth: '1360px',
+          maxWidth: '1680px',
           margin: '0 auto',
           borderTop: '1px solid var(--border-subtle)',
           paddingTop: '20px',

@@ -35,6 +35,8 @@
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
   --radius-full: 9999px;
 
   --transition-fast: 0.15s ease;
