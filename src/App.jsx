@@ -10,6 +10,7 @@ import AuthModal from './components/AuthModal';
 import UserProfileModal from './components/UserProfileModal';
 import MobileMenuDrawer from './components/MobileMenuDrawer';
 import CustomerSupportModal from './components/CustomerSupportModal';
+import TopHeroBanner from './components/TopHeroBanner';
 import { fetchProducts } from './services/storeService';
 import { getCurrentUser, logout } from './services/authService';
 import { ArrowDown, Flame, Sparkles, Shield, Truck, RefreshCw, Smartphone, SlidersHorizontal, X, RotateCcw, ArrowUpDown } from 'lucide-react';
@@ -93,23 +94,23 @@ export default function App() {
   useEffect(() => {
     if (isAnyModalActive) {
       const scrollY = window.scrollY;
-      const originalOverflow = document.body.style.overflow;
-      const originalPosition = document.body.style.position;
-      const originalTop = document.body.style.top;
-      const originalWidth = document.body.style.width;
-
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
 
       return () => {
-        document.body.style.position = originalPosition;
-        document.body.style.top = originalTop;
-        document.body.style.width = originalWidth;
-        document.body.style.overflow = originalOverflow;
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
         window.scrollTo(0, scrollY);
       };
+    } else {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
     }
   }, [isAnyModalActive]);
 
@@ -355,6 +356,11 @@ export default function App() {
         <AdminPortal onSwitchToStore={() => setActiveView('store')} />
       ) : (
         <main style={{ flex: 1 }}>
+          {/* Top Promotional Hero Banner */}
+          {!isWishlistFilterActive && (
+            <TopHeroBanner onSelectCategory={(cat) => setSelectedCategory(cat)} />
+          )}
+
           {/* Product Catalog Grid (Products First) */}
           <section id="catalog" className="catalog-section" style={{ maxWidth: '1360px', margin: '0 auto', padding: '32px 24px 48px' }}>
             <div style={{

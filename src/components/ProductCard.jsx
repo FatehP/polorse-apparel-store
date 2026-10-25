@@ -413,64 +413,43 @@ export default function ProductCard({
               </button>
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '6px' }}>
-              <button
-                type="button"
-                onClick={handleQuickAddClick}
-                style={{
-                  height: '38px',
-                  borderRadius: 'var(--radius-md)',
-                  background: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
-                  color: '#FAF7F2',
-                  fontSize: '0.82rem',
-                  fontWeight: '700',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: 'var(--shadow-sm)',
-                  transition: 'all 0.2s ease',
-                  cursor: 'pointer'
-                }}
-              >
-                {isAdded ? (
-                  <>
-                    <Check size={15} />
-                    <span>Added</span>
-                  </>
-                ) : (
-                  <>
-                    <ShoppingBag size={14} />
-                    <span>Add to Bag</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleBuyNowClick}
-                style={{
-                  height: '38px',
-                  padding: '0 12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'rgba(194, 26, 44, 0.08)',
-                  border: '1px solid rgba(194, 26, 44, 0.25)',
-                  color: 'var(--accent-red)',
-                  fontSize: '0.8rem',
-                  fontWeight: '800',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '4px',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-                title="Instant Buy Now with Express Checkout"
-              >
-                <Zap size={13} />
-                <span>Buy</span>
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleQuickAddClick}
+              className="product-card-add-btn"
+              style={{
+                width: '100%',
+                height: '38px',
+                borderRadius: 'var(--radius-md)',
+                background: isAdded ? 'var(--accent-green)' : 'var(--accent-navy)',
+                color: '#FAF7F2',
+                fontSize: '0.78rem',
+                fontWeight: '800',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: 'var(--shadow-sm)',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                cursor: 'pointer',
+                border: 'none',
+                boxSizing: 'border-box'
+              }}
+            >
+              {isAdded ? (
+                <>
+                  <Check size={14} />
+                  <span>Added to Bag</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={14} />
+                  <span>Add to Bag</span>
+                </>
+              )}
+            </button>
           )}
         </div>
       </div>

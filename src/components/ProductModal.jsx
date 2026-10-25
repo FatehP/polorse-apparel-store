@@ -86,29 +86,6 @@ export default function ProductModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [imageList.length]);
 
-  // Bulletproof iOS Body Scroll Lock: physically freeze body at current scroll position
-  useEffect(() => {
-    const scrollY = window.scrollY;
-    const body = document.body;
-    const prevPosition = body.style.position;
-    const prevTop = body.style.top;
-    const prevWidth = body.style.width;
-    const prevOverflow = body.style.overflow;
-
-    body.style.position = 'fixed';
-    body.style.top = `-${scrollY}px`;
-    body.style.width = '100%';
-    body.style.overflow = 'hidden';
-
-    return () => {
-      body.style.position = prevPosition;
-      body.style.top = prevTop;
-      body.style.width = prevWidth;
-      body.style.overflow = prevOverflow;
-      window.scrollTo(0, scrollY);
-    };
-  }, []);
-
   // Pincode Deliverability State
   const [pincodeInput, setPincodeInput] = useState('');
   const [pincodeResult, setPincodeResult] = useState(null);

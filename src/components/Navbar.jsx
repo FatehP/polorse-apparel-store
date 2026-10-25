@@ -554,33 +554,6 @@ export default function Navbar({
             </button>
           )}
 
-          {/* Support & Create Ticket Quick-Access Pill */}
-          {activeView === 'store' && (
-            <button
-              type="button"
-              onClick={() => onOpenSupport?.('ticket')}
-              id="navbar-support-shortcut-btn"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '7px 12px',
-                background: 'var(--bg-secondary)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-full)',
-                color: 'var(--text-primary)',
-                fontSize: '0.8rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              title="Customer Care & Support Tickets"
-            >
-              <LifeBuoy size={14} style={{ color: 'var(--accent-red)' }} />
-              <span className="nav-desktop-only">Support</span>
-            </button>
-          )}
-
           {/* Wishlist Button with Live Scale-Bounce Counter */}
           {activeView === 'store' && (
             <button
