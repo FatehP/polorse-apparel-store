@@ -8,6 +8,8 @@ import AdminPortal from './components/AdminPortal';
 import FilterDrawer from './components/FilterDrawer';
 import AuthModal from './components/AuthModal';
 import UserProfileModal from './components/UserProfileModal';
+import MobileMenuDrawer from './components/MobileMenuDrawer';
+import CustomerSupportModal from './components/CustomerSupportModal';
 import { fetchProducts } from './services/storeService';
 import { getCurrentUser, logout } from './services/authService';
 import { ArrowDown, Flame, Sparkles, Shield, Truck, RefreshCw, Smartphone, SlidersHorizontal, X, RotateCcw, ArrowUpDown } from 'lucide-react';
@@ -39,6 +41,16 @@ export default function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [profileModalInitialTab, setProfileModalInitialTab] = useState('profile');
 
+  // Mobile Sidebar Menu & Customer Support States
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+  const [supportModalInitialTab, setSupportModalInitialTab] = useState('ticket');
+
+  const handleOpenSupport = (tab = 'ticket') => {
+    setSupportModalInitialTab(tab);
+    setIsSupportModalOpen(true);
+  };
+
   // Wishlist State with LocalStorage Persistence
   const [wishlist, setWishlist] = useState(() => {
     try {
@@ -68,7 +80,16 @@ export default function App() {
   }, []);
 
   // Global mobile body scroll lock whenever any modal or drawer is active
-  const isAnyModalActive = Boolean(selectedProduct || isCartOpen || isFilterOpen || isCheckoutOpen || isAuthModalOpen || isProfileModalOpen);
+  const isAnyModalActive = Boolean(
+    selectedProduct ||
+    isCartOpen ||
+    isFilterOpen ||
+    isCheckoutOpen ||
+    isAuthModalOpen ||
+    isProfileModalOpen ||
+    isMobileMenuOpen ||
+    isSupportModalOpen
+  );
   useEffect(() => {
     if (isAnyModalActive) {
       const scrollY = window.scrollY;
@@ -324,6 +345,8 @@ export default function App() {
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onOpenProfile={handleOpenProfile}
+        onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+        onOpenSupport={handleOpenSupport}
         onLogout={handleLogout}
       />
 
@@ -891,6 +914,39 @@ export default function App() {
         totalProductsCount={products.length}
         filteredCount={filteredProducts.length}
         categoryCounts={categoryCounts}
+      />
+
+      {/* Mobile Sidebar Navigation Drawer (Beardo D2C Style) */}
+      <MobileMenuDrawer
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        currentUser={currentUser}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={(cat) => {
+          setIsWishlistFilterActive(false);
+          setSelectedCategory(cat);
+        }}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenProfile={handleOpenProfile}
+        onOpenSupport={handleOpenSupport}
+        onOpenOrders={() => handleOpenProfile('orders')}
+        onOpenWishlist={() => {
+          setIsWishlistFilterActive(true);
+          const catalogEl = document.getElementById('catalog');
+          if (catalogEl) catalogEl.scrollIntoView({ behavior: 'smooth' });
+        }}
+        wishlistCount={wishlist.length}
+      />
+
+      {/* Customer Care, Help Center & Create Support Ticket Modal */}
+      <CustomerSupportModal
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+        initialTab={supportModalInitialTab}
+        onOpenOrders={() => handleOpenProfile('orders')}
       />
     </div>
   );

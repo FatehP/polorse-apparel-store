@@ -17,7 +17,9 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
-  Tag
+  Tag,
+  Menu,
+  LifeBuoy
 } from 'lucide-react';
 
 export default function Navbar({
@@ -40,6 +42,8 @@ export default function Navbar({
   currentUser = null,
   onOpenAuth,
   onOpenProfile,
+  onOpenMobileMenu,
+  onOpenSupport,
   onLogout
 }) {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -176,31 +180,55 @@ export default function Navbar({
           transition: 'padding 0.25s ease'
         }}
       >
-        {/* Brand Logo & Tagline */}
-        <div
-          onClick={() => {
-            setActiveView('store');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          style={{
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            flexShrink: 0
-          }}
-        >
-          <img
-            src="/polorse-logo.jpg"
-            alt="POLORSE"
+        {/* Brand Logo & Mobile Menu Hamburger Button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={onOpenMobileMenu}
+            className="mobile-menu-btn"
+            id="mobile-hamburger-btn"
             style={{
-              height: isScrolled ? '38px' : '44px',
-              width: 'auto',
-              objectFit: 'contain',
-              display: 'block',
-              transition: 'height 0.2s ease'
+              width: '38px',
+              height: '38px',
+              borderRadius: 'var(--radius-md)',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-subtle)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-primary)',
+              boxShadow: 'var(--shadow-sm)',
+              cursor: 'pointer',
+              padding: 0
             }}
-          />
+            title="Open Mobile Navigation Menu"
+          >
+            <Menu size={20} />
+          </button>
+
+          <div
+            onClick={() => {
+              setActiveView('store');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              flexShrink: 0
+            }}
+          >
+            <img
+              src="/polorse-logo.jpg"
+              alt="POLORSE"
+              style={{
+                height: isScrolled ? '36px' : '42px',
+                width: 'auto',
+                objectFit: 'contain',
+                display: 'block',
+                transition: 'height 0.2s ease'
+              }}
+            />
+          </div>
         </div>
 
         {/* Center: Live Search Bar with Auto-Suggestions (Desktop) */}
@@ -526,6 +554,33 @@ export default function Navbar({
             </button>
           )}
 
+          {/* Support & Create Ticket Quick-Access Pill */}
+          {activeView === 'store' && (
+            <button
+              type="button"
+              onClick={() => onOpenSupport?.('ticket')}
+              id="navbar-support-shortcut-btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '7px 12px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--radius-full)',
+                color: 'var(--text-primary)',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              title="Customer Care & Support Tickets"
+            >
+              <LifeBuoy size={14} style={{ color: 'var(--accent-red)' }} />
+              <span className="nav-desktop-only">Support</span>
+            </button>
+          )}
+
           {/* Wishlist Button with Live Scale-Bounce Counter */}
           {activeView === 'store' && (
             <button
@@ -843,6 +898,29 @@ export default function Navbar({
                       >
                         <CreditCard size={15} style={{ color: 'var(--accent-navy)' }} />
                         <span>Saved Cards & UPI</span>
+                      </button>
+
+                      {/* Customer Care & Create Ticket */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsUserMenuOpen(false);
+                          onOpenSupport?.('ticket');
+                        }}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '10px 14px',
+                          color: 'var(--accent-red)',
+                          fontSize: '0.82rem',
+                          fontWeight: '700',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <LifeBuoy size={15} style={{ color: 'var(--accent-red)' }} />
+                        <span>Customer Care & Create Ticket</span>
                       </button>
 
                       <div style={{ height: '1px', background: 'var(--border-subtle)', margin: '4px 0' }} />
